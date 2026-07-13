@@ -1,0 +1,142 @@
+.header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  z-index: 100;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--foreground);
+  transition: transform var(--transition-fast);
+}
+
+.logo:hover {
+  transform: scale(1.02);
+}
+
+.logoIcon {
+  color: var(--primary);
+  filter: drop-shadow(0 0 8px rgba(230, 92, 0, 0.6));
+}
+
+.highlight {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.navLink {
+  color: var(--foreground-secondary);
+  font-weight: 500;
+  font-size: 15px;
+  transition: color var(--transition-fast);
+  position: relative;
+  padding: 6px 0;
+}
+
+.navLink:hover {
+  color: var(--foreground);
+}
+
+.customLink {
+  color: var(--primary);
+  border: 1px solid var(--surface-border-glow);
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(230, 92, 0, 0.05);
+}
+
+.customLink:hover {
+  background: rgba(230, 92, 0, 0.12);
+  border-color: var(--primary);
+  color: var(--primary-hover);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.staffLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--foreground-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.staffLink:hover {
+  color: var(--accent);
+  background: rgba(255, 59, 48, 0.08);
+}
+
+.cartButton {
+  position: relative;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 24px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: var(--background);
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  .nav {
+    display: none; /* Mobile view links hidden - will integrate inside responsive drawers */
+  }
+  .staffText {
+    display: none;
+  }
+  .staffLink {
+    padding: 8px;
+  }
+  .logoText {
+    display: none;
+  }
+}

@@ -1,0 +1,57 @@
+.wrapper {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  max-width: 500px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.iconCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(255, 59, 48, 0.1);
+}
+
+.icon {
+  color: var(--accent);
+}
+
+.card h2 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.description {
+  font-size: 15px;
+  color: var(--foreground-secondary);
+  line-height: 1.6;
+}
+
+.username {
+  color: var(--primary-hover);
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+}

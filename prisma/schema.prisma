@@ -1,0 +1,151 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         String   // "STAFF" | "ADMIN"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id           String     @id @default(uuid())
+  name         String     @unique
+  slug         String     @unique
+  description  String?
+  displayOrder Int        @default(0)
+  items        MenuItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model MenuItem {
+  id           String      @id @default(uuid())
+  name         String
+  slug         String      @unique
+  description  String?
+  basePrice    Float
+  imageUrl     String?
+  isPizza      Boolean     @default(false)
+  isAvailable  Boolean     @default(true)
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model PizzaSize {
+  id             String                   @id @default(uuid())
+  name           String                   @unique // Personal, Medium, Large
+  priceFactor    Float                    @default(1.0)
+  priceAdd       Float                    @default(0.0)
+  displayOrder   Int                      @default(0)
+  customizations OrderItemCustomization[]
+}
+
+model PizzaCrust {
+  id             String                   @id @default(uuid())
+  name           String                   @unique // Thin Crust, Pan, Stuffed Crust
+  price          Float                    @default(0.0)
+  displayOrder   Int                      @default(0)
+  customizations OrderItemCustomization[]
+}
+
+model PizzaSauce {
+  id             String                   @id @default(uuid())
+  name           String                   @unique // Classic Tomato, White Garlic, BBQ
+  price          Float                    @default(0.0)
+  displayOrder   Int                      @default(0)
+  customizations OrderItemCustomization[]
+}
+
+model PizzaTopping {
+  id            String             @id @default(uuid())
+  name          String             @unique
+  price         Float              @default(0.0)
+  isVegetarian  Boolean            @default(false)
+  isVegan       Boolean            @default(false)
+  isAvailable   Boolean            @default(true)
+  orderToppings OrderItemTopping[]
+}
+
+model PizzaAddon {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  price       Float            @default(0.0)
+  isAvailable Boolean          @default(true)
+  orderAddons OrderItemAddon[]
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  orderNumber      String      @unique // Human-readable e.g. token "045"
+  customerName     String
+  customerPhone    String?
+  status           String      @default("RECEIVED") // RECEIVED, PREPARING, READY, COMPLETED
+  estimatedPrepMin Int         @default(20)
+  subtotal         Float
+  tax              Float
+  total            Float
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  items            OrderItem[]
+}
+
+model OrderItem {
+  id            String                  @id @default(uuid())
+  orderId       String
+  order         Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId    String
+  menuItem      MenuItem                @relation(fields: [menuItemId], references: [id])
+  quantity      Int                     @default(1)
+  unitPrice     Float
+  totalPrice    Float
+  notes         String?
+  customization OrderItemCustomization?
+}
+
+model OrderItemCustomization {
+  id          String             @id @default(uuid())
+  orderItemId String             @unique
+  orderItem   OrderItem          @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  sizeId      String?
+  size        PizzaSize?         @relation(fields: [sizeId], references: [id])
+  crustId     String?
+  crust       PizzaCrust?        @relation(fields: [crustId], references: [id])
+  sauceId     String?
+  sauce       PizzaSauce?        @relation(fields: [sauceId], references: [id])
+  toppings    OrderItemTopping[]
+  addons      OrderItemAddon[]
+}
+
+model OrderItemTopping {
+  id                       String                 @id @default(uuid())
+  orderItemCustomizationId String
+  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
+  toppingId                String
+  topping                  PizzaTopping           @relation(fields: [toppingId], references: [id])
+}
+
+model OrderItemAddon {
+  id                       String                 @id @default(uuid())
+  orderItemCustomizationId String
+  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
+  addonId                  String
+  addon                    PizzaAddon             @relation(fields: [addonId], references: [id])
+}
+
+model SystemConfig {
+  key   String @id
+  value String
+}
