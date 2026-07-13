@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Order } from "@/types";
 import { SessionUser } from "@/lib/session";
 import { Search, LogOut, Check, ArrowRight, ShieldAlert, Sparkles, Phone, MessageSquare } from "lucide-react";
-import styles from "./StaffDashboard.module.css";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface StaffDashboardContainerProps {
   user: SessionUser;
@@ -21,7 +21,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
   
   const prevOrdersCount = useRef<number | null>(null);
 
-  // Web Audio API beep synthesis (pure JS, no audio files needed, works offline)
+  // Web Audio API beep synthesis (pure JS, no audio files needed)
   const playNotificationSound = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -80,7 +80,6 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
 
       // Check if new orders arrived to play sound cue
       if (prevOrdersCount.current !== null && nextOrders.length > prevOrdersCount.current) {
-        // Find if the new orders are RECEIVED orders
         const receivedOrdersCount = nextOrders.filter((o: Order) => o.status === "RECEIVED").length;
         const prevReceivedCount = orders.filter((o: Order) => o.status === "RECEIVED").length;
         if (receivedOrdersCount > prevReceivedCount) {
@@ -163,10 +162,10 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "RECEIVED": return styles.badgeReceived;
-      case "PREPARING": return styles.badgePreparing;
-      case "READY": return styles.badgeReady;
-      case "COMPLETED": return styles.badgeCompleted;
+      case "RECEIVED": return "bg-brand-red/10 text-brand-red border-brand-red/20";
+      case "PREPARING": return "bg-brand-orange/10 text-brand-orange border-brand-orange/20";
+      case "READY": return "bg-brand-green/10 text-brand-green border-brand-green/20";
+      case "COMPLETED": return "bg-brand-dark/10 text-brand-dark/60 border-brand-dark/15";
       default: return "";
     }
   };
@@ -181,201 +180,237 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
   };
 
   return (
-    <div className={styles.wrapper}>
-      {/* Top dashboard header info bar */}
-      <header className={`${styles.header} glass-elevated`}>
-        <div className={styles.headerLeft}>
-          <div className={styles.crewTitle}>
-            <Sparkles className={styles.sparkleIcon} />
-            <h2>Kitchen Queue Dashboard</h2>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+      
+      {/* Top dashboard header bar */}
+      <header className="bg-white rounded-2xl p-6 shadow-sm border border-brand-dark/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-brand-orange" />
+            <h2 className="text-xl font-extrabold text-brand-dark">Kitchen Queue Dashboard</h2>
           </div>
-          <span className={styles.userTag}>
-            Welcome, <strong>{user.name}</strong> ({user.role})
+          <span className="text-xs text-brand-dark/50 font-semibold">
+            Signed in as: <strong className="text-brand-dark/80 font-bold">{user.name}</strong> ({user.role})
           </span>
         </div>
 
-        <div className={styles.headerRight}>
+        <div className="flex items-center gap-3 w-full md:w-auto">
           {user.role === "ADMIN" && (
             <button
               onClick={() => router.push("/admin")}
-              className="btn btn-secondary"
-              style={{ borderColor: "rgba(255, 149, 0, 0.4)", color: "var(--warning)" }}
+              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-orange/20 hover:border-brand-orange text-brand-orange text-xs font-bold transition-colors cursor-pointer"
             >
-              <ShieldAlert size={16} />
+              <ShieldAlert className="w-4 h-4" />
               <span>Admin Panel</span>
             </button>
           )}
 
-          <button onClick={handleLogout} className={`${styles.logoutBtn} btn btn-secondary`}>
-            <LogOut size={16} />
+          <button 
+            onClick={handleLogout} 
+            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-dark hover:text-white text-brand-dark/70 hover:border-brand-dark text-xs font-bold transition-all cursor-pointer active:scale-95"
+          >
+            <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </button>
         </div>
       </header>
 
-      {/* Main content grid */}
-      <div className={styles.dashboardContent}>
-        {/* Sidebar filters and controls */}
-        <div className={`${styles.sidebar} glass`}>
-          <div className={styles.searchBox}>
-            <Search size={18} className={styles.searchIcon} />
+      {/* Main dashboard content */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Sidebar filters and controls (3 Columns) */}
+        <div className="lg:col-span-3 flex flex-col gap-6 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5">
+          
+          {/* Search Box */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-dark/40" />
             <input
               type="text"
               placeholder="Search token / name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/40 border border-transparent focus:border-brand-red/20 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
             />
           </div>
 
-          <div className={styles.filtersList}>
-            <h4 className={styles.sidebarSectionTitle}>Order Status Filters</h4>
+          {/* Filter list */}
+          <div className="flex flex-col gap-1.5">
+            <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-brand-dark/40 mb-1 px-1">
+              Order Status Filters
+            </h4>
             {[
               { label: "Active Orders", value: "ACTIVE" },
               { label: "Received", value: "RECEIVED" },
               { label: "Preparing", value: "PREPARING" },
               { label: "Ready at Counter", value: "READY" },
               { label: "Completed", value: "COMPLETED" },
-            ].map((f) => (
-              <button
-                key={f.value}
-                onClick={() => setStatusFilter(f.value)}
-                className={`${styles.filterBtn} ${
-                  statusFilter === f.value ? styles.filterBtnActive : ""
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+            ].map((f) => {
+              const isActive = statusFilter === f.value;
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => setStatusFilter(f.value)}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? "bg-brand-red text-white shadow-sm shadow-brand-red/20"
+                      : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/95 hover:text-brand-dark"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Orders Cards Grid */}
-        <div className={styles.queueArea}>
+        {/* Orders Queue list (9 Columns) */}
+        <div className="lg:col-span-9 flex flex-col gap-4">
+          
           {errorMsg && (
-            <div className={styles.errorAlert}>
-              <span>{errorMsg}</span>
+            <div className="p-4 rounded-xl bg-brand-red/10 border border-brand-red/25 text-brand-red text-xs font-bold">
+              {errorMsg}
             </div>
           )}
 
           {isLoading ? (
-            <div className={styles.loaderContainer}>
-              <div className={styles.spinner}></div>
-              <p>Syncing kitchen database...</p>
+            <div className="flex flex-col items-center justify-center text-center p-12 bg-white rounded-2xl border border-brand-dark/5 shadow-xs">
+              <div className="w-8 h-8 rounded-full border-4 border-brand-red/20 border-t-brand-red animate-spin mb-3"></div>
+              <p className="text-xs text-brand-dark/50 font-bold">Syncing kitchen database...</p>
             </div>
           ) : orders.length > 0 ? (
-            <div className={styles.orderGrid}>
-              {orders.map((order) => {
-                // Calculate elapsed minutes since order creation
-                const minutesElapsed = Math.floor(
-                  (Date.now() - new Date(order.createdAt).getTime()) / 60000
-                );
-                
-                return (
-                  <div
-                    key={order.id}
-                    className={`${styles.orderCard} glass ${
-                      order.status === "RECEIVED" ? styles.newOrderBorder : ""
-                    }`}
-                  >
-                    <div className={styles.cardHeader}>
-                      <div className={styles.tokenCircle}>
-                        <span>{order.orderNumber}</span>
-                      </div>
-                      <div className={styles.cardMeta}>
-                        <span className={`${styles.statusBadge} ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                        <span className={styles.timeElapsed}>
-                          {minutesElapsed === 0 ? "Just now" : `${minutesElapsed}m ago`}
-                        </span>
-                      </div>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <AnimatePresence>
+                {orders.map((order) => {
+                  const minutesElapsed = Math.floor(
+                    (Date.now() - new Date(order.createdAt).getTime()) / 60000
+                  );
+                  const isNew = order.status === "RECEIVED";
 
-                    <div className={styles.cardCustomer}>
-                      <span className={styles.customerName}>{order.customerName}</span>
-                      {order.customerPhone && (
-                        <div className={styles.customerPhone}>
-                          <Phone size={12} />
-                          <span>{order.customerPhone}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Order Items list */}
-                    <div className={styles.cardItems}>
-                      {order.items?.map((item) => (
-                        <div key={item.id} className={styles.itemRow}>
-                          <div className={styles.itemTitle}>
-                            <span className={styles.itemQty}>{item.quantity}x</span>
-                            <span className={styles.itemNameText}>{item.menuItem.name}</span>
+                  return (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      key={order.id}
+                      className={`bg-white rounded-2xl shadow-xs border-2 flex flex-col justify-between overflow-hidden ${
+                        isNew ? "border-brand-red shadow-md shadow-brand-red/5" : "border-brand-dark/5"
+                      }`}
+                    >
+                      {/* Header block */}
+                      <div className="p-5 bg-brand-light border-b border-brand-dark/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-full bg-brand-red text-white flex items-center justify-center text-base font-extrabold shadow-sm shadow-brand-red/25 shrink-0">
+                            {order.orderNumber}
                           </div>
-                          
-                          {item.customization && (
-                            <div className={styles.itemCustomizations}>
-                              <p>
-                                {item.customization.size?.name} • {item.customization.crust?.name}
-                              </p>
-                              <p>Sauce: {item.customization.sauce?.name}</p>
-                              {item.customization.toppings.length > 0 && (
-                                <p>
-                                  Toppings:{" "}
-                                  {item.customization.toppings.map((t) => t.topping.name).join(", ")}
-                                </p>
-                              )}
-                              {item.customization.addons.length > 0 && (
-                                <p>
-                                  Add-ons:{" "}
-                                  {item.customization.addons.map((a) => a.addon.name).join(", ")}
-                                </p>
-                              )}
-                            </div>
-                          )}
-
-                          {item.notes && (
-                            <div className={styles.notesBox}>
-                              <MessageSquare size={12} className={styles.notesIcon} />
-                              <span className={styles.notesText}>{item.notes}</span>
-                            </div>
-                          )}
+                          <div className="flex flex-col">
+                            <span className="text-sm font-extrabold text-brand-dark truncate max-w-[120px] sm:max-w-none">
+                              {order.customerName}
+                            </span>
+                            {order.customerPhone && (
+                              <div className="flex items-center gap-1 text-[10px] text-brand-dark/45 mt-0.5 font-semibold">
+                                <Phone className="w-3 h-3 text-brand-orange" />
+                                <span>{order.customerPhone}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      ))}
-                    </div>
 
-                    {/* Card Footer actions */}
-                    <div className={styles.cardFooter}>
-                      <div className={styles.priceSection}>
-                        <span>Total</span>
-                        <strong>${order.total.toFixed(2)}</strong>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
+                          <span className="text-[10px] font-semibold text-brand-dark/40">
+                            {minutesElapsed === 0 ? "Just now" : `${minutesElapsed}m ago`}
+                          </span>
+                        </div>
                       </div>
 
-                      {order.status !== "COMPLETED" ? (
-                        <button
-                          onClick={() => handleUpdateStatus(order.id, order.status)}
-                          className={`${styles.actionBtn} btn btn-primary`}
-                        >
-                          <span>{getActionLabel(order.status)}</span>
-                          <ArrowRight size={14} />
-                        </button>
-                      ) : (
-                        <div className={styles.completedIndicator}>
-                          <Check size={14} />
-                          <span>Collected</span>
+                      {/* Items list */}
+                      <div className="p-5 flex-1 flex flex-col gap-3.5 divide-y divide-brand-dark/5">
+                        {order.items?.map((item) => (
+                          <div key={item.id} className="flex flex-col gap-1 text-xs pt-3.5 first:pt-0 first:border-t-0">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-extrabold text-brand-red bg-brand-red/5 px-1.5 py-0.5 rounded text-[10px]">
+                                  {item.quantity}x
+                                </span>
+                                <span className="font-bold text-brand-dark leading-tight">
+                                  {item.menuItem.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {item.customization && (
+                              <div className="text-[10px] text-brand-dark/50 flex flex-col gap-0.5 pl-6 mt-1">
+                                <p>{item.customization.size?.name} • {item.customization.crust?.name}</p>
+                                <p>Sauce: {item.customization.sauce?.name}</p>
+                                {item.customization.toppings.length > 0 && (
+                                  <p>
+                                    Toppings:{" "}
+                                    {item.customization.toppings.map((t) => t.topping.name).join(", ")}
+                                  </p>
+                                )}
+                                {item.customization.addons.length > 0 && (
+                                  <p>
+                                    Add-ons:{" "}
+                                    {item.customization.addons.map((a) => a.addon.name).join(", ")}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+
+                            {item.notes && (
+                              <div className="flex items-start gap-1 p-2 rounded bg-brand-orange/5 border border-brand-orange/10 text-brand-orange text-[10px] mt-1.5 ml-6">
+                                <MessageSquare className="w-3 h-3 shrink-0 mt-0.5" />
+                                <span className="italic leading-normal">Note: {item.notes}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Card Actions Footer */}
+                      <div className="p-5 bg-brand-light border-t border-brand-dark/5 flex items-center justify-between gap-4 mt-auto">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-brand-dark/40">Total</span>
+                          <strong className="text-sm font-extrabold text-brand-dark">
+                            ${order.total.toFixed(2)}
+                          </strong>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+
+                        {order.status !== "COMPLETED" ? (
+                          <button
+                            onClick={() => handleUpdateStatus(order.id, order.status)}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[11px] shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-95"
+                          >
+                            <span>{getActionLabel(order.status)}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-1 text-[11px] font-bold text-brand-green bg-brand-green/5 px-3 py-1.5 rounded-lg border border-brand-green/20">
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Collected</span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           ) : (
-            <div className={`${styles.emptyState} glass`}>
-              <h3>No Active Orders</h3>
-              <p>Kitchen queue is clean! Sit back or check search parameters.</p>
+            <div className="flex flex-col items-center justify-center text-center p-12 bg-white rounded-2xl border border-brand-dark/5 shadow-xs">
+              <h3 className="text-sm font-bold text-brand-dark">No active orders</h3>
+              <p className="text-xs text-brand-dark/50 max-w-sm mt-1 leading-relaxed">
+                Kitchen queue is clean! Sit back or check search parameters.
+              </p>
             </div>
           )}
         </div>
+
       </div>
+
     </div>
   );
 }

@@ -13,12 +13,14 @@ import {
   LogOut,
   Plus,
   Trash2,
-  Edit2,
   CheckCircle2,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Pizza,
+  Store,
+  ChevronRight
 } from "lucide-react";
-import styles from "./AdminDashboard.module.css";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AdminDashboardContainerProps {
   user: any;
@@ -339,152 +341,168 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
     router.refresh();
   };
 
+  const getStatusBadgeStyles = (status: string) => {
+    switch (status) {
+      case "RECEIVED": return "bg-brand-red/10 text-brand-red border-brand-red/20";
+      case "PREPARING": return "bg-brand-orange/10 text-brand-orange border-brand-orange/20";
+      case "READY": return "bg-brand-green/10 text-brand-green border-brand-green/20";
+      case "COMPLETED": return "bg-brand-dark/10 text-brand-dark/60 border-brand-dark/15";
+      default: return "";
+    }
+  };
+
   return (
-    <div className={styles.wrapper}>
+    <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+      
       {/* Sidebar Navigation */}
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>
-          <TrendingUp className={styles.brandIcon} />
-          <h2>Admin Control</h2>
+      <aside className="w-full lg:w-64 bg-white rounded-2xl p-5 shadow-sm border border-brand-dark/5 flex flex-col gap-6 shrink-0">
+        <div className="flex items-center gap-2 border-b border-brand-dark/5 pb-4">
+          <TrendingUp className="w-5 h-5 text-brand-red" />
+          <h2 className="text-base font-extrabold text-brand-dark">Admin Control</h2>
         </div>
 
-        <nav className={styles.nav}>
-          <button
-            onClick={() => { setActiveTab("analytics"); clearAlerts(); }}
-            className={`${styles.navItem} ${activeTab === "analytics" ? styles.navActive : ""}`}
-          >
-            <PieChart size={18} />
-            <span>Dashboard & Stats</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("menu"); clearAlerts(); }}
-            className={`${styles.navItem} ${activeTab === "menu" ? styles.navActive : ""}`}
-          >
-            <Grid size={18} />
-            <span>Menu & Categories</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("config"); clearAlerts(); }}
-            className={`${styles.navItem} ${activeTab === "config" ? styles.navActive : ""}`}
-          >
-            <Settings size={18} />
-            <span>Pizza Builder Config</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("users"); clearAlerts(); }}
-            className={`${styles.navItem} ${activeTab === "users" ? styles.navActive : ""}`}
-          >
-            <Users size={18} />
-            <span>Staff & Accounts</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("orders"); clearAlerts(); }}
-            className={`${styles.navItem} ${activeTab === "orders" ? styles.navActive : ""}`}
-          >
-            <ShoppingBag size={18} />
-            <span>Order History</span>
-          </button>
+        <nav className="flex flex-col gap-1 w-full">
+          {[
+            { id: "analytics", label: "Dashboard & Stats", icon: <PieChart className="w-4.5 h-4.5" /> },
+            { id: "menu", label: "Menu & Categories", icon: <Grid className="w-4.5 h-4.5" /> },
+            { id: "config", label: "Pizza Customizer", icon: <Settings className="w-4.5 h-4.5" /> },
+            { id: "users", label: "Staff & Logins", icon: <Users className="w-4.5 h-4.5" /> },
+            { id: "orders", label: "Order History", icon: <ShoppingBag className="w-4.5 h-4.5" /> }
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveTab(tab.id as any); clearAlerts(); }}
+                className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? "bg-brand-red text-white shadow-sm shadow-brand-red/20"
+                    : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/95 hover:text-brand-dark"
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        <div className={styles.sidebarFooter}>
-          <button onClick={() => router.push("/staff")} className="btn btn-secondary" style={{ width: "100%", justifyContent: "flex-start", marginBottom: "8px" }}>
-            <span>Kitchen Dashboard</span>
+        <div className="flex flex-col gap-2 border-t border-brand-dark/5 pt-5">
+          <button 
+            onClick={() => router.push("/staff")} 
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-light text-brand-dark/80 text-xs font-bold transition-all cursor-pointer"
+          >
+            <Store className="w-4 h-4 text-brand-orange" />
+            <span>Kitchen Queue</span>
           </button>
-          <button onClick={handleLogout} className={`${styles.logoutBtn} btn btn-secondary`} style={{ width: "100%", justifyContent: "flex-start" }}>
-            <LogOut size={16} />
+          
+          <button 
+            onClick={handleLogout} 
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-red/5 hover:bg-brand-red hover:text-white text-brand-red text-xs font-bold transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Workspace content */}
-      <main className={styles.workspace}>
-        {actionSuccess && (
-          <div className={`${styles.alert} ${styles.alertSuccess} glass`}>
-            <CheckCircle2 size={16} />
-            <span>{actionSuccess}</span>
-          </div>
-        )}
+      <main className="flex-1 w-full flex flex-col gap-6">
+        
+        {/* Success/Error Alerts */}
+        <AnimatePresence>
+          {actionSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-green/10 border border-brand-green/20 text-brand-green text-sm font-semibold"
+            >
+              <CheckCircle2 className="w-4.5 h-4.5 shrink-0" />
+              <span>{actionSuccess}</span>
+            </motion.div>
+          )}
 
-        {actionError && (
-          <div className={`${styles.alert} ${styles.alertError} glass`}>
-            <AlertCircle size={16} />
-            <span>{actionError}</span>
-          </div>
-        )}
+          {actionError && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-red/10 border border-brand-red/20 text-brand-red text-sm font-semibold"
+            >
+              <AlertCircle className="w-4.5 h-4.5 shrink-0" />
+              <span>{actionError}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* 1. TAB: ANALYTICS */}
         {activeTab === "analytics" && (
-          <div className={styles.tabContent}>
-            <h1 className={styles.tabTitle}>Sales Analytics Overview</h1>
-            <p className={styles.tabSubtitle}>Live statistics for your physical branch.</p>
-
-            <div className={styles.kpiGrid}>
-              <div className={`${styles.kpiCard} glass`}>
-                <DollarSign className={styles.kpiIcon} style={{ color: "var(--success)" }} />
-                <div className={styles.kpiInfo}>
-                  <span>Total Sales</span>
-                  <h3>${analytics.totalRevenue.toFixed(2)}</h3>
-                </div>
-              </div>
-
-              <div className={`${styles.kpiCard} glass`}>
-                <ShoppingBag className={styles.kpiIcon} style={{ color: "var(--primary)" }} />
-                <div className={styles.kpiInfo}>
-                  <span>Total Orders Placed</span>
-                  <h3>{analytics.orderCount}</h3>
-                </div>
-              </div>
-
-              <div className={`${styles.kpiCard} glass`}>
-                <TrendingUp className={styles.kpiIcon} style={{ color: "var(--warning)" }} />
-                <div className={styles.kpiInfo}>
-                  <span>Average Ticket Value</span>
-                  <h3>${analytics.avgOrderValue.toFixed(2)}</h3>
-                </div>
-              </div>
-
-              <div className={`${styles.kpiCard} glass`}>
-                <Calendar className={styles.kpiIcon} style={{ color: "#34c759" }} />
-                <div className={styles.kpiInfo}>
-                  <span>Today's Sales</span>
-                  <h3>${analytics.todayRevenue.toFixed(2)}</h3>
-                  <small style={{ color: "var(--foreground-secondary)" }}>{analytics.todayCount} orders</small>
-                </div>
-              </div>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h1 className="text-xl font-extrabold text-brand-dark">Sales Analytics Overview</h1>
+              <p className="text-xs text-brand-dark/50 font-medium">Live metrics for your in-store pizzeria branch.</p>
             </div>
 
-            <div className={styles.analyticsDetailGrid}>
-              {/* Popular Items */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Top 5 Menu Items</h3>
-                <div className={styles.popularTable}>
+            {/* KPI Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: "Total Sales", val: `$${analytics.totalRevenue.toFixed(2)}`, icon: <DollarSign className="w-5 h-5 text-brand-green" />, bg: "bg-brand-green/5" },
+                { label: "Total Orders", val: analytics.orderCount, icon: <ShoppingBag className="w-5 h-5 text-brand-red" />, bg: "bg-brand-red/5" },
+                { label: "Avg. Ticket Value", val: `$${analytics.avgOrderValue.toFixed(2)}`, icon: <TrendingUp className="w-5 h-5 text-brand-orange" />, bg: "bg-brand-orange/5" },
+                { label: "Today's Sales", val: `$${analytics.todayRevenue.toFixed(2)}`, icon: <Calendar className="w-5 h-5 text-brand-yellow" />, bg: "bg-brand-yellow/5", sub: `${analytics.todayCount} orders` }
+              ].map((kpi, idx) => (
+                <div key={idx} className="bg-white rounded-2xl p-5 shadow-xs border border-brand-dark/5 flex items-center gap-4">
+                  <div className={`w-11 h-11 rounded-full ${kpi.bg} flex items-center justify-center shrink-0`}>
+                    {kpi.icon}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-bold text-brand-dark/40">{kpi.label}</span>
+                    <h3 className="text-lg font-extrabold text-brand-dark mt-0.5">{kpi.val}</h3>
+                    {kpi.sub && <small className="text-[10px] text-brand-dark/40 font-semibold">{kpi.sub}</small>}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Popular and Live info grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+              {/* Popular Items Panel */}
+              <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Top 5 Gourmet Items</h3>
+                <div className="flex flex-col gap-2">
                   {analytics.popularItems.map((item, index) => (
-                    <div key={index} className={styles.popularRow}>
-                      <span className={styles.rankNum}>#{index + 1}</span>
-                      <span className={styles.rankName}>{item.name}</span>
-                      <span className={styles.rankQty}>{item.qty} sold</span>
-                      <strong className={styles.rankRevenue}>${item.revenue.toFixed(2)}</strong>
+                    <div key={index} className="flex items-center justify-between p-3.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex items-center gap-3">
+                        <span className="w-5 h-5 rounded bg-brand-red/5 text-brand-red text-[10px] font-extrabold flex items-center justify-center">
+                          #{index + 1}
+                        </span>
+                        <span className="font-bold text-brand-dark">{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-brand-dark/50">{item.qty} sold</span>
+                        <strong className="text-brand-red font-bold">${item.revenue.toFixed(2)}</strong>
+                      </div>
                     </div>
                   ))}
-                  {analytics.popularItems.length === 0 && <p className={styles.noData}>No orders recorded yet.</p>}
+                  {analytics.popularItems.length === 0 && (
+                    <p className="text-xs text-brand-dark/40 italic py-4 text-center">No transactions recorded yet.</p>
+                  )}
                 </div>
               </div>
 
-              {/* Quick Info card */}
-              <div className={`${styles.panel} glass-elevated`} style={{ borderLeft: "4px solid var(--primary)" }}>
-                <h3 className={styles.panelTitle}>Branch Live Status</h3>
-                <div className={styles.liveMeta}>
-                  <p>Estimated prep calculation triggers automatically based on pending table orders.</p>
-                  <ul>
-                    <li>Base Prep: 15 minutes</li>
-                    <li>Prep Time Increments: +5 minutes per cooking order in queue</li>
+              {/* Prep logic quick info card */}
+              <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 border-l-4 border-l-brand-orange flex flex-col gap-3 justify-center">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Branch Prep Engine</h3>
+                <div className="text-xs text-brand-dark/65 flex flex-col gap-2 leading-relaxed">
+                  <p>Prep time is computed dynamically based on cooking orders in queue:</p>
+                  <ul className="list-disc pl-4 flex flex-col gap-1 font-bold text-brand-dark/80">
+                    <li>Base Prep Time: 15 minutes</li>
+                    <li>Increments: +5 minutes per pending order</li>
                   </ul>
-                  <p style={{ marginTop: "16px" }}>Use this administration panel to edit catalog items, config prices, and manage crew credential access.</p>
+                  <p className="mt-2 text-brand-dark/50">
+                    Use this center to manage categories, menu listings, customizer parameters, and staff dashboard credentials.
+                  </p>
                 </div>
               </div>
             </div>
@@ -493,313 +511,454 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
 
         {/* 2. TAB: MENU & CATEGORIES CRUD */}
         {activeTab === "menu" && (
-          <div className={styles.tabContent}>
-            <h1 className={styles.tabTitle}>Catalog Management</h1>
-            <p className={styles.tabSubtitle}>Manage your pizza categories and menu listings.</p>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h1 className="text-xl font-extrabold text-brand-dark">Catalog Management</h1>
+              <p className="text-xs text-brand-dark/50 font-medium">Configure categories and gourmet food listings.</p>
+            </div>
 
-            <div className={styles.editorSplit}>
-              {/* Left Column: Category Control */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Categories</h3>
-                <form onSubmit={handleAddCategory} className={styles.editorForm}>
-                  <div className={styles.formRow}>
-                    <input type="text" placeholder="Category Name" value={newCatName} onChange={e => setNewCatName(e.target.value)} required className={styles.input} />
-                    <input type="text" placeholder="Slug (lowercase)" value={newCatSlug} onChange={e => setNewCatSlug(e.target.value)} required className={styles.input} />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Category Control Panel */}
+              <div className="lg:col-span-5 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-5">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Categories</h3>
+                <form onSubmit={handleAddCategory} className="flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Name" 
+                      value={newCatName} 
+                      onChange={e => setNewCatName(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Slug (lowercase)" 
+                      value={newCatSlug} 
+                      onChange={e => setNewCatSlug(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
                   </div>
-                  <input type="text" placeholder="Short description" value={newCatDesc} onChange={e => setNewCatDesc(e.target.value)} className={styles.input} />
-                  <input type="number" placeholder="Sort Order" value={newCatOrder} onChange={e => setNewCatOrder(e.target.value)} className={styles.input} />
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
-                    <Plus size={16} />
+                  <input 
+                    type="text" 
+                    placeholder="Short description" 
+                    value={newCatDesc} 
+                    onChange={e => setNewCatDesc(e.target.value)} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Display Sort Order" 
+                    value={newCatOrder} 
+                    onChange={e => setNewCatOrder(e.target.value)} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                    <Plus className="w-4 h-4" />
                     <span>Create Category</span>
                   </button>
                 </form>
 
-                <div className={styles.listRows} style={{ marginTop: "24px" }}>
+                {/* List rows */}
+                <div className="flex flex-col gap-2 mt-2 max-h-[300px] overflow-y-auto pr-1">
                   {categories.map((c) => (
-                    <div key={c.id} className={styles.dataRow}>
-                      <div>
-                        <strong>{c.name}</strong> <span style={{ color: "var(--foreground-secondary)", fontSize: "12px" }}>/{c.slug}</span>
-                        {c.description && <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>{c.description}</p>}
+                    <div key={c.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{c.name} <strong className="text-brand-dark/40 font-bold">/{c.slug}</strong></span>
+                        {c.description && <p className="text-[10px] text-brand-dark/50 leading-tight mt-0.5">{c.description}</p>}
                       </div>
-                      <button onClick={() => handleDeleteCategory(c.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeleteCategory(c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Right Column: Menu Listing Control */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Add Menu Listing</h3>
-                <form onSubmit={handleAddMenuItem} className={styles.editorForm}>
-                  <div className={styles.formRow}>
-                    <input type="text" placeholder="Item Name" value={newItemName} onChange={e => setNewItemName(e.target.value)} required className={styles.input} />
-                    <input type="text" placeholder="URL Slug" value={newItemSlug} onChange={e => setNewItemSlug(e.target.value)} required className={styles.input} />
+              {/* Menu listings controller (7 Columns) */}
+              <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-5">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Add Menu Listing</h3>
+                <form onSubmit={handleAddMenuItem} className="flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Item Name" 
+                      value={newItemName} 
+                      onChange={e => setNewItemName(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="URL Slug" 
+                      value={newItemSlug} 
+                      onChange={e => setNewItemSlug(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
                   </div>
-                  <div className={styles.formRow}>
-                    <input type="number" step="0.01" placeholder="Base Price ($)" value={newItemPrice} onChange={e => setNewItemPrice(e.target.value)} required className={styles.input} />
-                    <select value={newItemCat} onChange={e => setNewItemCat(e.target.value)} className={styles.input}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="number" 
+                      step="0.01" 
+                      placeholder="Base Price ($)" 
+                      value={newItemPrice} 
+                      onChange={e => setNewItemPrice(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
+                    <select 
+                      value={newItemCat} 
+                      onChange={e => setNewItemCat(e.target.value)} 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    >
                       <option value="">-- Choose Category --</option>
                       {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <input type="text" placeholder="Listing description ingredients" value={newItemDesc} onChange={e => setNewItemDesc(e.target.value)} className={styles.input} />
+                  <input 
+                    type="text" 
+                    placeholder="Listing description ingredients" 
+                    value={newItemDesc} 
+                    onChange={e => setNewItemDesc(e.target.value)} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
                   
-                  <div className={styles.checkboxLabel}>
-                    <input type="checkbox" id="isPizza" checked={newItemIsPizza} onChange={e => setNewItemIsPizza(e.target.checked)} />
-                    <label htmlFor="isPizza">This is a custom Pizza (enable customization options)</label>
+                  <div className="flex items-center gap-2 text-xs font-semibold text-brand-dark/70 py-1">
+                    <input 
+                      type="checkbox" 
+                      id="isPizza" 
+                      checked={newItemIsPizza} 
+                      onChange={e => setNewItemIsPizza(e.target.checked)} 
+                      className="rounded text-brand-red focus:ring-brand-red/30"
+                    />
+                    <label htmlFor="isPizza">This is a custom Pizza (enable Visual Customizer)</label>
                   </div>
 
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
-                    <Plus size={16} />
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                    <Plus className="w-4 h-4" />
                     <span>Create Menu Listing</span>
                   </button>
                 </form>
 
-                <h3 className={styles.panelTitle} style={{ marginTop: "32px" }}>Active Menu Items</h3>
-                <div className={styles.listRows}>
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider border-t border-brand-dark/5 pt-5 mt-2">
+                  Active Listings
+                </h3>
+                <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
                   {menuItems.map((item) => (
-                    <div key={item.id} className={styles.dataRow}>
-                      <div>
-                        <strong>{item.name}</strong> <span style={{ color: "var(--primary)", fontSize: "14px", marginLeft: "10px" }}>${item.basePrice.toFixed(2)}</span>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>
+                    <div key={item.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{item.name} <strong className="text-brand-red ml-1">${item.basePrice.toFixed(2)}</strong></span>
+                        <p className="text-[10px] text-brand-dark/50 font-bold">
                           Category: {categories.find((c) => c.id === item.categoryId)?.name || "Unknown"}
-                          {item.isPizza && <strong style={{ color: "var(--warning)", marginLeft: "10px" }}>[PIZZA]</strong>}
+                          {item.isPizza && <span className="text-brand-orange ml-2">[PIZZA]</span>}
                         </p>
                       </div>
-                      <button onClick={() => handleDeleteMenuItem(item.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeleteMenuItem(item.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
           </div>
         )}
 
         {/* 3. TAB: PIZZA OPTIONS CRUD */}
         {activeTab === "config" && (
-          <div className={styles.tabContent}>
-            <h1 className={styles.tabTitle}>Pizza Customizer Configuration</h1>
-            <p className={styles.tabSubtitle}>Manage custom crusts, sizes, sauces, toppings, and add-ons pricing.</p>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h1 className="text-xl font-extrabold text-brand-dark">Pizza Customizer Options</h1>
+              <p className="text-xs text-brand-dark/50 font-medium">Configure crusts, sizes, sauces, toppings, and dippers.</p>
+            </div>
 
-            <div className={styles.editorSplit}>
-              {/* Left Column: Form Editor */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Add Pizza Customizer Factor</h3>
-                <form onSubmit={handleAddPizzaOption} className={styles.editorForm}>
-                  <div className={styles.formRow}>
-                    <select value={optType} onChange={e => setOptType(e.target.value as any)} className={styles.input}>
-                      <option value="size">Pizza Size</option>
-                      <option value="crust">Pizza Crust</option>
-                      <option value="sauce">Pizza Sauce</option>
-                      <option value="topping">Pizza Topping</option>
-                      <option value="addon">Add-on Item</option>
-                    </select>
-                    <input type="text" placeholder="Option Name (e.g. Garlic White)" value={optName} onChange={e => setOptName(e.target.value)} required className={styles.input} />
-                  </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Form Option Panel */}
+              <div className="lg:col-span-5 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-5">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Add customizer parameter</h3>
+                <form onSubmit={handleAddPizzaOption} className="flex flex-col gap-3">
+                  <select 
+                    value={optType} 
+                    onChange={e => setOptType(e.target.value as any)} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  >
+                    <option value="size">Pizza Size</option>
+                    <option value="crust">Pizza Crust</option>
+                    <option value="sauce">Pizza Sauce</option>
+                    <option value="topping">Pizza Topping</option>
+                    <option value="addon">Add-on Item</option>
+                  </select>
+
+                  <input 
+                    type="text" 
+                    placeholder="Option Name (e.g. Thick Sicilian)" 
+                    value={optName} 
+                    onChange={e => setOptName(e.target.value)} 
+                    required 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
 
                   {optType === "size" ? (
-                    <div className={styles.formRow}>
-                      <input type="number" step="0.1" placeholder="Base Multiplier (e.g. 1.3)" value={optFactor} onChange={e => setOptFactor(e.target.value)} required className={styles.input} />
-                      <input type="number" step="0.01" placeholder="Flat Price Addition ($)" value={optPrice} onChange={e => setOptPrice(e.target.value)} required className={styles.input} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input 
+                        type="number" 
+                        step="0.1" 
+                        placeholder="Multiplier Factor (1.3)" 
+                        value={optFactor} 
+                        onChange={e => setOptFactor(e.target.value)} 
+                        required 
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      />
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        placeholder="Flat price add ($)" 
+                        value={optPrice} 
+                        onChange={e => setOptPrice(e.target.value)} 
+                        required 
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      />
                     </div>
                   ) : (
-                    <input type="number" step="0.01" placeholder="Flat Price ($)" value={optPrice} onChange={e => setOptPrice(e.target.value)} required className={styles.input} />
+                    <input 
+                      type="number" 
+                      step="0.01" 
+                      placeholder="Flat Price ($)" 
+                      value={optPrice} 
+                      onChange={e => setOptPrice(e.target.value)} 
+                      required 
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    />
                   )}
 
                   {optType === "topping" && (
-                    <div className={styles.formRow}>
-                      <div className={styles.checkboxLabel}>
-                        <input type="checkbox" id="isVeg" checked={optIsVeg} onChange={e => setOptIsVeg(e.target.checked)} />
+                    <div className="grid grid-cols-2 gap-3 text-xs font-semibold text-brand-dark/70 py-1">
+                      <div className="flex items-center gap-1.5">
+                        <input type="checkbox" id="isVeg" checked={optIsVeg} onChange={e => setOptIsVeg(e.target.checked)} className="rounded text-brand-red focus:ring-brand-red/30" />
                         <label htmlFor="isVeg">Vegetarian</label>
                       </div>
-                      <div className={styles.checkboxLabel}>
-                        <input type="checkbox" id="isVegan" checked={optIsVegan} onChange={e => setOptIsVegan(e.target.checked)} />
+                      <div className="flex items-center gap-1.5">
+                        <input type="checkbox" id="isVegan" checked={optIsVegan} onChange={e => setOptIsVegan(e.target.checked)} className="rounded text-brand-red focus:ring-brand-red/30" />
                         <label htmlFor="isVegan">Vegan</label>
                       </div>
                     </div>
                   )}
 
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
-                    <Plus size={16} />
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                    <Plus className="w-4 h-4" />
                     <span>Create Custom Option</span>
                   </button>
                 </form>
               </div>
 
-              {/* Right Column: Listing Options */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Active Configs ({optType.toUpperCase()}S)</h3>
+              {/* Config list table column */}
+              <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">
+                  Active Configs ({optType.toUpperCase()}S)
+                </h3>
                 
-                <div className={styles.listRows}>
+                <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
                   {optType === "size" && sizes.map((s) => (
-                    <div key={s.id} className={styles.dataRow}>
-                      <div>
+                    <div key={s.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
                         <strong>{s.name}</strong>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>
-                          Multiplier: {s.priceFactor}x | Flat price add: +${s.priceAdd.toFixed(2)}
+                        <p className="text-[10px] text-brand-dark/50">
+                          Multiplier: {s.priceFactor}x | Flat Price add: +${s.priceAdd.toFixed(2)}
                         </p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
 
                   {optType === "crust" && crusts.map((c) => (
-                    <div key={c.id} className={styles.dataRow}>
-                      <div>
+                    <div key={c.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
                         <strong>{c.name}</strong>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>Price addition: +${c.price.toFixed(2)}</p>
+                        <p className="text-[10px] text-brand-dark/50">Price addition: +${c.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
 
                   {optType === "sauce" && sauces.map((s) => (
-                    <div key={s.id} className={styles.dataRow}>
-                      <div>
+                    <div key={s.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
                         <strong>{s.name}</strong>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>Price addition: +${s.price.toFixed(2)}</p>
+                        <p className="text-[10px] text-brand-dark/50">Price addition: +${s.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
 
                   {optType === "topping" && toppings.map((t) => (
-                    <div key={t.id} className={styles.dataRow}>
-                      <div>
+                    <div key={t.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
                         <strong>{t.name}</strong>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>
+                        <p className="text-[10px] text-brand-dark/50">
                           Price: +${t.price.toFixed(2)}
-                          {t.isVegetarian && <span style={{ color: "var(--success)", marginLeft: "8px" }}>[VEG]</span>}
-                          {t.isVegan && <span style={{ color: "var(--success)", marginLeft: "4px" }}>[VEGAN]</span>}
+                          {t.isVegetarian && <span className="text-brand-green ml-2">[VEG]</span>}
+                          {t.isVegan && <span className="text-brand-green ml-1">[VEGAN]</span>}
                         </p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
 
                   {optType === "addon" && addons.map((a) => (
-                    <div key={a.id} className={styles.dataRow}>
-                      <div>
+                    <div key={a.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
                         <strong>{a.name}</strong>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>Price: +${a.price.toFixed(2)}</p>
+                        <p className="text-[10px] text-brand-dark/50">Price: +${a.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className={styles.dangerIconBtn}>
-                        <Trash2 size={16} />
+                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
           </div>
         )}
 
         {/* 4. TAB: STAFF & ACCOUNTS CRUD */}
         {activeTab === "users" && (
-          <div className={styles.tabContent}>
-            <h1 className={styles.tabTitle}>Staff & Account Settings</h1>
-            <p className={styles.tabSubtitle}>Manage dashboard access user logins and roles.</p>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h1 className="text-xl font-extrabold text-brand-dark">Staff Logins</h1>
+              <p className="text-xs text-brand-dark/50 font-medium">Manage credentials access settings for kitchen crew.</p>
+            </div>
 
-            <div className={styles.editorSplit}>
-              {/* Left Column: Create user */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Create Crew Account</h3>
-                <form onSubmit={handleAddUser} className={styles.editorForm}>
-                  <input type="text" placeholder="Real Name (e.g. John Doe)" value={newRealName} onChange={e => setNewRealName(e.target.value)} required className={styles.input} />
-                  <input type="text" placeholder="Login Username" value={newUsername} onChange={e => setNewUsername(e.target.value)} required className={styles.input} />
-                  <input type="password" placeholder="Password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className={styles.input} />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Add User Panel */}
+              <div className="lg:col-span-5 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-5">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Create Crew Account</h3>
+                <form onSubmit={handleAddUser} className="flex flex-col gap-3">
+                  <input 
+                    type="text" 
+                    placeholder="Real Name (e.g. John Doe)" 
+                    value={newRealName} 
+                    onChange={e => setNewRealName(e.target.value)} 
+                    required 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Login Username" 
+                    value={newUsername} 
+                    onChange={e => setNewUsername(e.target.value)} 
+                    required 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Password" 
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)} 
+                    required 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  />
                   
-                  <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className={styles.input}>
+                  <select 
+                    value={newUserRole} 
+                    onChange={e => setNewUserRole(e.target.value)} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                  >
                     <option value="STAFF">STAFF (Kitchen Queue access)</option>
                     <option value="ADMIN">ADMIN (Full Panel access)</option>
                   </select>
 
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
-                    <Plus size={16} />
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                    <Plus className="w-4 h-4" />
                     <span>Create User</span>
                   </button>
                 </form>
               </div>
 
-              {/* Right Column: Listing users */}
-              <div className={`${styles.panel} glass`}>
-                <h3 className={styles.panelTitle}>Registered System Users</h3>
-                <div className={styles.listRows}>
+              {/* List users column */}
+              <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
+                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Registered System Users</h3>
+                <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
                   {usersList.map((usr) => (
-                    <div key={usr.id} className={styles.dataRow}>
-                      <div>
-                        <strong>{usr.name}</strong> <span style={{ color: "var(--foreground-secondary)", fontSize: "13px" }}>@{usr.username}</span>
-                        <p style={{ fontSize: "12px", color: "var(--foreground-secondary)" }}>Role: <strong>{usr.role}</strong> | Created: {new Date(usr.createdAt).toLocaleDateString()}</p>
+                    <div key={usr.id} className="flex justify-between items-center p-3.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{usr.name} <strong className="text-brand-dark/40 font-bold">@{usr.username}</strong></span>
+                        <p className="text-[10px] text-brand-dark/50 mt-0.5 leading-normal">
+                          Role: <strong>{usr.role}</strong> | Created: {new Date(usr.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                       {user.id !== usr.id ? (
-                        <button onClick={() => handleDeleteUser(usr.id)} className={styles.dangerIconBtn}>
-                          <Trash2 size={16} />
+                        <button onClick={() => handleDeleteUser(usr.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       ) : (
-                        <span style={{ fontSize: "12px", color: "var(--success)" }}>Active Account</span>
+                        <span className="text-[10px] font-bold text-brand-green bg-brand-green/5 border border-brand-green/20 px-2 py-1 rounded">Active</span>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
           </div>
         )}
 
         {/* 5. TAB: ORDER HISTORY */}
         {activeTab === "orders" && (
-          <div className={styles.tabContent}>
-            <h1 className={styles.tabTitle}>Order Log History</h1>
-            <p className={styles.tabSubtitle}>Review all historical transactions placed in-store.</p>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h1 className="text-xl font-extrabold text-brand-dark">Order History Logs</h1>
+              <p className="text-xs text-brand-dark/50 font-medium">Review and track historical dine-in transactions.</p>
+            </div>
 
-            <div className={`${styles.panel} glass`}>
-              <div className={styles.historyList}>
-                {orders.map((o) => (
-                  <div key={o.id} className={styles.historyRow}>
-                    <div className={styles.historyMeta}>
-                      <span className={styles.historyToken}>Token #{o.orderNumber}</span>
-                      <span className={styles.historyDate}>
-                        {new Date(o.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className={styles.historyCustomer}>
-                      <strong>Name:</strong> {o.customerName}
-                      {o.customerPhone && <span style={{ marginLeft: "15px" }}><strong>Phone:</strong> {o.customerPhone}</span>}
-                    </div>
-
-                    <div className={styles.historySummaryText}>
-                      <strong>Items:</strong>{" "}
-                      {o.items?.map((item: any) => `${item.quantity}x ${item.menuItem.name}`).join(", ")}
-                    </div>
-
-                    <div className={styles.historyFooter}>
-                      <span className={`${styles.statusBadge} ${
-                        o.status === "COMPLETED" ? styles.badgeCompleted : o.status === "READY" ? styles.badgeReady : o.status === "PREPARING" ? styles.badgePreparing : styles.badgeReceived
-                      }`}>
-                        {o.status}
-                      </span>
-                      <strong className={styles.historyTotal}>${o.total.toFixed(2)}</strong>
-                    </div>
+            <div className="bg-white rounded-2xl p-5 shadow-xs border border-brand-dark/5 flex flex-col gap-3.5 max-h-[600px] overflow-y-auto">
+              {orders.map((o) => (
+                <div key={o.id} className="p-4 bg-brand-light border border-brand-dark/5 rounded-2xl text-xs flex flex-col gap-2.5">
+                  <div className="flex justify-between items-center border-b border-brand-dark/5 pb-2">
+                    <span className="text-sm font-extrabold text-brand-red">Token #{o.orderNumber}</span>
+                    <span className="text-[10px] text-brand-dark/45 font-semibold">
+                      {new Date(o.createdAt).toLocaleString()}
+                    </span>
                   </div>
-                ))}
-                {orders.length === 0 && <p className={styles.noData}>No orders recorded in database yet.</p>}
-              </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-brand-dark">Customer: <strong className="text-brand-dark/80 font-bold">{o.customerName}</strong> {o.customerPhone && <span className="ml-2">({o.customerPhone})</span>}</span>
+                    <p className="text-brand-dark/55 leading-relaxed mt-0.5">
+                      <strong className="text-brand-dark/70">Items:</strong>{" "}
+                      {o.items?.map((item: any) => `${item.quantity}x ${item.menuItem.name}`).join(", ")}
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center border-t border-brand-dark/5 pt-2.5 mt-0.5">
+                    <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${getStatusBadgeStyles(o.status)}`}>
+                      {o.status}
+                    </span>
+                    <strong className="text-sm font-extrabold text-brand-dark">${o.total.toFixed(2)}</strong>
+                  </div>
+                </div>
+              ))}
+              {orders.length === 0 && (
+                <p className="text-xs text-brand-dark/45 italic py-6 text-center">No orders recorded in database yet.</p>
+              )}
             </div>
           </div>
         )}
+
       </main>
     </div>
   );

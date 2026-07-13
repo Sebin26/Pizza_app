@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Order } from "@/types";
 import { ArrowLeft, Clock, Bell, ChefHat, CheckCircle2, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import styles from "./OrderTracker.module.css";
+import { motion } from "framer-motion";
 
 interface OrderTrackerProps {
   initialOrder: Order;
@@ -35,169 +35,228 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
     return () => clearInterval(interval);
   }, [order.id, order.status]);
 
-  const getStatusStepClass = (step: string) => {
+  const getStepStatus = (step: string) => {
     const statuses = ["RECEIVED", "PREPARING", "READY", "COMPLETED"];
     const currentIndex = statuses.indexOf(order.status);
     const stepIndex = statuses.indexOf(step);
 
-    if (stepIndex === currentIndex) return styles.stepActive;
-    if (stepIndex < currentIndex) return styles.stepCompleted;
-    return styles.stepPending;
+    if (stepIndex === currentIndex) return "active";
+    if (stepIndex < currentIndex) return "completed";
+    return "pending";
+  };
+
+  const getStepColor = (status: "active" | "completed" | "pending") => {
+    if (status === "completed") return "bg-brand-green text-white border-brand-green";
+    if (status === "active") return "bg-brand-orange text-white border-brand-orange animate-pulse";
+    return "bg-white text-brand-dark/30 border-brand-dark/15";
+  };
+
+  const getStepTextColor = (status: "active" | "completed" | "pending") => {
+    if (status === "completed") return "text-brand-green font-bold";
+    if (status === "active") return "text-brand-orange font-bold";
+    return "text-brand-dark/40 font-semibold";
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+      
       {/* Thank you note */}
-      <div className={`${styles.successHeader} glass-elevated`}>
-        <CheckCircle2 size={48} className={styles.successIcon} />
-        <h1>Order Placed Successfully!</h1>
-        <p>Thank you for dining with us, <strong>{order.customerName}</strong>.</p>
-      </div>
-
-      <div className={styles.trackerLayout}>
-        {/* Token and Live Status card */}
-        <div className={`${styles.statusCard} glass-elevated`}>
-          <div className={styles.tokenSection}>
-            <span className={styles.tokenLabel}>YOUR TOKEN NUMBER</span>
-            <h2 className={styles.tokenNumber}>{order.orderNumber}</h2>
-            <p className={styles.tokenHint}>Please watch the screens or wait for this token to be called.</p>
-          </div>
-
-          {/* Progress Tracker */}
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{
-                  width:
-                    order.status === "RECEIVED"
-                      ? "16%"
-                      : order.status === "PREPARING"
-                      ? "50%"
-                      : order.status === "READY"
-                      ? "83%"
-                      : "100%",
-                }}
-              />
-            </div>
-
-            <div className={styles.steps}>
-              <div className={`${styles.step} ${getStatusStepClass("RECEIVED")}`}>
-                <div className={styles.stepCircle}>
-                  <ShoppingBag size={16} />
-                </div>
-                <span className={styles.stepLabelText}>Received</span>
-              </div>
-
-              <div className={`${styles.step} ${getStatusStepClass("PREPARING")}`}>
-                <div className={styles.stepCircle}>
-                  <ChefHat size={16} />
-                </div>
-                <span className={styles.stepLabelText}>Preparing</span>
-              </div>
-
-              <div className={`${styles.step} ${getStatusStepClass("READY")}`}>
-                <div className={styles.stepCircle}>
-                  <Bell size={16} />
-                </div>
-                <span className={styles.stepLabelText}>Ready</span>
-              </div>
-
-              <div className={`${styles.step} ${getStatusStepClass("COMPLETED")}`}>
-                <div className={styles.stepCircle}>
-                  <CheckCircle2 size={16} />
-                </div>
-                <span className={styles.stepLabelText}>Completed</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Wait Time Display */}
-          <div className={styles.waitSection}>
-            {order.status === "READY" ? (
-              <div className={styles.readyBanner}>
-                <Bell className={styles.bellIcon} />
-                <div>
-                  <h4>Your Order is Ready!</h4>
-                  <p>Please head over to the counter to collect your fresh pizza.</p>
-                </div>
-              </div>
-            ) : order.status === "COMPLETED" ? (
-              <div className={styles.completedBanner}>
-                <h4>Order Collected</h4>
-                <p>Enjoy your meal! Thank you for choosing D Town Pizza.</p>
-              </div>
-            ) : (
-              <div className={styles.waitTimer}>
-                <Clock size={20} className={styles.clockIcon} />
-                <div>
-                  <span>Estimated Preparation Time</span>
-                  <h4>~{order.estimatedPrepMin} Minutes</h4>
-                </div>
-              </div>
-            )}
-          </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-brand-dark/5 flex flex-col sm:flex-row gap-4 items-center text-center sm:text-left"
+      >
+        <div className="w-14 h-14 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
+          <CheckCircle2 className="w-8 h-8" />
         </div>
+        <div className="flex flex-col gap-0.5">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-brand-dark">Order Placed Successfully!</h1>
+          <p className="text-sm text-brand-dark/50">
+            Thank you for dining with us, <strong className="text-brand-dark/80 font-bold">{order.customerName}</strong>.
+          </p>
+        </div>
+      </motion.div>
 
-        {/* Order Details card */}
-        <div className={`${styles.detailsCard} glass`}>
-          <h3>Order Details</h3>
-          <span className={styles.orderId}>ID: {order.id}</span>
-          
-          <div className={styles.itemList}>
-            {order.items?.map((item) => (
-              <div key={item.id} className={styles.itemRow}>
-                <div className={styles.itemMeta}>
-                  <span className={styles.itemQty}>{item.quantity}x</span>
-                  <div>
-                    <h4 className={styles.itemName}>{item.menuItem.name}</h4>
-                    {item.customization && (
-                      <div className={styles.customText}>
-                        <p>{item.customization.size?.name} | {item.customization.crust?.name}</p>
-                        <p>Sauce: {item.customization.sauce?.name}</p>
-                        {item.customization.toppings.length > 0 && (
-                          <p>
-                            Toppings:{" "}
-                            {item.customization.toppings.map((t) => t.topping.name).join(", ")}
-                          </p>
-                        )}
-                        {item.customization.addons.length > 0 && (
-                          <p>
-                            Add-ons:{" "}
-                            {item.customization.addons.map((a) => a.addon.name).join(", ")}
-                          </p>
-                        )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Token and Live Status card (7 Columns) */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-brand-dark/5 flex flex-col gap-8">
+            
+            {/* Token Section */}
+            <div className="flex flex-col items-center text-center border-b border-brand-dark/5 pb-6">
+              <span className="text-xs font-extrabold tracking-wider text-brand-dark/40 uppercase">Your Token Number</span>
+              <h2 className="text-6xl sm:text-7xl font-extrabold text-brand-red tracking-tight my-2">
+                {order.orderNumber}
+              </h2>
+              <p className="text-sm text-brand-dark/60 max-w-xs leading-relaxed">
+                Please watch the kitchen display screens or wait at your table for this token to be called.
+              </p>
+            </div>
+
+            {/* Progress Tracker stepper bar */}
+            <div className="flex flex-col gap-6 px-2">
+              <h4 className="text-sm font-extrabold text-brand-dark">Order Status</h4>
+              
+              <div className="relative flex items-center justify-between w-full">
+                
+                {/* Horizontal Progress Bar Background */}
+                <div className="absolute left-0 right-0 h-1 bg-brand-dark/5 -translate-y-4"></div>
+                
+                {/* Horizontal Progress Bar Fill */}
+                <div 
+                  className="absolute left-0 h-1 bg-brand-green -translate-y-4 transition-all duration-500"
+                  style={{
+                    width:
+                      order.status === "RECEIVED"
+                        ? "0%"
+                        : order.status === "PREPARING"
+                        ? "33%"
+                        : order.status === "READY"
+                        ? "66%"
+                        : "100%",
+                  }}
+                ></div>
+
+                {/* Stepper points */}
+                {[
+                  { key: "RECEIVED", label: "Received", icon: <ShoppingBag className="w-4 h-4" /> },
+                  { key: "PREPARING", label: "Preparing", icon: <ChefHat className="w-4 h-4" /> },
+                  { key: "READY", label: "Ready", icon: <Bell className="w-4 h-4" /> },
+                  { key: "COMPLETED", label: "Completed", icon: <CheckCircle2 className="w-4 h-4" /> }
+                ].map((step) => {
+                  const status = getStepStatus(step.key);
+                  return (
+                    <div key={step.key} className="flex flex-col items-center gap-2 relative z-10">
+                      <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${getStepColor(status)}`}>
+                        {step.icon}
                       </div>
-                    )}
-                    {item.notes && <p className={styles.itemNotes}>Note: {item.notes}</p>}
+                      <span className={`text-[11px] sm:text-xs tracking-tight ${getStepTextColor(status)}`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Banners based on order status */}
+            <div className="border-t border-brand-dark/5 pt-6 mt-2">
+              {order.status === "READY" ? (
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-yellow/10 border border-brand-yellow/20 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-brand-yellow text-brand-dark flex items-center justify-center shrink-0 animate-bounce">
+                    <Bell className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <h4 className="font-extrabold text-[15px]">Your Order is Ready!</h4>
+                    <p className="text-xs text-brand-dark/70 leading-relaxed">
+                      Please head over to the counter to collect your fresh hot pizza. Enjoy!
+                    </p>
                   </div>
                 </div>
-                <span className={styles.itemPrice}>${item.totalPrice.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
+              ) : order.status === "COMPLETED" ? (
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-green/10 border border-brand-green/20 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-brand-green text-white flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <h4 className="font-extrabold text-[15px] text-brand-green">Order Collected</h4>
+                    <p className="text-xs text-brand-dark/70 leading-relaxed">
+                      Enjoy your meal! Thank you for dining with D Town Pizza.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-brand-light border border-brand-dark/5 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-white text-brand-orange flex items-center justify-center shrink-0 shadow-xs">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-brand-dark/50">Estimated Prep Time</span>
+                    <h4 className="text-lg font-extrabold text-brand-dark">~{order.estimatedPrepMin} Minutes</h4>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          <div className={styles.totalsSection}>
-            <div className={styles.totalRow}>
-              <span>Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className={styles.totalRow}>
-              <span>Taxes (10%)</span>
-              <span>${order.tax.toFixed(2)}</span>
-            </div>
-            <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-              <span>Total Paid</span>
-              <span>${order.total.toFixed(2)}</span>
-            </div>
           </div>
-
-          <Link href="/" className={`${styles.homeLink} btn btn-secondary`}>
-            <ArrowLeft size={16} />
-            <span>Order Something Else</span>
-          </Link>
         </div>
+
+        {/* Order Details card (5 Columns) */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-brand-dark/5 flex flex-col gap-6">
+            <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
+              <h3 className="text-lg font-extrabold text-brand-dark">Order Summary Details</h3>
+              <span className="text-[11px] font-mono text-brand-dark/40 break-all">ID: {order.id}</span>
+            </div>
+            
+            {/* Scrollable Items List */}
+            <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto pr-1">
+              {order.items?.map((item) => (
+                <div key={item.id} className="flex justify-between items-start gap-4 text-sm border-b border-brand-dark/5 pb-4 last:border-b-0 last:pb-0">
+                  <div className="flex gap-2.5 items-start">
+                    <span className="font-extrabold text-brand-red bg-brand-red/5 px-2 py-0.5 rounded-lg text-xs mt-0.5">
+                      {item.quantity}x
+                    </span>
+                    <div className="flex flex-col gap-0.5">
+                      <h4 className="font-bold text-brand-dark">{item.menuItem.name}</h4>
+                      {item.customization && (
+                        <div className="text-xs text-brand-dark/50 flex flex-col gap-0.5">
+                          <p>{item.customization.size?.name} | {item.customization.crust?.name}</p>
+                          <p>Sauce: {item.customization.sauce?.name}</p>
+                          {item.customization.toppings.length > 0 && (
+                            <p>
+                              Toppings:{" "}
+                              {item.customization.toppings.map((t) => t.topping.name).join(", ")}
+                            </p>
+                          )}
+                          {item.customization.addons.length > 0 && (
+                            <p>
+                              Add-ons:{" "}
+                              {item.customization.addons.map((a) => a.addon.name).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {item.notes && (
+                        <p className="text-xs italic text-brand-orange mt-1">Note: {item.notes}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className="font-bold text-brand-dark shrink-0">${item.totalPrice.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Totals panel */}
+            <div className="border-t border-brand-dark/5 pt-4 flex flex-col gap-2 text-sm">
+              <div className="flex justify-between text-brand-dark/60">
+                <span>Subtotal</span>
+                <span className="font-bold">${order.subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-brand-dark/60">
+                <span>Taxes (10%)</span>
+                <span className="font-bold">${order.tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t border-brand-dark/5 pt-3 text-brand-dark">
+                <span className="text-base font-extrabold">Total Paid</span>
+                <span className="text-lg font-extrabold text-brand-red">${order.total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Bottom Return CTA Link */}
+            <Link 
+              href="/" 
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-brand-light hover:bg-brand-dark hover:text-white text-brand-dark font-bold text-sm transition-all active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Order Something Else</span>
+            </Link>
+          </div>
+        </div>
+
       </div>
+
     </div>
   );
 }

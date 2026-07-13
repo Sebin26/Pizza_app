@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, Send, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import styles from "./CartPage.module.css";
+import { motion } from "framer-motion";
 
 export default function CartPage() {
   const router = useRouter();
@@ -80,158 +80,202 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className={styles.emptyContainer}>
-        <div className={`${styles.emptyCard} glass`}>
-          <ShoppingBag size={64} className={styles.emptyIcon} />
-          <h2>Your Cart is Empty</h2>
-          <p>Go back to our menu and select some delicious food to order.</p>
-          <Link href="/" className="btn btn-primary">
-            <ArrowLeft size={16} />
+      <div className="max-w-xl mx-auto px-4 py-16 text-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-brand-dark/5 flex flex-col items-center gap-6"
+        >
+          <div className="w-20 h-20 rounded-full bg-brand-light flex items-center justify-center text-brand-dark/30">
+            <ShoppingBag className="w-10 h-10" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-2xl font-extrabold text-brand-dark">Your Cart is Empty</h2>
+            <p className="text-sm sm:text-base text-brand-dark/50 leading-relaxed max-w-sm">
+              Head back to our gourmet menu and select some delicious food to order.
+            </p>
+          </div>
+          <Link 
+            href="/" 
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-sm shadow-md shadow-brand-red/20 transition-all active:scale-95 hover:-translate-y-0.5"
+          >
+            <ArrowLeft className="w-4 h-4" />
             <span>Browse Menu</span>
           </Link>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
-      <h1 className={styles.title}>Review Your Order</h1>
-      <p className={styles.subtitle}>Verify your details and checkout instantly. No signup required.</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+      
+      <div className="flex flex-col gap-1.5 border-b border-brand-dark/5 pb-5">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-dark">
+          Review Your Order
+        </h1>
+        <p className="text-sm sm:text-[15px] text-brand-dark/50">
+          Verify your details and checkout instantly. No registration required.
+        </p>
+      </div>
 
       {errorMsg && (
-        <div className={`${styles.errorAlert} glass`}>
-          <AlertTriangle className={styles.errorIcon} />
-          <span>{errorMsg}</span>
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-red/10 border border-brand-red/25 text-brand-red">
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+          <span className="text-sm font-semibold">{errorMsg}</span>
         </div>
       )}
 
-      <div className={styles.content}>
-        {/* Left Column: Cart Items list */}
-        <div className={styles.itemsCol}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Column: Cart Items List (8 Columns) */}
+        <div className="lg:col-span-8 flex flex-col gap-4">
           {cart.map((item) => (
-            <div key={item.id} className={`${styles.itemRow} glass`}>
-              <span className={styles.itemEmoji}>
-                {item.menuItem.isPizza ? "🍕" : "🍽️"}
-              </span>
-
-              <div className={styles.itemDetails}>
-                <h3 className={styles.itemName}>{item.menuItem.name}</h3>
-                
-                {item.menuItem.isPizza && item.customization && (
-                  <div className={styles.customizationSummary}>
-                    <p>
-                      <strong>Size:</strong> {item.customization.size.name} |{" "}
-                      <strong>Crust:</strong> {item.customization.crust.name}
-                    </p>
-                    <p>
-                      <strong>Sauce:</strong> {item.customization.sauce.name}
-                    </p>
-                    {item.customization.toppings.length > 0 && (
-                      <p>
-                        <strong>Toppings:</strong>{" "}
-                        {item.customization.toppings.map((t) => t.name).join(", ")}
-                      </p>
-                    )}
-                    {item.customization.addons.length > 0 && (
-                      <p>
-                        <strong>Add-ons:</strong>{" "}
-                        {item.customization.addons.map((a) => a.name).join(", ")}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {item.notes && (
-                  <p className={styles.itemNotes}>
-                    <em>Note: {item.notes}</em>
-                  </p>
-                )}
-                
-                <span className={styles.itemPrice}>
-                  ${(item.price * item.quantity).toFixed(2)}
-                  {item.quantity > 1 && <small> (${item.price.toFixed(2)} each)</small>}
+            <motion.div 
+              layout
+              key={item.id} 
+              className="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+            >
+              <div className="flex gap-4 items-start sm:items-center flex-1">
+                <span className="text-4xl shrink-0 p-2.5 rounded-xl bg-brand-light">
+                  {item.menuItem.isPizza ? "🍕" : "🍽️"}
                 </span>
+
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-base sm:text-lg font-bold text-brand-dark">
+                    {item.menuItem.name}
+                  </h3>
+                  
+                  {item.menuItem.isPizza && item.customization && (
+                    <div className="text-xs sm:text-sm text-brand-dark/50 flex flex-col gap-0.5">
+                      <p>
+                        <strong className="text-brand-dark/70 font-semibold">Size:</strong> {item.customization.size.name} |{" "}
+                        <strong className="text-brand-dark/70 font-semibold">Crust:</strong> {item.customization.crust.name}
+                      </p>
+                      <p>
+                        <strong className="text-brand-dark/70 font-semibold">Sauce:</strong> {item.customization.sauce.name}
+                      </p>
+                      {item.customization.toppings.length > 0 && (
+                        <p>
+                          <strong className="text-brand-dark/70 font-semibold">Toppings:</strong>{" "}
+                          {item.customization.toppings.map((t) => t.name).join(", ")}
+                        </p>
+                      )}
+                      {item.customization.addons.length > 0 && (
+                        <p>
+                          <strong className="text-brand-dark/70 font-semibold">Add-ons:</strong>{" "}
+                          {item.customization.addons.map((a) => a.name).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {item.notes && (
+                    <p className="text-xs sm:text-sm italic text-brand-orange bg-brand-orange/5 px-2.5 py-1 rounded-lg border border-brand-orange/10 w-fit mt-1">
+                      Note: {item.notes}
+                    </p>
+                  )}
+                  
+                  <span className="text-base font-extrabold text-brand-red mt-1.5 flex items-baseline gap-1.5">
+                    ${(item.price * item.quantity).toFixed(2)}
+                    {item.quantity > 1 && (
+                      <span className="text-xs font-semibold text-brand-dark/40">
+                        (${item.price.toFixed(2)} each)
+                      </span>
+                    )}
+                  </span>
+                </div>
               </div>
 
-              {/* Quantity Selector and Delete */}
-              <div className={styles.itemActions}>
-                <div className={styles.quantityControls}>
+              {/* Quantity controls and delete action */}
+              <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 border-brand-dark/5 pt-4 sm:pt-0">
+                <div className="flex items-center gap-3.5 bg-brand-light rounded-xl p-1 shrink-0">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className={styles.qtyBtn}
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-95"
                   >
-                    <Minus size={14} />
+                    <Minus className="w-3.5 h-3.5" />
                   </button>
-                  <span className={styles.qtyVal}>{item.quantity}</span>
+                  <span className="text-sm font-extrabold w-5 text-center text-brand-dark">
+                    {item.quantity}
+                  </span>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className={styles.qtyBtn}
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-95"
                   >
-                    <Plus size={14} />
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className={styles.deleteBtn}
+                  className="w-9 h-9 rounded-xl bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white flex items-center justify-center transition-colors duration-200 active:scale-95 shrink-0"
                   title="Remove item"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 className="w-4.5 h-4.5" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
           
-          <Link href="/" className={styles.continueLink}>
-            <ArrowLeft size={16} />
+          <Link 
+            href="/" 
+            className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/60 hover:text-brand-red transition-colors w-fit px-1.5"
+          >
+            <ArrowLeft className="w-4 h-4" />
             <span>Continue Adding Food</span>
           </Link>
         </div>
 
-        {/* Right Column: Checkout Summary & Form */}
-        <div className={styles.checkoutCol}>
-          <div className={`${styles.checkoutCard} glass-elevated`}>
-            <h3>Order Summary</h3>
+        {/* Right Column: Checkout Summary & Guest Form (4 Columns) */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-brand-dark/5 flex flex-col gap-6">
+            <h3 className="text-lg font-extrabold text-brand-dark border-b border-brand-dark/5 pb-3">
+              Order Summary
+            </h3>
             
-            <div className={styles.summaryTotals}>
-              <div className={styles.totalRow}>
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+            <div className="flex flex-col gap-3 text-sm">
+              <div className="flex justify-between items-center text-brand-dark/60">
+                <span className="font-semibold">Subtotal</span>
+                <span className="font-bold">${subtotal.toFixed(2)}</span>
               </div>
-              <div className={styles.totalRow}>
-                <span>Taxes (10%)</span>
-                <span>${tax.toFixed(2)}</span>
+              <div className="flex justify-between items-center text-brand-dark/60">
+                <span className="font-semibold">Taxes (10%)</span>
+                <span className="font-bold">${tax.toFixed(2)}</span>
               </div>
-              <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-                <span>Total Amount</span>
-                <span>${total.toFixed(2)}</span>
+              <div className="flex justify-between items-center border-t border-brand-dark/5 pt-4 text-brand-dark">
+                <span className="text-base font-extrabold">Total Amount</span>
+                <span className="text-2xl font-extrabold text-brand-red">${total.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Guest Details Form */}
-            <form onSubmit={handleSubmitOrder} className={styles.checkoutForm}>
-              <h4 className={styles.formTitle}>Guest Information</h4>
-              <p className={styles.formSubtitle}>Required to call your number when the pizza is ready.</p>
+            <form onSubmit={handleSubmitOrder} className="flex flex-col gap-4 border-t border-brand-dark/5 pt-5">
+              <div className="flex flex-col gap-1">
+                <h4 className="text-sm font-extrabold text-brand-dark">Guest Information</h4>
+                <p className="text-[11px] text-brand-dark/40">
+                  Required to identify your table and call your token.
+                </p>
+              </div>
 
-              <div className={styles.formGroup}>
-                <label htmlFor="customer-name" className={styles.formLabel}>
-                  Your Name <span className={styles.required}>*</span>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="customer-name" className="text-xs font-bold text-brand-dark/70">
+                  Your Name <span className="text-brand-red font-bold">*</span>
                 </label>
                 <input
                   id="customer-name"
                   type="text"
                   required
-                  placeholder="E.g., John Doe"
+                  placeholder="E.g., Mario Rossi"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className={styles.formInput}
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label htmlFor="customer-phone" className={styles.formLabel}>
-                  Phone Number <span className={styles.optional}>(Optional)</span>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="customer-phone" className="text-xs font-bold text-brand-dark/70">
+                  Phone Number <span className="text-brand-dark/40 font-semibold">(Optional)</span>
                 </label>
                 <input
                   id="customer-phone"
@@ -239,20 +283,20 @@ export default function CartPage() {
                   placeholder="E.g., 555-0199"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className={styles.formInput}
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`${styles.submitBtn} btn btn-primary`}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[15px] shadow-md shadow-brand-red/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
               >
                 {isSubmitting ? (
                   <span>Placing Order...</span>
                 ) : (
                   <>
-                    <Send size={18} />
+                    <Send className="w-4.5 h-4.5" />
                     <span>Place In-Store Order</span>
                   </>
                 )}
@@ -260,6 +304,7 @@ export default function CartPage() {
             </form>
           </div>
         </div>
+
       </div>
     </div>
   );
