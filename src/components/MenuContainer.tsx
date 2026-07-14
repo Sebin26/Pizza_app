@@ -6,6 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { Category, MenuItem } from "@/types";
 import { Search, ShoppingBag, Plus, Minus, Info, Flame, Wine, Cake, Disc } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 interface MenuContainerProps {
   initialCategories: Category[];
@@ -151,28 +152,40 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                 <div className="h-44 bg-brand-light relative flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-tr from-brand-orange/5 to-brand-red/5"></div>
                   
-                  {/* Pizza/Item circular illustration */}
-                  <div 
-                    className="w-28 h-28 rounded-full shadow-lg flex items-center justify-center text-4xl animate-float"
-                    style={{
-                      background: item.isPizza 
-                        ? "radial-gradient(circle, #FBC02D 10%, #F57C00 50%, #C62828 100%)"
-                        : "radial-gradient(circle, #E5E7EB 20%, #9CA3AF 80%)"
-                    }}
-                  >
-                    <span>
-                      {item.isPizza 
-                        ? "🍕" 
-                        : item.categoryId === initialCategories.find(c => c.slug === "drinks")?.id 
-                        ? "🥤" 
-                        : item.categoryId === initialCategories.find(c => c.slug === "desserts")?.id 
-                        ? "🍰" 
-                        : "🍟"}
-                    </span>
-                  </div>
+                  {/* Pizza Image / Item circular illustration */}
+                  {item.imageUrl && item.isPizza ? (
+                    <div className="relative w-36 h-36 transition-all duration-700 ease-out group-hover:scale-110">
+                      <Image
+                        src={`/${item.imageUrl}.png`}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-contain rounded-full drop-shadow-lg"
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-28 h-28 rounded-full shadow-lg flex items-center justify-center text-4xl animate-float"
+                      style={{
+                        background: item.isPizza 
+                          ? "radial-gradient(circle, #FBC02D 10%, #F57C00 50%, #C62828 100%)"
+                          : "radial-gradient(circle, #E5E7EB 20%, #9CA3AF 80%)"
+                      }}
+                    >
+                      <span>
+                        {item.isPizza 
+                          ? "🍕" 
+                          : item.categoryId === initialCategories.find(c => c.slug === "drinks")?.id 
+                          ? "🥤" 
+                          : item.categoryId === initialCategories.find(c => c.slug === "desserts")?.id 
+                          ? "🍰" 
+                          : "🍟"}
+                      </span>
+                    </div>
+                  )}
 
                   {item.isPizza && (
-                    <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-brand-orange text-white text-[10px] font-extrabold uppercase tracking-wide">
+                    <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-brand-orange text-white text-[10px] font-extrabold uppercase tracking-wide z-10">
                       Chef Special
                     </span>
                   )}

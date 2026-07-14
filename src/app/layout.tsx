@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "D Town Pizza | In-Store Digital Ordering",
@@ -22,6 +23,7 @@ export default function RootLayout({
             <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {children}
             </main>
+            <Footer />
           </div>
         </CartProvider>
       </body>

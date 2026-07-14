@@ -28,7 +28,7 @@ export default function Navbar() {
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-8">
           <Link 
-            href="/" 
+            href="/?order=true" 
             className="text-[15px] font-semibold text-brand-dark/70 hover:text-brand-red transition-colors duration-200"
           >
             Menu
