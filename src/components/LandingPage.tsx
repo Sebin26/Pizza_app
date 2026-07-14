@@ -14,9 +14,6 @@ import {
   Leaf, 
   Award, 
   Star, 
-  MapPin, 
-  Phone, 
-  Mail, 
   ArrowUpRight 
 } from "lucide-react";
 
@@ -59,9 +56,9 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,124,0,0.025)_0%,transparent_75%)]" />
         
         {/* Warm ambient light blobs */}
-        <div className="absolute top-[10%] left-[65%] w-[50vw] h-[50vw] max-w-[600px] bg-gradient-to-tr from-brand-orange/12 to-brand-red/8 rounded-full blur-[120px] opacity-75" />
+        <div className="absolute top-[10%] left-[65%] w-[50vw] h-[50vw] max-w-[600px] bg-linear-to-tr from-brand-orange/12 to-brand-red/8 rounded-full blur-[120px] opacity-75" />
         <div className="absolute top-[40%] left-[-15%] w-[45vw] h-[45vw] max-w-[500px] bg-brand-orange/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] max-w-[450px] bg-gradient-to-br from-brand-yellow/10 to-brand-orange/5 rounded-full blur-[110px]" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] max-w-[450px] bg-linear-to-br from-brand-yellow/10 to-brand-orange/5 rounded-full blur-[110px]" />
       </div>
 
       {/* 1. CINEMATIC HERO SECTION */}
@@ -83,7 +80,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.08] text-brand-dark">
                 Freshly Made Pizza.<br />
-                <span className="bg-gradient-to-r from-brand-red to-brand-orange bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-brand-red to-brand-orange bg-clip-text text-transparent">
                   Ready When You Are.
                 </span>
               </h1>
@@ -105,7 +102,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                 className="group relative flex items-center justify-center gap-2 px-8 py-4 bg-brand-red hover:bg-brand-red/95 text-white font-bold rounded-2xl shadow-lg shadow-brand-red/25 hover:shadow-xl hover:shadow-brand-red/35 transition-all duration-300 hover:-translate-y-1 active:translate-y-0 active:scale-98 overflow-hidden"
               >
                 {/* Micro-glow effect */}
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                <div className="absolute inset-0 w-full h-full bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                 <span>Start Ordering</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -187,7 +184,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               >
                 {/* Pizza Graphic/Image Header */}
                 <div className="h-52 bg-brand-light relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-brand-orange/10 to-brand-red/10 transition-transform duration-500 group-hover:scale-105"></div>
+                  <div className="absolute inset-0 bg-linear-to-tr from-brand-orange/10 to-brand-red/10 transition-transform duration-500 group-hover:scale-105"></div>
                   
                   {/* Rotating/Scaling Pizza Image on Hover */}
                   {item.imageUrl ? (
@@ -376,7 +373,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                 Born and raised in Napoli, Chef Giovanni brought the scent of wood-fired smoke and traditional yeast recipes to D Town Pizza. For over 20 years, his sourdough starter has been nurtured daily, bringing complex fermentation notes to every bite.
               </p>
               <p>
-                "Making a pizza is not just cooking. It is a precise dance between temperature, humidity, and time. When that crust hits the stone in our oven, it's the culmination of hours of fermentation and decades of tradition coming alive."
+                &ldquo;Making a pizza is not just cooking. It is a precise dance between temperature, humidity, and time. When that crust hits the stone in our oven, it&apos;s the culmination of hours of fermentation and decades of tradition coming alive.&rdquo;
               </p>
             </div>
 
@@ -433,7 +430,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                 </div>
                 <p className="text-sm font-medium text-brand-dark/80 italic leading-relaxed">
-                  "The Margherita was flawless. Crust was incredibly puffy and charred in all the right places. Ordering from the table layout was simple and it arrived within 6 minutes."
+                  &ldquo;The Margherita was flawless. Crust was incredibly puffy and charred in all the right places. Ordering from the table layout was simple and it arrived within 6 minutes.&rdquo;
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -460,7 +457,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                 </div>
                 <p className="text-sm font-medium text-brand-dark/80 italic leading-relaxed">
-                  "I customized a pie with pepperoni, jalapeños, and honey. Best crust in the city. The digital tracker keeps you updated, so you know exactly when to get your plates!"
+                  &ldquo;I customized a pie with pepperoni, jalapeños, and honey. Best crust in the city. The digital tracker keeps you updated, so you know exactly when to get your plates!&rdquo;
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -487,7 +484,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                 </div>
                 <p className="text-sm font-medium text-brand-dark/80 italic leading-relaxed">
-                  "Outstanding sourdough texture. You can feel the lightness immediately. The white garlic sauce base is a revelation. Clean, fast UI, zero friction."
+                  &ldquo;Outstanding sourdough texture. You can feel the lightness immediately. The white garlic sauce base is a revelation. Clean, fast UI, zero friction.&rdquo;
                 </p>
               </div>
               <div className="flex items-center gap-3">

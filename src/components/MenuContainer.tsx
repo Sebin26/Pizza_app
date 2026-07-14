@@ -79,7 +79,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
         transition={{ duration: 0.5 }}
         className="relative overflow-hidden rounded-3xl bg-brand-dark text-white p-8 sm:p-12 md:p-16 shadow-xl"
       >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-brand-orange/30 to-brand-red/30 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-br from-brand-orange/30 to-brand-red/30 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-orange/10 rounded-full blur-2xl -ml-20 -mb-20"></div>
 
         <div className="relative max-w-2xl flex flex-col gap-4">
@@ -150,7 +150,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
               >
                 {/* Visual Header */}
                 <div className="h-44 bg-brand-light relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-brand-orange/5 to-brand-red/5"></div>
+                  <div className="absolute inset-0 bg-linear-to-tr from-brand-orange/5 to-brand-red/5"></div>
                   
                   {/* Pizza Image / Item circular illustration */}
                   {item.imageUrl && item.isPizza ? (
@@ -233,7 +233,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
             <Info className="w-12 h-12 text-brand-dark/30 mb-3" />
             <h3 className="text-lg font-bold text-brand-dark">No dishes found</h3>
             <p className="text-sm text-brand-dark/50 max-w-sm">
-              We couldn't find any items matching "{searchQuery}" in this category.
+              We couldn&apos;t find any items matching &ldquo;{searchQuery}&rdquo; in this category.
             </p>
           </div>
         )}
