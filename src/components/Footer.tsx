@@ -49,7 +49,6 @@ export default function Footer() {
               <li><Link href="/?order=true" className="hover:text-white transition-colors">Menu Catalog</Link></li>
               <li><Link href="/builder" className="hover:text-white transition-colors">Pizza Customizer</Link></li>
               <li><Link href="/cart" className="hover:text-white transition-colors">My Cart</Link></li>
-              <li><Link href="/staff" className="hover:text-white transition-colors">Staff Login</Link></li>
             </ul>
           </div>
 

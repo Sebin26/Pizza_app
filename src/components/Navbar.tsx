@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, Flame, ShieldAlert } from "lucide-react";
+import { ShoppingCart, Flame } from "lucide-react";
 
 export default function Navbar() {
   const { cart } = useCart();
@@ -43,15 +43,6 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          <Link 
-            href="/staff" 
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:border-brand-dark/20 text-brand-dark/80 hover:text-brand-dark text-sm font-semibold transition-all duration-200"
-            title="Staff Dashboard"
-          >
-            <ShieldAlert className="w-4 h-4 text-brand-orange" />
-            <span className="hidden sm:inline">Staff Portal</span>
-          </Link>
-          
           <Link 
             href="/cart" 
             className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold shadow-md shadow-brand-red/20 transition-all duration-200 active:scale-95 hover:-translate-y-0.5"

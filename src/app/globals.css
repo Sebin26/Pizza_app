@@ -13,6 +13,8 @@
   --color-brand-yellow: #FBC02D;
   
   --radius-xl: 18px;
+  
+  --animate-spin-slow: spin 35s linear infinite;
 }
 
 @layer base {
