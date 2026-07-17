@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCart, calculateItemPrice } from "@/context/CartContext";
 import { MenuItem, PizzaConfig, PizzaSize, PizzaCrust, PizzaSauce, PizzaTopping, PizzaAddon } from "@/types";
@@ -61,6 +61,17 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
   const [direction, setDirection] = useState(0); // 1 = forward, -1 = backward
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
   const [isEditingFromReview, setIsEditingFromReview] = useState(false);
+
+  const topAnchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Only scroll to top on mobile/tablet viewports on step changes
+    if (window.innerWidth < 1024 && topAnchorRef.current) {
+      const yOffset = -90; // offset for sticky header
+      const y = topAnchorRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  }, [currentStep]);
 
 
   const steps = [
@@ -410,7 +421,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8 flex flex-col gap-6">
+    <div ref={topAnchorRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8 flex flex-col gap-6">
       
       {/* Header Back Button */}
       <div className="flex items-center justify-between">

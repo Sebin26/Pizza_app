@@ -30,7 +30,18 @@ export default function CartPage() {
     try {
       // Map cart items to API requirements
       const apiItems = cart.map((item) => {
-        const payload: any = {
+        const payload: {
+          menuItemId: string;
+          quantity: number;
+          notes: string;
+          customization?: {
+            sizeId: string;
+            crustId: string;
+            sauceId: string;
+            toppingIds: string[];
+            addonIds: string[];
+          };
+        } = {
           menuItemId: item.menuItem.id,
           quantity: item.quantity,
           notes: item.notes || "",
@@ -70,9 +81,10 @@ export default function CartPage() {
       // Success
       clearCart();
       router.push(`/confirmation/${data.order.id}`);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setErrorMsg(err.message || "Failed to submit order. Please try again.");
+      const message = err instanceof Error ? err.message : "Failed to submit order. Please try again.";
+      setErrorMsg(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +108,7 @@ export default function CartPage() {
             </p>
           </div>
           <Link 
-            href="/" 
+            href="/?order=true" 
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-sm shadow-md shadow-brand-red/20 transition-all active:scale-95 hover:-translate-y-0.5"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -219,7 +231,7 @@ export default function CartPage() {
           ))}
           
           <Link 
-            href="/" 
+            href="/?order=true" 
             className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/60 hover:text-brand-red transition-colors w-fit px-1.5"
           >
             <ArrowLeft className="w-4 h-4" />
