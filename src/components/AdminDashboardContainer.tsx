@@ -374,14 +374,23 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               <button
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id as any); clearAlerts(); }}
-                className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`relative w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-[color] duration-200 ease-out cursor-pointer active:scale-[0.97] overflow-hidden ${
                   isActive
-                    ? "bg-brand-red text-white shadow-sm shadow-brand-red/20"
+                    ? "text-white font-extrabold"
                     : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/95 hover:text-brand-dark"
                 }`}
               >
-                {tab.icon}
-                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.span
+                    layoutId="activeAdminTab"
+                    className="absolute inset-0 bg-brand-red rounded-xl shadow-sm shadow-brand-red/20 z-0"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <div className="relative z-10 flex items-center gap-2.5">
+                  {tab.icon}
+                  <span>{tab.label}</span>
+                </div>
               </button>
             );
           })}
@@ -390,7 +399,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
         <div className="flex flex-col gap-2 border-t border-brand-dark/5 pt-5">
           <button 
             onClick={() => router.push("/staff")} 
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-light text-brand-dark/80 text-xs font-bold transition-all cursor-pointer"
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-light text-brand-dark/80 text-xs font-bold transition-[background-color,border-color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
           >
             <Store className="w-4 h-4 text-brand-orange" />
             <span>Kitchen Queue</span>
@@ -398,7 +407,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
           
           <button 
             onClick={handleLogout} 
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-red/5 hover:bg-brand-red hover:text-white text-brand-red text-xs font-bold transition-all cursor-pointer"
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-red/5 hover:bg-brand-red hover:text-white text-brand-red text-xs font-bold transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -452,7 +461,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                 { label: "Avg. Ticket Value", val: `$${analytics.avgOrderValue.toFixed(2)}`, icon: <TrendingUp className="w-5 h-5 text-brand-orange" />, bg: "bg-brand-orange/5" },
                 { label: "Today's Sales", val: `$${analytics.todayRevenue.toFixed(2)}`, icon: <Calendar className="w-5 h-5 text-brand-yellow" />, bg: "bg-brand-yellow/5", sub: `${analytics.todayCount} orders` }
               ].map((kpi, idx) => (
-                <div key={idx} className="bg-white rounded-2xl p-5 shadow-xs border border-brand-dark/5 flex items-center gap-4">
+                <div key={idx} className="bg-white rounded-2xl p-5 border border-brand-dark/5 flex items-center gap-4 hover:-translate-y-0.5 hover:shadow-xs transition-[transform,box-shadow] duration-300 ease-out shadow-xs">
                   <div className={`w-11 h-11 rounded-full ${kpi.bg} flex items-center justify-center shrink-0`}>
                     {kpi.icon}
                   </div>
@@ -530,7 +539,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newCatName} 
                       onChange={e => setNewCatName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <input 
                       type="text" 
@@ -538,7 +547,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newCatSlug} 
                       onChange={e => setNewCatSlug(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   </div>
                   <input 
@@ -546,16 +555,16 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     placeholder="Short description" 
                     value={newCatDesc} 
                     onChange={e => setNewCatDesc(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="number" 
                     placeholder="Display Sort Order" 
                     value={newCatOrder} 
                     onChange={e => setNewCatOrder(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create Category</span>
                   </button>
@@ -569,7 +578,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         <span>{c.name} <strong className="text-brand-dark/40 font-bold">/{c.slug}</strong></span>
                         {c.description && <p className="text-[10px] text-brand-dark/50 leading-tight mt-0.5">{c.description}</p>}
                       </div>
-                      <button onClick={() => handleDeleteCategory(c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeleteCategory(c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -588,7 +597,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemName} 
                       onChange={e => setNewItemName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <input 
                       type="text" 
@@ -596,7 +605,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemSlug} 
                       onChange={e => setNewItemSlug(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -607,12 +616,12 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemPrice} 
                       onChange={e => setNewItemPrice(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <select 
                       value={newItemCat} 
                       onChange={e => setNewItemCat(e.target.value)} 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     >
                       <option value="">-- Choose Category --</option>
                       {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -623,7 +632,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     placeholder="Listing description ingredients" 
                     value={newItemDesc} 
                     onChange={e => setNewItemDesc(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   
                   <div className="flex items-center gap-2 text-xs font-semibold text-brand-dark/70 py-1">
@@ -637,7 +646,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     <label htmlFor="isPizza">This is a custom Pizza (enable Visual Customizer)</label>
                   </div>
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create Menu Listing</span>
                   </button>
@@ -656,7 +665,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                           {item.isPizza && <span className="text-brand-orange ml-2">[PIZZA]</span>}
                         </p>
                       </div>
-                      <button onClick={() => handleDeleteMenuItem(item.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeleteMenuItem(item.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -685,7 +694,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                   <select 
                     value={optType} 
                     onChange={e => setOptType(e.target.value as any)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   >
                     <option value="size">Pizza Size</option>
                     <option value="crust">Pizza Crust</option>
@@ -700,7 +709,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={optName} 
                     onChange={e => setOptName(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
 
                   {optType === "size" ? (
@@ -712,7 +721,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         value={optFactor} 
                         onChange={e => setOptFactor(e.target.value)} 
                         required 
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                       />
                       <input 
                         type="number" 
@@ -721,7 +730,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         value={optPrice} 
                         onChange={e => setOptPrice(e.target.value)} 
                         required 
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                       />
                     </div>
                   ) : (
@@ -732,7 +741,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={optPrice} 
                       onChange={e => setOptPrice(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   )}
 
@@ -749,7 +758,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     </div>
                   )}
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create Custom Option</span>
                   </button>
@@ -771,7 +780,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                           Multiplier: {s.priceFactor}x | Flat Price add: +${s.priceAdd.toFixed(2)}
                         </p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -783,7 +792,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         <strong>{c.name}</strong>
                         <p className="text-[10px] text-brand-dark/50">Price addition: +${c.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -795,7 +804,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         <strong>{s.name}</strong>
                         <p className="text-[10px] text-brand-dark/50">Price addition: +${s.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -811,7 +820,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                           {t.isVegan && <span className="text-brand-green ml-1">[VEGAN]</span>}
                         </p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -823,7 +832,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         <strong>{a.name}</strong>
                         <p className="text-[10px] text-brand-dark/50">Price: +${a.price.toFixed(2)}</p>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -855,7 +864,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={newRealName} 
                     onChange={e => setNewRealName(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="text" 
@@ -863,7 +872,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={newUsername} 
                     onChange={e => setNewUsername(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="password" 
@@ -871,19 +880,19 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={newPassword} 
                     onChange={e => setNewPassword(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   
                   <select 
                     value={newUserRole} 
                     onChange={e => setNewUserRole(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   >
                     <option value="STAFF">STAFF (Kitchen Queue access)</option>
                     <option value="ADMIN">ADMIN (Full Panel access)</option>
                   </select>
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create User</span>
                   </button>
@@ -903,7 +912,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         </p>
                       </div>
                       {user.id !== usr.id ? (
-                        <button onClick={() => handleDeleteUser(usr.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-colors cursor-pointer">
+                        <button onClick={() => handleDeleteUser(usr.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       ) : (

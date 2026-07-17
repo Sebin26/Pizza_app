@@ -39,11 +39,13 @@ export default function Pizza3D() {
       
       {/* Soft shadow cast below the pizza */}
       <motion.div
-        initial={{ opacity: 0, scaleX: 0.6 }}
-        animate={{ opacity: 1, scaleX: 1.1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-        className="absolute bottom-2 w-48 h-5 bg-brand-dark/10 blur-md rounded-full animate-pulse"
-      ></motion.div>
+        className="absolute bottom-2 w-48 h-5 pointer-events-none"
+      >
+        <div className="w-full h-full bg-brand-dark/10 rounded-full animate-float-shadow will-change-transform" />
+      </motion.div>
     </div>
   );
 }

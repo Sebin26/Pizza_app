@@ -22,7 +22,7 @@ const Pizza3D = dynamic(() => import("./Pizza3D"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full aspect-square max-w-md md:max-w-xl flex items-center justify-center">
-      <div className="w-24 h-24 rounded-full border-4 border-t-brand-red border-r-transparent border-b-brand-orange border-l-transparent animate-spin"></div>
+      <div className="w-16 h-16 rounded-full border-2 border-brand-red/20 border-t-brand-red animate-[spin_0.8s_linear_infinite]" />
     </div>
   )
 });
@@ -85,7 +85,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                 </span>
               </h1>
               
-              <p className="text-[16px] sm:text-[18px] text-brand-dark/70 leading-relaxed font-medium max-w-xl">
+              <p className="text-base sm:text-lg text-brand-dark/70 leading-relaxed font-medium max-w-xl">
                 Skip the queue. Place your order directly from your table, customize toppings live, and watch as our chefs fire your pizza at 900°F.
               </p>
             </motion.div>
@@ -99,18 +99,18 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
             >
               <Link
                 href="/?order=true"
-                className="group relative flex items-center justify-center gap-2 px-8 py-4 bg-brand-red hover:bg-brand-red/95 text-white font-bold rounded-2xl shadow-lg shadow-brand-red/25 hover:shadow-xl hover:shadow-brand-red/35 transition-all duration-300 hover:-translate-y-1 active:translate-y-0 active:scale-98 overflow-hidden"
+                className="group relative flex items-center justify-center gap-2 px-8 py-4 bg-brand-red hover:bg-brand-red/95 text-white font-bold rounded-2xl shadow-lg shadow-brand-red/25 hover:shadow-xl hover:shadow-brand-red/35 transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] overflow-hidden"
               >
                 {/* Micro-glow effect */}
                 <div className="absolute inset-0 w-full h-full bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                 <span>Start Ordering</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
               </Link>
 
               <a
                 href="#featured-pizzas"
                 onClick={(e) => handleScroll(e, "featured-pizzas")}
-                className="group flex items-center justify-center gap-2 px-8 py-4 bg-white/70 hover:bg-white border border-brand-dark/10 hover:border-brand-dark/20 text-brand-dark font-bold rounded-2xl shadow-xs transition-all duration-300 hover:-translate-y-1 active:translate-y-0 active:scale-98"
+                className="group flex items-center justify-center gap-2 px-8 py-4 bg-white/70 hover:bg-white border border-brand-dark/10 hover:border-brand-dark/20 text-brand-dark font-bold rounded-2xl shadow-xs transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]"
               >
                 <span>View Menu</span>
               </a>
@@ -118,23 +118,32 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
 
             {/* In-Store Ordering Features badge */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.08,
+                    delayChildren: 0.4
+                  }
+                }
+              }}
+              initial="hidden"
+              animate="visible"
               className="grid grid-cols-3 gap-6 pt-4 border-t border-brand-dark/10 max-w-lg"
             >
-              <div>
+              <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
                 <span className="block text-2xl font-extrabold text-brand-red">Table #</span>
                 <span className="text-xs font-semibold text-brand-dark/50 uppercase tracking-wider">Tap to Order</span>
-              </div>
-              <div>
+              </motion.div>
+              <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
                 <span className="block text-2xl font-extrabold text-brand-red">900°F</span>
                 <span className="text-xs font-semibold text-brand-dark/50 uppercase tracking-wider">Wood Oven</span>
-              </div>
-              <div>
+              </motion.div>
+              <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
                 <span className="block text-2xl font-extrabold text-brand-red">5 Min</span>
                 <span className="text-xs font-semibold text-brand-dark/50 uppercase tracking-wider">Fast Service</span>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
 
@@ -178,17 +187,16 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="group bg-brand-cream rounded-3xl overflow-hidden shadow-xs hover:shadow-xl border border-brand-dark/5 flex flex-col justify-between transition-all duration-300"
+                transition={{ duration: 0.5, delay: idx * 0.08, ease: [0.23, 1, 0.32, 1] }}
+                className="group bg-brand-cream rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-2 hover:border-brand-dark/10 border border-brand-dark/5 flex flex-col justify-between transition-[transform,box-shadow,border-color] duration-300 ease-out"
               >
                 {/* Pizza Graphic/Image Header */}
                 <div className="h-52 bg-brand-light relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-tr from-brand-orange/10 to-brand-red/10 transition-transform duration-500 group-hover:scale-105"></div>
+                  <div className="absolute inset-0 bg-linear-to-tr from-brand-orange/10 to-brand-red/10 transition-transform duration-500 ease-out group-hover:scale-105"></div>
                   
                   {/* Rotating/Scaling Pizza Image on Hover */}
                   {item.imageUrl ? (
-                    <div className="relative w-40 h-40 transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-12">
+                    <div className="relative w-40 h-40 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-[6deg]">
                       <Image
                         src={`/${item.imageUrl}.png`}
                         alt={item.name}
@@ -199,7 +207,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                     </div>
                   ) : (
                     <div 
-                      className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-700 ease-out group-hover:rotate-45"
+                      className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-[15deg]"
                       style={{
                         background: "radial-gradient(circle, #FBC02D 10%, #F57C00 50%, #C62828 100%)"
                       }}
@@ -232,10 +240,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                   {/* Actions */}
                   <button
                     onClick={() => router.push(`/builder?id=${item.id}`)}
-                    className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-brand-red group-hover:bg-brand-red text-brand-dark group-hover:text-white font-bold rounded-xl border border-brand-dark/10 group-hover:border-transparent text-sm transition-all duration-300 active:scale-97 shadow-xs hover:shadow-md"
+                    className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-brand-red group-hover:bg-brand-red text-brand-dark group-hover:text-white font-bold rounded-xl border border-brand-dark/10 group-hover:border-transparent text-sm transition-[background-color,color,border-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] shadow-xs hover:shadow-md"
                   >
                     <span>Customize & Order</span>
-                    <ArrowRight className="w-4 h-4 translate-x-0 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 translate-x-0 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
                   </button>
                 </div>
               </motion.div>
@@ -246,10 +254,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
           <div className="mt-16 text-center">
             <Link
               href="/?order=true"
-              className="inline-flex items-center gap-2 text-sm font-bold text-brand-red hover:text-brand-orange transition-colors"
+              className="group inline-flex items-center gap-2 text-sm font-bold text-brand-red hover:text-brand-orange transition-colors duration-200"
             >
               <span>Explore full catalog of pizzas, sides, and drinks</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
             </Link>
           </div>
 
@@ -281,10 +289,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:shadow-md transition-shadow duration-300"
+              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:-translate-y-1 hover:shadow-md transition-[transform,box-shadow] duration-300 ease-out"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 ease-out">
                 <Leaf className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-brand-dark">Fresh Ingredients</h3>
@@ -298,10 +306,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:shadow-md transition-shadow duration-300"
+              transition={{ duration: 0.5, delay: 0.08, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:-translate-y-1 hover:shadow-md transition-[transform,box-shadow] duration-300 ease-out"
             >
-              <div className="w-12 h-12 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 ease-out">
                 <Clock className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-brand-dark">Fast Preparation</h3>
@@ -315,10 +323,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:shadow-md transition-shadow duration-300"
+              transition={{ duration: 0.5, delay: 0.16, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white p-8 rounded-3xl shadow-xs border border-brand-dark/5 flex flex-col gap-6 group hover:-translate-y-1 hover:shadow-md transition-[transform,box-shadow] duration-300 ease-out"
             >
-              <div className="w-12 h-12 rounded-2xl bg-brand-red/10 text-brand-red flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-brand-red/10 text-brand-red flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 ease-out">
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-brand-dark">Authentic Recipe</h3>
@@ -338,10 +346,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
           
           {/* Left: Chef Portrait */}
           <motion.div 
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             className="lg:col-span-5 relative w-full aspect-square max-w-[480px] mx-auto rounded-[32px] overflow-hidden shadow-2xl border border-brand-dark/10 group"
           >
             {/* Overlay border design */}
@@ -353,7 +361,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               alt="Chef Giovanni preparing authentic wood-fired pizza" 
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
               priority
             />
           </motion.div>
@@ -386,10 +394,10 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
             <div className="pt-4">
               <Link
                 href="/?order=true"
-                className="group inline-flex items-center gap-2 px-6 py-3.5 bg-brand-dark hover:bg-brand-red text-white font-bold rounded-xl text-sm transition-all duration-300 shadow-xs hover:shadow-md"
+                className="group inline-flex items-center gap-2 px-6 py-3.5 bg-brand-dark hover:bg-brand-red text-white font-bold rounded-xl text-sm transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] shadow-xs hover:shadow-md"
               >
                 <span>Discover Chef Specials</span>
-                <ArrowUpRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <ArrowUpRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200 ease-out" />
               </Link>
             </div>
           </div>
@@ -422,8 +430,8 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6"
+              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6 hover:bg-white/85 hover:-translate-y-1 hover:shadow-md transition-[transform,background-color,box-shadow] duration-300 ease-out"
             >
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-1 text-brand-yellow">
@@ -449,8 +457,8 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6"
+              transition={{ duration: 0.5, delay: 0.08, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6 hover:bg-white/85 hover:-translate-y-1 hover:shadow-md transition-[transform,background-color,box-shadow] duration-300 ease-out"
             >
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-1 text-brand-yellow">
@@ -476,8 +484,8 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6"
+              transition={{ duration: 0.5, delay: 0.16, ease: [0.23, 1, 0.32, 1] }}
+              className="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-white shadow-xs flex flex-col justify-between gap-6 hover:bg-white/85 hover:-translate-y-1 hover:shadow-md transition-[transform,background-color,box-shadow] duration-300 ease-out"
             >
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-1 text-brand-yellow">

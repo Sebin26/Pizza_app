@@ -45,7 +45,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link 
             href="/cart" 
-            className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold shadow-md shadow-brand-red/20 transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
+            className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold shadow-md shadow-brand-red/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] hover:-translate-y-0.5"
           >
             <ShoppingCart className="w-4.5 h-4.5" />
             <span>Cart</span>

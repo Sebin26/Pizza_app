@@ -198,7 +198,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
           {user.role === "ADMIN" && (
             <button
               onClick={() => router.push("/admin")}
-              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-orange/20 hover:border-brand-orange text-brand-orange text-xs font-bold transition-colors cursor-pointer"
+              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-orange/20 hover:border-brand-orange text-brand-orange text-xs font-bold transition-[border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
             >
               <ShieldAlert className="w-4 h-4" />
               <span>Admin Panel</span>
@@ -207,7 +207,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
 
           <button 
             onClick={handleLogout} 
-            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-dark hover:text-white text-brand-dark/70 hover:border-brand-dark text-xs font-bold transition-all cursor-pointer active:scale-95"
+            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-dark hover:text-white text-brand-dark/70 hover:border-brand-dark text-xs font-bold transition-[background-color,color,border-color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -229,7 +229,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
               placeholder="Search token / name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/40 border border-transparent focus:border-brand-red/20 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/40 border border-transparent focus:border-brand-red/20 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-[box-shadow,border-color,background-color] duration-200 ease-out"
             />
           </div>
 
@@ -250,13 +250,20 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                 <button
                   key={f.value}
                   onClick={() => setStatusFilter(f.value)}
-                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  className={`relative w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-[color] duration-200 ease-out active:scale-[0.97] cursor-pointer overflow-hidden ${
                     isActive
-                      ? "bg-brand-red text-white shadow-sm shadow-brand-red/20"
+                      ? "text-white"
                       : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/95 hover:text-brand-dark"
                   }`}
                 >
-                  {f.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeStaffFilter"
+                      className="absolute inset-0 bg-brand-red rounded-xl shadow-sm shadow-brand-red/20 z-0"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{f.label}</span>
                 </button>
               );
             })}
@@ -274,7 +281,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center text-center p-12 bg-white rounded-2xl border border-brand-dark/5 shadow-xs">
-              <div className="w-8 h-8 rounded-full border-4 border-brand-red/20 border-t-brand-red animate-spin mb-3"></div>
+              <div className="w-8 h-8 rounded-full border-4 border-brand-red/20 border-t-brand-red animate-[spin_0.8s_linear_infinite] mb-3"></div>
               <p className="text-xs text-brand-dark/50 font-bold">Syncing kitchen database...</p>
             </div>
           ) : orders.length > 0 ? (
@@ -382,7 +389,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                         {order.status !== "COMPLETED" ? (
                           <button
                             onClick={() => handleUpdateStatus(order.id, order.status)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[11px] shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[11px] shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]"
                           >
                             <span>{getActionLabel(order.status)}</span>
                             <ArrowRight className="w-3.5 h-3.5" />

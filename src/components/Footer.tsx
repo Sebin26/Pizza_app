@@ -14,10 +14,10 @@ export default function Footer() {
           {/* Col 1: Brand Info */}
           <div className="md:col-span-4 flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-2 group w-fit">
-              <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-md">
+              <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-md group-hover:scale-105 group-hover:rotate-[6deg] transition-[transform] duration-300 ease-out">
                 <Flame className="w-5 h-5 fill-current text-white" />
               </div>
-              <span className="text-lg font-bold tracking-tight">
+              <span className="text-lg font-bold tracking-tight group-hover:text-brand-red transition-[color] duration-300 ease-out">
                 D Town <span className="text-brand-red">Pizza</span>
               </span>
             </Link>
@@ -27,14 +27,14 @@ export default function Footer() {
             
             {/* Social icons */}
             <div className="flex items-center gap-3 mt-1">
-              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-brand-red text-white/70 hover:text-white flex items-center justify-center transition-all" aria-label="Instagram">
+              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-brand-red text-white/70 hover:text-white flex items-center justify-center transition-[background-color,color,transform] duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.9] cursor-pointer" aria-label="Instagram">
                 <svg className="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                 </svg>
               </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-brand-red text-white/70 hover:text-white flex items-center justify-center transition-all" aria-label="Facebook">
+              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-brand-red text-white/70 hover:text-white flex items-center justify-center transition-[background-color,color,transform] duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.9] cursor-pointer" aria-label="Facebook">
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                 </svg>
@@ -46,9 +46,9 @@ export default function Footer() {
           <div className="md:col-span-2 flex flex-col gap-4">
             <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-orange">Explore</h4>
             <ul className="flex flex-col gap-3 text-xs text-white/60">
-              <li><Link href="/?order=true" className="hover:text-white transition-colors">Menu Catalog</Link></li>
-              <li><Link href="/builder" className="hover:text-white transition-colors">Pizza Customizer</Link></li>
-              <li><Link href="/cart" className="hover:text-white transition-colors">My Cart</Link></li>
+              <li><Link href="/?order=true" className="hover:text-white transition-[color] duration-150 ease-out">Menu Catalog</Link></li>
+              <li><Link href="/builder" className="hover:text-white transition-[color] duration-150 ease-out">Pizza Customizer</Link></li>
+              <li><Link href="/cart" className="hover:text-white transition-[color] duration-150 ease-out">My Cart</Link></li>
             </ul>
           </div>
 
@@ -95,8 +95,8 @@ export default function Footer() {
         <div className="pt-8 border-t border-white/5 text-center text-[11px] text-white/40 flex flex-col sm:flex-row justify-between items-center gap-4">
           <span>© {new Date().getFullYear()} D Town Pizza. All rights reserved.</span>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white/60 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white/60 transition-[color] duration-150 ease-out">Privacy Policy</a>
+            <a href="#" className="hover:text-white/60 transition-[color] duration-150 ease-out">Terms of Service</a>
           </div>
         </div>
 

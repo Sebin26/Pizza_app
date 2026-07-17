@@ -105,7 +105,7 @@ function FloatingIngredient({
 }: IngredientProps) {
   return (
     <motion.div
-      className={`absolute select-none pointer-events-none z-10 ${className}`}
+      className={`absolute select-none pointer-events-none z-10 will-change-transform ${className}`}
       style={{ scale }}
       initial={{ y: 0, x: 0, rotate: 0 }}
       animate={{
