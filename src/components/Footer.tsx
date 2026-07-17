@@ -14,7 +14,7 @@ export default function Footer() {
           {/* Col 1: Brand Info */}
           <div className="md:col-span-4 flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-2 group w-fit">
-              <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-md group-hover:scale-105 group-hover:rotate-[6deg] transition-[transform] duration-300 ease-out">
+              <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-md group-hover:scale-105 group-hover:rotate-6 transition-[transform] duration-300 ease-out">
                 <Flame className="w-5 h-5 fill-current text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight group-hover:text-brand-red transition-[color] duration-300 ease-out">

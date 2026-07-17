@@ -196,7 +196,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                   
                   {/* Rotating/Scaling Pizza Image on Hover */}
                   {item.imageUrl ? (
-                    <div className="relative w-40 h-40 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-[6deg]">
+                    <div className="relative w-40 h-40 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
                       <Image
                         src={`/${item.imageUrl}.png`}
                         alt={item.name}
@@ -207,7 +207,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                     </div>
                   ) : (
                     <div 
-                      className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-[15deg]"
+                      className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-15"
                       style={{
                         background: "radial-gradient(circle, #FBC02D 10%, #F57C00 50%, #C62828 100%)"
                       }}

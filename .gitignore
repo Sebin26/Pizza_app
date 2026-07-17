@@ -46,3 +46,8 @@ next-env.d.ts
 /prisma/*.db-shm
 /prisma/*.db-wal
 
+# AI agent directories and lockfiles
+.agents/
+skills-lock.json
+
+

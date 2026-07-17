@@ -16,24 +16,40 @@ import {
   CheckCircle2,
   Calendar,
   AlertCircle,
-  Pizza,
   Store,
-  ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Category,
+  MenuItem,
+  PizzaSize,
+  PizzaCrust,
+  PizzaSauce,
+  PizzaTopping,
+  PizzaAddon,
+  Order,
+} from "@/types";
+
+interface AdminUser {
+  id: string;
+  username: string;
+  name: string;
+  role: string;
+  createdAt?: string;
+}
 
 interface AdminDashboardContainerProps {
-  user: any;
+  user: AdminUser;
   initialData: {
-    categories: any[];
-    menuItems: any[];
-    sizes: any[];
-    crusts: any[];
-    sauces: any[];
-    toppings: any[];
-    addons: any[];
-    users: any[];
-    orders: any[];
+    categories: Category[];
+    menuItems: MenuItem[];
+    sizes: PizzaSize[];
+    crusts: PizzaCrust[];
+    sauces: PizzaSauce[];
+    toppings: PizzaTopping[];
+    addons: PizzaAddon[];
+    users: AdminUser[];
+    orders: Order[];
   };
 }
 
@@ -50,7 +66,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
   const [toppings, setToppings] = useState(initialData.toppings);
   const [addons, setAddons] = useState(initialData.addons);
   const [usersList, setUsersList] = useState(initialData.users);
-  const [orders, setOrders] = useState(initialData.orders);
+  const [orders] = useState(initialData.orders);
 
   // Form states
   // -- Category
@@ -152,8 +168,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       setNewCatSlug("");
       setNewCatDesc("");
       setNewCatOrder("0");
-    } catch (err: any) {
-      setActionError(err.message || "Failed to add category");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to add category");
     }
   };
 
@@ -169,8 +185,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       setCategories((prev) => prev.filter((c) => c.id !== id));
       setMenuItems((prev) => prev.filter((m) => m.categoryId !== id));
       setActionSuccess("Category deleted successfully.");
-    } catch (err: any) {
-      setActionError(err.message || "Failed to delete category");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to delete category");
     }
   };
 
@@ -202,8 +218,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       setNewItemDesc("");
       setNewItemPrice("");
       setNewItemIsPizza(false);
-    } catch (err: any) {
-      setActionError(err.message || "Failed to add menu item");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to add menu item");
     }
   };
 
@@ -218,8 +234,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       }
       setMenuItems((prev) => prev.filter((m) => m.id !== id));
       setActionSuccess("Menu item deleted.");
-    } catch (err: any) {
-      setActionError(err.message || "Failed to delete item");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to delete item");
     }
   };
 
@@ -228,7 +244,15 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
     e.preventDefault();
     clearAlerts();
     try {
-      const payload: any = { name: optName };
+      const payload: {
+        name: string;
+        priceFactor?: number;
+        priceAdd?: number;
+        price?: number;
+        displayOrder?: number;
+        isVegetarian?: boolean;
+        isVegan?: boolean;
+      } = { name: optName };
       if (optType === "size") {
         payload.priceFactor = parseFloat(optFactor) || 1.0;
         payload.priceAdd = parseFloat(optPrice) || 0.0;
@@ -265,8 +289,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       setOptFactor("1.0");
       setOptIsVeg(false);
       setOptIsVegan(false);
-    } catch (err: any) {
-      setActionError(err.message || "Failed to add option");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to add option");
     }
   };
 
@@ -287,8 +311,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       else if (type === "addon") setAddons((p) => p.filter((x) => x.id !== id));
 
       setActionSuccess(`Option deleted.`);
-    } catch (err: any) {
-      setActionError(err.message || "Failed to delete option");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to delete option");
     }
   };
 
@@ -315,8 +339,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       setNewUsername("");
       setNewPassword("");
       setNewRealName("");
-    } catch (err: any) {
-      setActionError(err.message || "Failed to create user");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to create user");
     }
   };
 
@@ -330,8 +354,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
 
       setUsersList((prev) => prev.filter((u) => u.id !== id));
       setActionSuccess("User account deleted.");
-    } catch (err: any) {
-      setActionError(err.message || "Failed to delete user");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to delete user");
     }
   };
 
@@ -362,18 +386,18 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
         </div>
 
         <nav className="flex flex-col gap-1 w-full">
-          {[
+          {([
             { id: "analytics", label: "Dashboard & Stats", icon: <PieChart className="w-4.5 h-4.5" /> },
             { id: "menu", label: "Menu & Categories", icon: <Grid className="w-4.5 h-4.5" /> },
             { id: "config", label: "Pizza Customizer", icon: <Settings className="w-4.5 h-4.5" /> },
             { id: "users", label: "Staff & Logins", icon: <Users className="w-4.5 h-4.5" /> },
             { id: "orders", label: "Order History", icon: <ShoppingBag className="w-4.5 h-4.5" /> }
-          ].map((tab) => {
+          ] as const).map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => { setActiveTab(tab.id as any); clearAlerts(); }}
+                onClick={() => { setActiveTab(tab.id); clearAlerts(); }}
                 className={`relative w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-[color] duration-200 ease-out cursor-pointer active:scale-[0.97] overflow-hidden ${
                   isActive
                     ? "text-white font-extrabold"
@@ -693,7 +717,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                 <form onSubmit={handleAddPizzaOption} className="flex flex-col gap-3">
                   <select 
                     value={optType} 
-                    onChange={e => setOptType(e.target.value as any)} 
+                    onChange={e => setOptType(e.target.value as typeof optType)} 
                     className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   >
                     <option value="size">Pizza Size</option>
@@ -908,7 +932,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       <div className="flex flex-col gap-0.5">
                         <span>{usr.name} <strong className="text-brand-dark/40 font-bold">@{usr.username}</strong></span>
                         <p className="text-[10px] text-brand-dark/50 mt-0.5 leading-normal">
-                          Role: <strong>{usr.role}</strong> | Created: {new Date(usr.createdAt).toLocaleDateString()}
+                          Role: <strong>{usr.role}</strong> | Created: {usr.createdAt ? new Date(usr.createdAt).toLocaleDateString() : "N/A"}
                         </p>
                       </div>
                       {user.id !== usr.id ? (
@@ -949,7 +973,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     <span className="font-bold text-brand-dark">Customer: <strong className="text-brand-dark/80 font-bold">{o.customerName}</strong> {o.customerPhone && <span className="ml-2">({o.customerPhone})</span>}</span>
                     <p className="text-brand-dark/55 leading-relaxed mt-0.5">
                       <strong className="text-brand-dark/70">Items:</strong>{" "}
-                      {o.items?.map((item: any) => `${item.quantity}x ${item.menuItem.name}`).join(", ")}
+                      {o.items?.map((item) => `${item.quantity}x ${item.menuItem.name}`).join(", ")}
                     </p>
                   </div>
 

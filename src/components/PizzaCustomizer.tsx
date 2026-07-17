@@ -518,7 +518,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                             onClick={() => setSelectedSize(sz)}
                             className={`flex flex-col items-center text-center p-5 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                               isActive
-                                ? "border-brand-red bg-brand-red/[0.02]"
+                                ? "border-brand-red bg-brand-red/2"
                                 : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                             }`}
                           >
@@ -549,7 +549,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                             onClick={() => setSelectedCrust(cr)}
                             className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
                               isActive
-                                ? "border-brand-red bg-brand-red/[0.02]"
+                                ? "border-brand-red bg-brand-red/2"
                                 : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                             }`}
                           >
@@ -584,7 +584,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                             onClick={() => setSelectedSauce(sc)}
                             className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
                               isActive
-                                ? "border-brand-red bg-brand-red/[0.02]"
+                                ? "border-brand-red bg-brand-red/2"
                                 : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                             }`}
                           >
@@ -624,7 +624,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => handleToppingToggle(tp)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                 isSelected
-                                  ? "border-brand-red bg-brand-red/[0.02]"
+                                  ? "border-brand-red bg-brand-red/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
@@ -656,7 +656,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => handleToppingToggle(tp)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                 isSelected
-                                  ? "border-brand-red bg-brand-red/[0.02]"
+                                  ? "border-brand-red bg-brand-red/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
@@ -688,7 +688,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => handleToppingToggle(tp)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                 isSelected
-                                  ? "border-brand-red bg-brand-red/[0.02]"
+                                  ? "border-brand-red bg-brand-red/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
@@ -725,7 +725,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                             onClick={() => handleAddonToggle(ad)}
                             className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                               isSelected
-                                ? "border-brand-red bg-brand-red/[0.02]"
+                                ? "border-brand-red bg-brand-red/2"
                                 : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                             }`}
                           >
