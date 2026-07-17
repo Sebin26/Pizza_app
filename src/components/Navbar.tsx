@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, Flame } from "lucide-react";
+import { ShoppingCart, Flame, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
   const { cart } = useCart();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-brand-dark/5 shadow-xs">
@@ -25,7 +28,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation Links */}
+        {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-8">
           <Link 
             href="/?order=true" 
@@ -45,18 +48,57 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link 
             href="/cart" 
-            className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold shadow-md shadow-brand-red/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] hover:-translate-y-0.5"
+            className="relative flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold shadow-md shadow-brand-red/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] hover:-translate-y-0.5"
           >
             <ShoppingCart className="w-4.5 h-4.5" />
-            <span>Cart</span>
+            <span className="hidden sm:inline">Cart</span>
             {cartCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-brand-orange text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
                 {cartCount}
               </span>
             )}
           </Link>
+
+          {/* Hamburger button (Mobile) */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex md:hidden items-center justify-center w-10 h-10 rounded-xl bg-brand-light hover:bg-brand-light/95 border border-brand-dark/5 text-brand-dark focus:outline-none active:scale-[0.9] transition-transform duration-100 cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile dropdown navigation menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-white border-t border-brand-dark/5"
+          >
+            <nav className="flex flex-col px-6 py-4 gap-4">
+              <Link 
+                href="/?order=true" 
+                onClick={() => setIsOpen(false)}
+                className="text-[15px] font-bold text-brand-dark/70 hover:text-brand-red py-1.5 transition-colors duration-200"
+              >
+                Menu
+              </Link>
+              <Link 
+                href="/builder" 
+                onClick={() => setIsOpen(false)}
+                className="text-[15px] font-bold text-brand-dark/70 hover:text-brand-red py-1.5 transition-colors duration-200"
+              >
+                Pizza Customizer
+              </Link>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

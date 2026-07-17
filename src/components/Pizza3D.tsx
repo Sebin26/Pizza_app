@@ -89,6 +89,8 @@ export default function Pizza3D() {
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setIsHovered(false)}
       className="relative w-full h-[450px] flex items-center justify-center cursor-pointer select-none overflow-hidden rounded-3xl bg-radial from-brand-red/10 via-transparent to-transparent"
     >
       {/* Background hearth glow */}
