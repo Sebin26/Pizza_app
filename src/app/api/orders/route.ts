@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { getSession } from "@/lib/session";
 
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
     const search = searchParams.get("search");
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
 
     if (status) {
       if (status === "ACTIVE") {
@@ -309,10 +310,11 @@ export async function POST(request: Request) {
         status: newOrder.status,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Create order transaction error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to submit order";
     return NextResponse.json(
-      { error: error.message || "Failed to submit order" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -496,7 +496,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           </div>
 
           {/* Sliding wizard content container */}
-          <div className="relative overflow-hidden min-h-[380px]">
+          <div className="relative overflow-hidden min-h-95">
             <AnimatePresence mode="wait" initial={false} custom={direction}>
               <motion.div
                 key={currentStep}
@@ -522,7 +522,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                         <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Size</h4>
                         {selectedSize ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                            <Check className="w-3 h-3 stroke-3" /> Completed
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-brand-dark/40">Required</span>
@@ -561,7 +561,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                         <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Crust</h4>
                         {selectedCrust ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                            <Check className="w-3 h-3 stroke-3" /> Completed
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-brand-dark/40">Required</span>
@@ -603,7 +603,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                         <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Sauce</h4>
                         {selectedSauce ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                            <Check className="w-3 h-3 stroke-3" /> Completed
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-brand-dark/40">Required</span>
@@ -653,7 +653,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                         <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Add Toppings</h4>
                         {selectedToppings.length > 0 ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Check className="w-3 h-3 stroke-[3]" /> {selectedToppings.length} Selected
+                            <Check className="w-3 h-3 stroke-3" /> {selectedToppings.length} Selected
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-brand-dark/40">Optional</span>
@@ -765,7 +765,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                         <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Add-ons & Dippers</h4>
                         {selectedAddons.length > 0 ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Check className="w-3 h-3 stroke-[3]" /> {selectedAddons.length} Selected
+                            <Check className="w-3 h-3 stroke-3" /> {selectedAddons.length} Selected
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-brand-dark/40">Optional</span>
@@ -1073,7 +1073,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                 <span>Back</span>
               </button>
             ) : (
-              <div className="w-[80px]" />
+              <div className="w-20" />
             )}
 
             {/* Running Total price visible near the bottom action buttons for steps 1-2 */}
@@ -1100,7 +1100,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               </button>
             ) : (
               // Empty spacer on Step 3 for desktop since the only CTA is the sidebar button
-              <div className="w-[180px]" />
+              <div className="w-45" />
             )}
           </div>
 
@@ -1138,7 +1138,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden bg-white px-6 py-4 flex flex-col gap-4 text-sm max-h-[300px] overflow-y-auto"
+              className="overflow-hidden bg-white px-6 py-4 flex flex-col gap-4 text-sm max-h-75 overflow-y-auto"
             >
               {/* Receipt styling: label/value pairs with light bottom border */}
               <div className="flex justify-between items-center py-1.5 border-b border-brand-dark/5">

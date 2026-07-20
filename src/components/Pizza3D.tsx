@@ -1,18 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+interface Ember {
+  id: number;
+  size: number;
+  delay: number;
+  duration: number;
+  xStart: number;
+}
+
 // Steam & Embers Option A
 function EmbersEffect() {
-  const embers = Array.from({ length: 12 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 3 + 2,
-    delay: Math.random() * 4,
-    duration: Math.random() * 4 + 4,
-    xStart: Math.random() * 70 + 15,
-  }));
+  const [embers, setEmbers] = useState<Ember[]>([]);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setEmbers(
+        Array.from({ length: 12 }, (_, i) => ({
+          id: i,
+          size: Math.random() * 3 + 2,
+          delay: Math.random() * 4,
+          duration: Math.random() * 4 + 4,
+          xStart: Math.random() * 70 + 15,
+        }))
+      );
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
@@ -91,7 +108,7 @@ export default function Pizza3D() {
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => setIsHovered(false)}
-      className="relative w-full h-[450px] flex items-center justify-center cursor-pointer select-none overflow-hidden rounded-3xl bg-radial from-brand-red/10 via-transparent to-transparent"
+      className="relative w-full h-112.5 flex items-center justify-center cursor-pointer select-none overflow-hidden rounded-3xl bg-radial from-brand-red/10 via-transparent to-transparent"
     >
       {/* Background hearth glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,124,0,0.06)_0%,transparent_65%)]" />
