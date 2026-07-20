@@ -75,22 +75,17 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
 
 
   const steps = [
-    { id: 1, name: "Size" },
-    { id: 2, name: "Crust" },
-    { id: 3, name: "Sauce" },
-    { id: 4, name: "Toppings" },
-    { id: 5, name: "Extras" },
-    { id: 6, name: "Review" },
+    { id: 1, name: "Build Your Base" },
+    { id: 2, name: "Toppings & Extras" },
+    { id: 3, name: "Review" },
   ];
 
   const isStepValid = (stepNum: number) => {
     switch (stepNum) {
       case 1:
-        return !!selectedSize;
+        return !!selectedSize && !!selectedCrust && !!selectedSauce;
       case 2:
-        return !!selectedCrust;
-      case 3:
-        return !!selectedSauce;
+        return true; // toppings and extras are optional
       default:
         return true;
     }
@@ -106,11 +101,11 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
   const handleNext = () => {
     if (isEditingFromReview) {
       setDirection(1);
-      setCurrentStep(6);
+      setCurrentStep(3);
       setIsEditingFromReview(false);
       return;
     }
-    if (currentStep < 6 && isStepValid(currentStep)) {
+    if (currentStep < 3 && isStepValid(currentStep)) {
       setDirection(1);
       setCurrentStep((prev) => prev + 1);
     }
@@ -443,7 +438,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           {/* Animated active progress bar */}
           <div 
             className="absolute top-1/2 left-0 h-0.5 bg-brand-red -translate-y-1/2 z-0 transition-all duration-300"
-            style={{ width: `${((currentStep - 1) / 5) * 100}%` }}
+            style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
           />
 
           {steps.map((s) => {
@@ -481,7 +476,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
         </div>
         {/* Mobile active step title */}
         <div className="text-center mt-3 sm:hidden text-sm font-extrabold text-brand-red">
-          Step {currentStep} of 6: {steps[currentStep - 1].name}
+          Step {currentStep} of 3: {steps[currentStep - 1].name}
         </div>
       </div>
 
@@ -511,255 +506,306 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-                className="w-full flex flex-col gap-6"
+                className="w-full flex flex-col gap-6 max-h-[calc(100vh-340px)] lg:max-h-none overflow-y-auto pr-1 pb-4 scrollbar-thin"
               >
-                {/* 1. Choose Size */}
+                {/* 1. Build Your Base (Size + Crust + Sauce) */}
                 {currentStep === 1 && (
-                  <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-3">
-                      1. Choose Size
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {config.sizes.map((sz) => {
-                        const isActive = selectedSize.id === sz.id;
-                        return (
-                          <button
-                            key={sz.id}
-                            type="button"
-                            onClick={() => setSelectedSize(sz)}
-                            className={`flex flex-col items-center text-center p-5 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
-                              isActive
-                                ? "border-brand-red bg-brand-red/2"
-                                : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                            }`}
-                          >
-                            <span className="text-3xl mb-2">🍕</span>
-                            <span className="text-[15px] font-bold text-brand-dark">{sz.name}</span>
-                            <span className="text-xs text-brand-dark/50 mt-1 font-semibold">
-                              {sz.priceAdd > 0 ? `+$${sz.priceAdd.toFixed(2)}` : "Base Price"}
-                            </span>
-                          </button>
-                        );
-                      })}
+                  <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-6">
+                    <div>
+                      <h3 className="text-xl font-black text-brand-dark">1. Build Your Base</h3>
+                      <p className="text-xs text-brand-dark/50 mt-1">Select your pizza size, crust type, and signature sauce.</p>
                     </div>
-                  </section>
+
+                    {/* Sub-section: Size */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-brand-dark/5 pb-2">
+                        <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Size</h4>
+                        {selectedSize ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-brand-dark/40">Required</span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {config.sizes.map((sz) => {
+                          const isActive = selectedSize?.id === sz.id;
+                          return (
+                            <button
+                              key={sz.id}
+                              type="button"
+                              onClick={() => setSelectedSize(sz)}
+                              className={`flex flex-col items-center text-center p-5 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
+                                isActive
+                                  ? "border-brand-red bg-brand-red/2"
+                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                              }`}
+                            >
+                              <span className="text-3xl mb-2">🍕</span>
+                              <span className="text-[15px] font-bold text-brand-dark">{sz.name}</span>
+                              <span className="text-xs text-brand-dark/50 mt-1 font-semibold">
+                                {sz.priceAdd > 0 ? `+$${sz.priceAdd.toFixed(2)}` : "Base Price"}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-brand-dark/5 my-2" />
+
+                    {/* Sub-section: Crust */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-brand-dark/5 pb-2">
+                        <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Crust</h4>
+                        {selectedCrust ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-brand-dark/40">Required</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {config.crusts.map((cr) => {
+                          const isActive = selectedCrust?.id === cr.id;
+                          return (
+                            <div
+                              key={cr.id}
+                              onClick={() => setSelectedCrust(cr)}
+                              className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
+                                isActive
+                                  ? "border-brand-red bg-brand-red/2"
+                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
+                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
+                                </div>
+                                <span className="text-[15px] font-bold text-brand-dark">{cr.name}</span>
+                              </div>
+                              <span className="text-sm font-semibold text-brand-dark/60">
+                                {cr.price > 0 ? `+$${cr.price.toFixed(2)}` : "+$0.00"}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-brand-dark/5 my-2" />
+
+                    {/* Sub-section: Sauce */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-brand-dark/5 pb-2">
+                        <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Choose Sauce</h4>
+                        {selectedSauce ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <Check className="w-3 h-3 stroke-[3]" /> Completed
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-brand-dark/40">Required</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {config.sauces.map((sc) => {
+                          const isActive = selectedSauce?.id === sc.id;
+                          return (
+                            <div
+                              key={sc.id}
+                              onClick={() => setSelectedSauce(sc)}
+                              className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
+                                isActive
+                                  ? "border-brand-red bg-brand-red/2"
+                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
+                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
+                                </div>
+                                <span className="text-[15px] font-bold text-brand-dark">{sc.name}</span>
+                              </div>
+                              <span className="text-sm font-semibold text-brand-dark/60">
+                                {sc.price > 0 ? `+$${sc.price.toFixed(2)}` : "+$0.00"}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 )}
 
-                {/* 2. Choose Crust */}
+                {/* 2. Toppings & Extras (Toppings + Extras combined) */}
                 {currentStep === 2 && (
-                  <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-3">
-                      2. Choose Crust
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      {config.crusts.map((cr) => {
-                        const isActive = selectedCrust.id === cr.id;
-                        return (
-                          <div
-                            key={cr.id}
-                            onClick={() => setSelectedCrust(cr)}
-                            className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
-                              isActive
-                                ? "border-brand-red bg-brand-red/2"
-                                : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
-                                {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
-                              </div>
-                              <span className="text-[15px] font-bold text-brand-dark">{cr.name}</span>
-                            </div>
-                            <span className="text-sm font-semibold text-brand-dark/60">
-                              {cr.price > 0 ? `+$${cr.price.toFixed(2)}` : "+$0.00"}
-                            </span>
-                          </div>
-                        );
-                      })}
+                  <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-6">
+                    <div>
+                      <h3 className="text-xl font-black text-brand-dark">2. Toppings & Extras</h3>
+                      <p className="text-xs text-brand-dark/50 mt-1">Select your toppings and optional extra dippers or sides.</p>
                     </div>
-                  </section>
+
+                    {/* Sub-section: Toppings */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-brand-dark/5 pb-2">
+                        <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Add Toppings</h4>
+                        {selectedToppings.length > 0 ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <Check className="w-3 h-3 stroke-[3]" /> {selectedToppings.length} Selected
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-brand-dark/40">Optional</span>
+                        )}
+                      </div>
+
+                      {/* Cheese Group */}
+                      <div className="flex flex-col gap-3">
+                        <h5 className="text-xs font-extrabold uppercase tracking-wider text-brand-dark/50">Cheeses</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {cheeseToppings.map((tp) => {
+                            const isSelected = selectedToppings.some((t) => t.id === tp.id);
+                            return (
+                              <button
+                                key={tp.id}
+                                type="button"
+                                onClick={() => handleToppingToggle(tp)}
+                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
+                                  isSelected
+                                    ? "border-brand-red bg-brand-red/2"
+                                    : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                  }`}>
+                                    {isSelected && <Check className="w-3.5 h-3.5" />}
+                                  </div>
+                                  <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
+                                </div>
+                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Meat Group */}
+                      <div className="flex flex-col gap-3 mt-2">
+                        <h5 className="text-xs font-extrabold uppercase tracking-wider text-brand-dark/50">Meats</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {meatToppings.map((tp) => {
+                            const isSelected = selectedToppings.some((t) => t.id === tp.id);
+                            return (
+                              <button
+                                key={tp.id}
+                                type="button"
+                                onClick={() => handleToppingToggle(tp)}
+                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
+                                  isSelected
+                                    ? "border-brand-red bg-brand-red/2"
+                                    : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                  }`}>
+                                    {isSelected && <Check className="w-3.5 h-3.5" />}
+                                  </div>
+                                  <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
+                                </div>
+                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Veggie Group */}
+                      <div className="flex flex-col gap-3 mt-2">
+                        <h5 className="text-xs font-extrabold uppercase tracking-wider text-brand-dark/50">Veggies</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {vegetarianToppings.map((tp) => {
+                            const isSelected = selectedToppings.some((t) => t.id === tp.id);
+                            return (
+                              <button
+                                key={tp.id}
+                                type="button"
+                                onClick={() => handleToppingToggle(tp)}
+                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
+                                  isSelected
+                                    ? "border-brand-red bg-brand-red/2"
+                                    : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                  }`}>
+                                    {isSelected && <Check className="w-3.5 h-3.5" />}
+                                  </div>
+                                  <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
+                                </div>
+                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-brand-dark/5 my-2" />
+
+                    {/* Sub-section: Extras */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-brand-dark/5 pb-2">
+                        <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/60">Add-ons & Dippers</h4>
+                        {selectedAddons.length > 0 ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <Check className="w-3 h-3 stroke-[3]" /> {selectedAddons.length} Selected
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-brand-dark/40">Optional</span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {config.addons.map((ad) => {
+                          const isSelected = selectedAddons.some((a) => a.id === ad.id);
+                          return (
+                            <button
+                              key={ad.id}
+                              type="button"
+                              onClick={() => handleAddonToggle(ad)}
+                              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
+                                isSelected
+                                  ? "border-brand-red bg-brand-red/2"
+                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                                  isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                }`}>
+                                  {isSelected && <Check className="w-3.5 h-3.5" />}
+                                </div>
+                                <span className="text-[15px] font-bold text-brand-dark">{ad.name}</span>
+                              </div>
+                              <span className="text-xs font-semibold text-brand-dark/50">
+                                {ad.price > 0 ? `+$${ad.price.toFixed(2)}` : "FREE"}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 )}
 
-                {/* 3. Choose Sauce */}
+                {/* 3. Integrated Review & Order summary step card */}
                 {currentStep === 3 && (
-                  <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-3">
-                      3. Choose Sauce
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      {config.sauces.map((sc) => {
-                        const isActive = selectedSauce.id === sc.id;
-                        return (
-                          <div
-                            key={sc.id}
-                            onClick={() => setSelectedSauce(sc)}
-                            className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
-                              isActive
-                                ? "border-brand-red bg-brand-red/2"
-                                : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
-                                {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
-                              </div>
-                              <span className="text-[15px] font-bold text-brand-dark">{sc.name}</span>
-                            </div>
-                            <span className="text-sm font-semibold text-brand-dark/60">
-                              {sc.price > 0 ? `+$${sc.price.toFixed(2)}` : "+$0.00"}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
-
-                {/* 4. Add Toppings */}
-                {currentStep === 4 && (
-                  <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-6">
-                    <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-3">
-                      4. Add Toppings
-                    </h3>
-                    
-                    {/* Cheese Group */}
-                    <div className="flex flex-col gap-3">
-                      <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/50">Cheeses</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {cheeseToppings.map((tp) => {
-                          const isSelected = selectedToppings.some((t) => t.id === tp.id);
-                          return (
-                            <button
-                              key={tp.id}
-                              type="button"
-                              onClick={() => handleToppingToggle(tp)}
-                              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
-                                isSelected
-                                  ? "border-brand-red bg-brand-red/2"
-                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                  isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
-                                }`}>
-                                  {isSelected && <Check className="w-3.5 h-3.5" />}
-                                </div>
-                                <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
-                              </div>
-                              <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Meat Group */}
-                    <div className="flex flex-col gap-3">
-                      <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/50">Meats</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {meatToppings.map((tp) => {
-                          const isSelected = selectedToppings.some((t) => t.id === tp.id);
-                          return (
-                            <button
-                              key={tp.id}
-                              type="button"
-                              onClick={() => handleToppingToggle(tp)}
-                              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
-                                isSelected
-                                  ? "border-brand-red bg-brand-red/2"
-                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                  isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
-                                }`}>
-                                  {isSelected && <Check className="w-3.5 h-3.5" />}
-                                </div>
-                                <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
-                              </div>
-                              <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Veggie Group */}
-                    <div className="flex flex-col gap-3">
-                      <h4 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark/50">Veggies</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {vegetarianToppings.map((tp) => {
-                          const isSelected = selectedToppings.some((t) => t.id === tp.id);
-                          return (
-                            <button
-                              key={tp.id}
-                              type="button"
-                              onClick={() => handleToppingToggle(tp)}
-                              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
-                                isSelected
-                                  ? "border-brand-red bg-brand-red/2"
-                                  : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                  isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
-                                }`}>
-                                  {isSelected && <Check className="w-3.5 h-3.5" />}
-                                </div>
-                                <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
-                              </div>
-                              <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </section>
-                )}
-
-                {/* 5. Add-ons Selection */}
-                {currentStep === 5 && (
-                  <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-3">
-                      5. Add-ons & Dippers
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {config.addons.map((ad) => {
-                        const isSelected = selectedAddons.some((a) => a.id === ad.id);
-                        return (
-                          <button
-                            key={ad.id}
-                            type="button"
-                            onClick={() => handleAddonToggle(ad)}
-                            className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
-                              isSelected
-                                ? "border-brand-red bg-brand-red/2"
-                                : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
-                              }`}>
-                                {isSelected && <Check className="w-3.5 h-3.5" />}
-                              </div>
-                              <span className="text-[15px] font-bold text-brand-dark">{ad.name}</span>
-                            </div>
-                            <span className="text-xs font-semibold text-brand-dark/50">
-                              {ad.price > 0 ? `+$${ad.price.toFixed(2)}` : "FREE"}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
-
-                {/* 6. Integrated Review & Order summary step card */}
-                {currentStep === 6 && (
                   <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-brand-dark/5 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     {/* Left Column: Review selections checklist, Order Type, Special Instructions */}
@@ -767,7 +813,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                       
                       <div className="flex flex-col gap-3">
                         <h3 className="text-lg font-bold text-brand-dark border-b border-brand-dark/5 pb-2">
-                          6. Review Your Selections
+                          3. Review Your Selections
                         </h3>
                         
                         <div className="flex flex-col gap-1.5 text-sm mt-1">
@@ -801,7 +847,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => {
                                 setIsEditingFromReview(true);
                                 setDirection(-1);
-                                setCurrentStep(2);
+                                setCurrentStep(1);
                               }}
                               className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer"
                             >
@@ -820,7 +866,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => {
                                 setIsEditingFromReview(true);
                                 setDirection(-1);
-                                setCurrentStep(3);
+                                setCurrentStep(1);
                               }}
                               className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer"
                             >
@@ -843,7 +889,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => {
                                 setIsEditingFromReview(true);
                                 setDirection(-1);
-                                setCurrentStep(4);
+                                setCurrentStep(2);
                               }}
                               className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer shrink-0"
                             >
@@ -866,7 +912,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => {
                                 setIsEditingFromReview(true);
                                 setDirection(-1);
-                                setCurrentStep(5);
+                                setCurrentStep(2);
                               }}
                               className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer shrink-0"
                             >
@@ -879,7 +925,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                       {/* Special Instructions card */}
                       <div className="flex flex-col gap-2.5 border-t border-brand-dark/5 pt-4">
                         <h3 className="text-base font-bold text-brand-dark">
-                          7. Special Instructions
+                          4. Special Instructions
                         </h3>
                         <textarea
                           placeholder="E.g., bake it extra crispy, cut in squares..."
@@ -1030,15 +1076,15 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               <div className="w-[80px]" />
             )}
 
-            {/* Running Total price visible near the bottom action buttons for steps 1-5 */}
-            {currentStep < 6 && (
+            {/* Running Total price visible near the bottom action buttons for steps 1-2 */}
+            {currentStep < 3 && (
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-brand-dark/5 shadow-2xs">
                 <span className="text-xs font-bold text-brand-dark/50 uppercase tracking-wider">Total:</span>
                 <span className="text-base font-black text-brand-red">${totalPrice.toFixed(2)}</span>
               </div>
             )}
 
-            {currentStep < 6 ? (
+            {currentStep < 3 ? (
               <button
                 type="button"
                 onClick={handleNext}
@@ -1053,7 +1099,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                 <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
-              // Empty spacer on Step 6 for desktop since the only CTA is the sidebar button
+              // Empty spacer on Step 3 for desktop since the only CTA is the sidebar button
               <div className="w-[180px]" />
             )}
           </div>
@@ -1185,7 +1231,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
             </button>
           )}
 
-          {currentStep < 6 ? (
+          {currentStep < 3 ? (
             <button
               type="button"
               onClick={handleNext}

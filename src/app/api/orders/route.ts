@@ -102,19 +102,7 @@ export async function POST(request: Request) {
 
     const { customerName, customerPhone, items } = result.data;
 
-    // 1. Calculate sequential daily token number
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const countToday = await prisma.order.count({
-      where: {
-        createdAt: {
-          gte: startOfDay,
-        },
-      },
-    });
-
-    const tokenNumber = String(countToday + 1).padStart(3, "0");
+    // Token generation moved inside the transaction to ensure atomic sequential ordering
 
     // 2. Calculate dynamic prep time
     const activeQueueCount = await prisma.order.count({
@@ -221,6 +209,37 @@ export async function POST(request: Request) {
 
     // 4. Create the Order in a transaction
     const newOrder = await prisma.$transaction(async (tx) => {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      let countToday = await tx.order.count({
+        where: {
+          createdAt: {
+            gte: startOfDay,
+          },
+        },
+      });
+
+      const month = String(startOfDay.getMonth() + 1).padStart(2, "0");
+      const day = String(startOfDay.getDate()).padStart(2, "0");
+      let tokenNumber = `${month}${day}-${String(countToday + 1).padStart(3, "0")}`;
+
+      // Guarantee unique token validation to prevent race conditions or daily reset conflicts
+      let isUnique = false;
+      let attempts = 0;
+      while (!isUnique && attempts < 10) {
+        const existing = await tx.order.findUnique({
+          where: { orderNumber: tokenNumber },
+        });
+        if (!existing) {
+          isUnique = true;
+        } else {
+          countToday++;
+          tokenNumber = `${month}${day}-${String(countToday + 1).padStart(3, "0")}`;
+          attempts++;
+        }
+      }
+
       const createdOrder = await tx.order.create({
         data: {
           orderNumber: tokenNumber,
