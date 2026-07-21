@@ -118,8 +118,6 @@ export default function Pizza3D() {
 
       {/* Main Container */}
       <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex items-center justify-center animate-float">
-        {/* Soft shadow cast beneath the pizza */}
-        <div className="absolute -bottom-6 w-[85%] h-6 bg-brand-dark/15 rounded-full blur-md" />
 
         {/* 1. THE MAIN PIZZA BODY (WITH 60-DEGREE WEDGE CUT OUT) */}
         <div
@@ -134,7 +132,7 @@ export default function Pizza3D() {
             fill
             sizes="400px"
             priority
-            className="object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.25)]"
+            className="object-contain"
           />
         </div>
 
@@ -238,7 +236,7 @@ export default function Pizza3D() {
             fill
             sizes="400px"
             priority
-            className="object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.25)]"
+            className="object-contain"
           />
         </motion.div>
       </div>
