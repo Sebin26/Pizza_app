@@ -36,7 +36,7 @@ function EmbersEffect() {
       {embers.map((ember) => (
         <motion.div
           key={ember.id}
-          className="absolute rounded-full bg-linear-to-t from-brand-orange to-brand-red opacity-75 shadow-[0_0_6px_rgba(245,124,0,0.7)]"
+          className="absolute rounded-full bg-linear-to-t from-brand-gold to-brand-primary opacity-75 shadow-[0_0_6px_rgba(232,114,44,0.7)]"
           style={{
             width: ember.size,
             height: ember.size,
@@ -108,10 +108,10 @@ export default function Pizza3D() {
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => setIsHovered(false)}
-      className="relative w-full h-112.5 flex items-center justify-center cursor-pointer select-none overflow-hidden rounded-3xl bg-radial from-brand-red/10 via-transparent to-transparent"
+      className="relative w-full h-112.5 flex items-center justify-center cursor-pointer select-none overflow-hidden rounded-3xl bg-radial from-brand-primary/10 via-transparent to-transparent"
     >
       {/* Background hearth glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,124,0,0.06)_0%,transparent_65%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(232,114,44,0.06)_0%,transparent_65%)]" />
 
       {/* Embers */}
       <EmbersEffect />

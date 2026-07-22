@@ -95,7 +95,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRealName, setNewRealName] = useState("");
-  const [newUserRole, setNewUserRole] = useState("STAFF");
+  const [newUserRole, setNewUserRole] = useState<"STAFF" | "ADMIN">("STAFF");
 
   // -- Alerts/Errors
   const [actionError, setActionError] = useState("");
@@ -367,9 +367,9 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
 
   const getStatusBadgeStyles = (status: string) => {
     switch (status) {
-      case "RECEIVED": return "bg-brand-red/10 text-brand-red border-brand-red/20";
-      case "PREPARING": return "bg-brand-orange/10 text-brand-orange border-brand-orange/20";
-      case "READY": return "bg-brand-green/10 text-brand-green border-brand-green/20";
+      case "RECEIVED": return "bg-brand-primary/10 text-brand-primary border-brand-primary/20";
+      case "PREPARING": return "bg-brand-primary/10 text-brand-primary border-brand-primary/20";
+      case "READY": return "bg-brand-gold/10 text-brand-gold border-brand-gold/20";
       case "COMPLETED": return "bg-brand-dark/10 text-brand-dark/60 border-brand-dark/15";
       default: return "";
     }
@@ -381,7 +381,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
       {/* Sidebar Navigation */}
       <aside className="w-full lg:w-64 bg-white rounded-2xl p-5 shadow-sm border border-brand-dark/5 flex flex-col gap-6 shrink-0">
         <div className="flex items-center gap-2 border-b border-brand-dark/5 pb-4">
-          <TrendingUp className="w-5 h-5 text-brand-red" />
+          <TrendingUp className="w-5 h-5 text-brand-primary" />
           <h2 className="text-base font-extrabold text-brand-dark">Admin Control</h2>
         </div>
 
@@ -407,7 +407,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                 {isActive && (
                   <motion.span
                     layoutId="activeAdminTab"
-                    className="absolute inset-0 bg-brand-red rounded-xl shadow-sm shadow-brand-red/20 z-0"
+                    className="absolute inset-0 bg-brand-primary rounded-xl shadow-sm shadow-brand-primary/20 z-0"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -425,13 +425,13 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
             onClick={() => router.push("/staff")} 
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-dark/10 hover:bg-brand-light text-brand-dark/80 text-xs font-bold transition-[background-color,border-color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
           >
-            <Store className="w-4 h-4 text-brand-orange" />
+            <Store className="w-4 h-4 text-brand-primary" />
             <span>Kitchen Queue</span>
           </button>
           
           <button 
             onClick={handleLogout} 
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-red/5 hover:bg-brand-red hover:text-white text-brand-red text-xs font-bold transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary/5 hover:bg-brand-primary hover:text-white text-brand-primary text-xs font-bold transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.97]"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -449,7 +449,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-green/10 border border-brand-green/20 text-brand-green text-sm font-semibold"
+              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-gold/10 border border-brand-gold/20 text-brand-gold text-sm font-semibold"
             >
               <CheckCircle2 className="w-4.5 h-4.5 shrink-0" />
               <span>{actionSuccess}</span>
@@ -461,7 +461,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-red/10 border border-brand-red/20 text-brand-red text-sm font-semibold"
+              className="flex items-center gap-2.5 p-4 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-sm font-semibold"
             >
               <AlertCircle className="w-4.5 h-4.5 shrink-0" />
               <span>{actionError}</span>
@@ -480,10 +480,10 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: "Total Sales", val: `$${analytics.totalRevenue.toFixed(2)}`, icon: <DollarSign className="w-5 h-5 text-brand-green" />, bg: "bg-brand-green/5" },
-                { label: "Total Orders", val: analytics.orderCount, icon: <ShoppingBag className="w-5 h-5 text-brand-red" />, bg: "bg-brand-red/5" },
-                { label: "Avg. Ticket Value", val: `$${analytics.avgOrderValue.toFixed(2)}`, icon: <TrendingUp className="w-5 h-5 text-brand-orange" />, bg: "bg-brand-orange/5" },
-                { label: "Today's Sales", val: `$${analytics.todayRevenue.toFixed(2)}`, icon: <Calendar className="w-5 h-5 text-brand-yellow" />, bg: "bg-brand-yellow/5", sub: `${analytics.todayCount} orders` }
+                { label: "Total Sales", val: `$${analytics.totalRevenue.toFixed(2)}`, icon: <DollarSign className="w-5 h-5 text-brand-gold" />, bg: "bg-brand-gold/5" },
+                { label: "Total Orders", val: analytics.orderCount, icon: <ShoppingBag className="w-5 h-5 text-brand-primary" />, bg: "bg-brand-primary/5" },
+                { label: "Avg. Ticket Value", val: `$${analytics.avgOrderValue.toFixed(2)}`, icon: <TrendingUp className="w-5 h-5 text-brand-primary" />, bg: "bg-brand-primary/5" },
+                { label: "Today's Sales", val: `$${analytics.todayRevenue.toFixed(2)}`, icon: <Calendar className="w-5 h-5 text-brand-gold" />, bg: "bg-brand-gold/5", sub: `${analytics.todayCount} orders` }
               ].map((kpi, idx) => (
                 <div key={idx} className="bg-white rounded-2xl p-5 border border-brand-dark/5 flex items-center gap-4 hover:-translate-y-0.5 hover:shadow-xs transition-[transform,box-shadow] duration-300 ease-out shadow-xs">
                   <div className={`w-11 h-11 rounded-full ${kpi.bg} flex items-center justify-center shrink-0`}>
@@ -507,14 +507,14 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                   {analytics.popularItems.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-3.5 bg-brand-light rounded-xl text-xs font-semibold">
                       <div className="flex items-center gap-3">
-                        <span className="w-5 h-5 rounded bg-brand-red/5 text-brand-red text-[10px] font-extrabold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded bg-brand-primary/5 text-brand-primary text-[10px] font-extrabold flex items-center justify-center">
                           #{index + 1}
                         </span>
                         <span className="font-bold text-brand-dark">{item.name}</span>
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-brand-dark/50">{item.qty} sold</span>
-                        <strong className="text-brand-red font-bold">${item.revenue.toFixed(2)}</strong>
+                        <strong className="text-brand-primary font-bold">${item.revenue.toFixed(2)}</strong>
                       </div>
                     </div>
                   ))}
@@ -525,7 +525,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               </div>
 
               {/* Prep logic quick info card */}
-              <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 border-l-4 border-l-brand-orange flex flex-col gap-3 justify-center">
+              <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 border-l-4 border-l-brand-primary flex flex-col gap-3 justify-center">
                 <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Branch Prep Engine</h3>
                 <div className="text-xs text-brand-dark/65 flex flex-col gap-2 leading-relaxed">
                   <p>Prep time is computed dynamically based on cooking orders in queue:</p>
@@ -563,7 +563,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newCatName} 
                       onChange={e => setNewCatName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <input 
                       type="text" 
@@ -571,7 +571,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newCatSlug} 
                       onChange={e => setNewCatSlug(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   </div>
                   <input 
@@ -579,30 +579,30 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     placeholder="Short description" 
                     value={newCatDesc} 
                     onChange={e => setNewCatDesc(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="number" 
                     placeholder="Display Sort Order" 
                     value={newCatOrder} 
                     onChange={e => setNewCatOrder(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create Category</span>
                   </button>
                 </form>
 
                 {/* List rows */}
-                <div className="flex flex-col gap-2 mt-2 max-h-[300px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-2 mt-2 max-h-75 overflow-y-auto pr-1">
                   {categories.map((c) => (
                     <div key={c.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
                       <div className="flex flex-col gap-0.5">
                         <span>{c.name} <strong className="text-brand-dark/40 font-bold">/{c.slug}</strong></span>
                         {c.description && <p className="text-[10px] text-brand-dark/50 leading-tight mt-0.5">{c.description}</p>}
                       </div>
-                      <button onClick={() => handleDeleteCategory(c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                      <button onClick={() => handleDeleteCategory(c.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -621,7 +621,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemName} 
                       onChange={e => setNewItemName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <input 
                       type="text" 
@@ -629,7 +629,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemSlug} 
                       onChange={e => setNewItemSlug(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -640,56 +640,46 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={newItemPrice} 
                       onChange={e => setNewItemPrice(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                     <select 
                       value={newItemCat} 
                       onChange={e => setNewItemCat(e.target.value)} 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     >
                       <option value="">-- Choose Category --</option>
-                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <input 
-                    type="text" 
-                    placeholder="Listing description ingredients" 
-                    value={newItemDesc} 
-                    onChange={e => setNewItemDesc(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
-                  />
-                  
-                  <div className="flex items-center gap-2 text-xs font-semibold text-brand-dark/70 py-1">
-                    <input 
-                      type="checkbox" 
-                      id="isPizza" 
-                      checked={newItemIsPizza} 
-                      onChange={e => setNewItemIsPizza(e.target.checked)} 
-                      className="rounded text-brand-red focus:ring-brand-red/30"
-                    />
-                    <label htmlFor="isPizza">This is a custom Pizza (enable Visual Customizer)</label>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-brand-dark/75 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={newItemIsPizza} 
+                        onChange={e => setNewItemIsPizza(e.target.checked)} 
+                        className="rounded text-brand-primary focus:ring-brand-primary/30"
+                      />
+                      <span>Is Customizable Pizza?</span>
+                    </label>
                   </div>
-
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
-                    <span>Create Menu Listing</span>
+                    <span>Create Menu Item</span>
                   </button>
                 </form>
 
-                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider border-t border-brand-dark/5 pt-5 mt-2">
-                  Active Listings
-                </h3>
-                <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                {/* List Items */}
+                <div className="flex flex-col gap-2 mt-2 max-h-87.5 overflow-y-auto pr-1">
                   {menuItems.map((item) => (
                     <div key={item.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
                       <div className="flex flex-col gap-0.5">
-                        <span>{item.name} <strong className="text-brand-red ml-1">${item.basePrice.toFixed(2)}</strong></span>
-                        <p className="text-[10px] text-brand-dark/50 font-bold">
-                          Category: {categories.find((c) => c.id === item.categoryId)?.name || "Unknown"}
-                          {item.isPizza && <span className="text-brand-orange ml-2">[PIZZA]</span>}
-                        </p>
+                        <span>{item.name} <strong className="text-brand-primary ml-1">${item.basePrice.toFixed(2)}</strong></span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[10px] text-brand-dark/45 font-bold uppercase">{categories.find(c => c.id === item.categoryId)?.name || "Uncategorized"}</span>
+                          {item.isPizza && <span className="text-brand-primary ml-2">[PIZZA]</span>}
+                        </div>
                       </div>
-                      <button onClick={() => handleDeleteMenuItem(item.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                      <button onClick={() => handleDeleteMenuItem(item.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -718,7 +708,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                   <select 
                     value={optType} 
                     onChange={e => setOptType(e.target.value as typeof optType)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   >
                     <option value="size">Pizza Size</option>
                     <option value="crust">Pizza Crust</option>
@@ -733,7 +723,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={optName} 
                     onChange={e => setOptName(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
 
                   {optType === "size" ? (
@@ -745,7 +735,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         value={optFactor} 
                         onChange={e => setOptFactor(e.target.value)} 
                         required 
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                       />
                       <input 
                         type="number" 
@@ -754,7 +744,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         value={optPrice} 
                         onChange={e => setOptPrice(e.target.value)} 
                         required 
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                       />
                     </div>
                   ) : (
@@ -765,24 +755,24 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       value={optPrice} 
                       onChange={e => setOptPrice(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   )}
 
                   {optType === "topping" && (
                     <div className="grid grid-cols-2 gap-3 text-xs font-semibold text-brand-dark/70 py-1">
                       <div className="flex items-center gap-1.5">
-                        <input type="checkbox" id="isVeg" checked={optIsVeg} onChange={e => setOptIsVeg(e.target.checked)} className="rounded text-brand-red focus:ring-brand-red/30" />
+                        <input type="checkbox" id="isVeg" checked={optIsVeg} onChange={e => setOptIsVeg(e.target.checked)} className="rounded text-brand-primary focus:ring-brand-primary/30" />
                         <label htmlFor="isVeg">Vegetarian</label>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <input type="checkbox" id="isVegan" checked={optIsVegan} onChange={e => setOptIsVegan(e.target.checked)} className="rounded text-brand-red focus:ring-brand-red/30" />
+                        <input type="checkbox" id="isVegan" checked={optIsVegan} onChange={e => setOptIsVegan(e.target.checked)} className="rounded text-brand-primary focus:ring-brand-primary/30" />
                         <label htmlFor="isVegan">Vegan</label>
                       </div>
                     </div>
                   )}
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create Custom Option</span>
                   </button>
@@ -790,73 +780,67 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               </div>
 
               {/* Config list table column */}
-              <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
-                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">
-                  Active Configs ({optType.toUpperCase()}S)
-                </h3>
-                
-                <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
-                  {optType === "size" && sizes.map((s) => (
-                    <div key={s.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
-                      <div className="flex flex-col gap-0.5">
-                        <strong>{s.name}</strong>
-                        <p className="text-[10px] text-brand-dark/50">
-                          Multiplier: {s.priceFactor}x | Flat Price add: +${s.priceAdd.toFixed(2)}
-                        </p>
-                      </div>
-                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+              <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-5">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-extrabold uppercase text-brand-dark/50 tracking-wider">Sizes</span>
+                  {sizes.map((s) => (
+                    <div key={s.id} className="flex justify-between items-center p-2.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <span>{s.name} <strong className="text-brand-primary ml-1">${s.priceAdd.toFixed(2)}</strong> (x{s.priceFactor})</span>
+                      <button onClick={() => handleDeletePizzaOption("size", s.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
+                </div>
 
-                  {optType === "crust" && crusts.map((c) => (
-                    <div key={c.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
-                      <div className="flex flex-col gap-0.5">
-                        <strong>{c.name}</strong>
-                        <p className="text-[10px] text-brand-dark/50">Price addition: +${c.price.toFixed(2)}</p>
-                      </div>
-                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-extrabold uppercase text-brand-dark/50 tracking-wider">Crusts</span>
+                  {crusts.map((c) => (
+                    <div key={c.id} className="flex justify-between items-center p-2.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <span>{c.name} <strong className="text-brand-primary ml-1">${c.price.toFixed(2)}</strong></span>
+                      <button onClick={() => handleDeletePizzaOption("crust", c.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
+                </div>
 
-                  {optType === "sauce" && sauces.map((s) => (
-                    <div key={s.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
-                      <div className="flex flex-col gap-0.5">
-                        <strong>{s.name}</strong>
-                        <p className="text-[10px] text-brand-dark/50">Price addition: +${s.price.toFixed(2)}</p>
-                      </div>
-                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-extrabold uppercase text-brand-dark/50 tracking-wider">Sauces</span>
+                  {sauces.map((s) => (
+                    <div key={s.id} className="flex justify-between items-center p-2.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <span>{s.name} <strong className="text-brand-primary ml-1">${s.price.toFixed(2)}</strong></span>
+                      <button onClick={() => handleDeletePizzaOption("sauce", s.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
+                </div>
 
-                  {optType === "topping" && toppings.map((t) => (
-                    <div key={t.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-extrabold uppercase text-brand-dark/50 tracking-wider">Toppings</span>
+                  {toppings.map((t) => (
+                    <div key={t.id} className="flex justify-between items-center p-2.5 bg-brand-light rounded-xl text-xs font-semibold">
                       <div className="flex flex-col gap-0.5">
-                        <strong>{t.name}</strong>
-                        <p className="text-[10px] text-brand-dark/50">
-                          Price: +${t.price.toFixed(2)}
-                          {t.isVegetarian && <span className="text-brand-green ml-2">[VEG]</span>}
-                          {t.isVegan && <span className="text-brand-green ml-1">[VEGAN]</span>}
-                        </p>
+                        <span>{t.name} <strong className="text-brand-primary ml-1">${t.price.toFixed(2)}</strong></span>
+                        <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-brand-dark/45">
+                          {t.isVegetarian && <span className="text-brand-gold">[VEG]</span>}
+                          {t.isVegan && <span className="text-brand-gold">[VEGAN]</span>}
+                        </div>
                       </div>
-                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                      <button onClick={() => handleDeletePizzaOption("topping", t.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
+                </div>
 
-                  {optType === "addon" && addons.map((a) => (
-                    <div key={a.id} className="flex justify-between items-center p-3 bg-brand-light rounded-xl text-xs font-semibold">
-                      <div className="flex flex-col gap-0.5">
-                        <strong>{a.name}</strong>
-                        <p className="text-[10px] text-brand-dark/50">Price: +${a.price.toFixed(2)}</p>
-                      </div>
-                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-extrabold uppercase text-brand-dark/50 tracking-wider">Add-ons & Dippers</span>
+                  {addons.map((a) => (
+                    <div key={a.id} className="flex justify-between items-center p-2.5 bg-brand-light rounded-xl text-xs font-semibold">
+                      <span>{a.name} <strong className="text-brand-primary ml-1">${a.price.toFixed(2)}</strong></span>
+                      <button onClick={() => handleDeletePizzaOption("addon", a.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -888,15 +872,15 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={newRealName} 
                     onChange={e => setNewRealName(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="text" 
-                    placeholder="Login Username" 
+                    placeholder="Username" 
                     value={newUsername} 
                     onChange={e => setNewUsername(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
                   <input 
                     type="password" 
@@ -904,19 +888,17 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     value={newPassword} 
                     onChange={e => setNewPassword(e.target.value)} 
                     required 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   />
-                  
                   <select 
                     value={newUserRole} 
-                    onChange={e => setNewUserRole(e.target.value)} 
-                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-red/30 focus:ring-1 focus:ring-brand-red/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+                    onChange={e => setNewUserRole(e.target.value as "STAFF" | "ADMIN")} 
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                   >
-                    <option value="STAFF">STAFF (Kitchen Queue access)</option>
-                    <option value="ADMIN">ADMIN (Full Panel access)</option>
+                    <option value="STAFF">STAFF (Kitchen Monitor)</option>
+                    <option value="ADMIN">ADMIN (Full Access)</option>
                   </select>
-
-                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
+                  <button type="submit" className="w-full flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-xs shadow-sm hover:shadow transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]">
                     <Plus className="w-4 h-4" />
                     <span>Create User</span>
                   </button>
@@ -926,7 +908,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               {/* List users column */}
               <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col gap-4">
                 <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Registered System Users</h3>
-                <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-2 max-h-105 overflow-y-auto pr-1">
                   {usersList.map((usr) => (
                     <div key={usr.id} className="flex justify-between items-center p-3.5 bg-brand-light rounded-xl text-xs font-semibold">
                       <div className="flex flex-col gap-0.5">
@@ -936,11 +918,11 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                         </p>
                       </div>
                       {user.id !== usr.id ? (
-                        <button onClick={() => handleDeleteUser(usr.id)} className="p-2 rounded-lg bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
+                        <button onClick={() => handleDeleteUser(usr.id)} className="p-2 rounded-lg bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white transition-[background-color,color,transform] duration-200 ease-out cursor-pointer active:scale-[0.92]">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       ) : (
-                        <span className="text-[10px] font-bold text-brand-green bg-brand-green/5 border border-brand-green/20 px-2 py-1 rounded">Active</span>
+                        <span className="text-[10px] font-bold text-brand-gold bg-brand-gold/5 border border-brand-gold/20 px-2 py-1 rounded">Active</span>
                       )}
                     </div>
                   ))}
@@ -959,11 +941,11 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               <p className="text-xs text-brand-dark/50 font-medium">Review and track historical dine-in transactions.</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 shadow-xs border border-brand-dark/5 flex flex-col gap-3.5 max-h-[600px] overflow-y-auto">
+            <div className="bg-white rounded-2xl p-5 shadow-xs border border-brand-dark/5 flex flex-col gap-3.5 max-h-150 overflow-y-auto">
               {orders.map((o) => (
                 <div key={o.id} className="p-4 bg-brand-light border border-brand-dark/5 rounded-2xl text-xs flex flex-col gap-2.5">
                   <div className="flex justify-between items-center border-b border-brand-dark/5 pb-2">
-                    <span className="text-sm font-extrabold text-brand-red">Token #{o.orderNumber}</span>
+                    <span className="text-sm font-extrabold text-brand-primary">Token #{o.orderNumber}</span>
                     <span className="text-[10px] text-brand-dark/45 font-semibold">
                       {new Date(o.createdAt).toLocaleString()}
                     </span>

@@ -4,13 +4,12 @@
 @theme {
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   
-  --color-brand-red: #C62828;
-  --color-brand-orange: #F57C00;
-  --color-brand-dark: #1C1C1E;
+  --color-brand-primary: #E8722C;
+  --color-brand-primary-dark: #C15E22;
+  --color-brand-dark: #241C15;
   --color-brand-light: #F5F5F7;
-  --color-brand-cream: #FAF9F6;
-  --color-brand-green: #2E7D32;
-  --color-brand-yellow: #FBC02D;
+  --color-brand-cream: #F6EFE6;
+  --color-brand-gold: #D99A2B;
   
   --radius-xl: 18px;
   
@@ -43,7 +42,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brand-orange);
+  background: var(--color-brand-primary);
 }
 
 @keyframes float {

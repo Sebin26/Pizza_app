@@ -422,7 +422,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
       <div className="flex items-center justify-between">
         <button 
           onClick={() => router.push("/")} 
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-brand-dark/70 hover:text-brand-red bg-white border border-brand-dark/5 hover:border-brand-dark/10 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-brand-dark/70 hover:text-brand-primary bg-white border border-brand-dark/5 hover:border-brand-dark/10 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Back to Menu</span>
@@ -437,7 +437,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           
           {/* Animated active progress bar */}
           <div 
-            className="absolute top-1/2 left-0 h-0.5 bg-brand-red -translate-y-1/2 z-0 transition-all duration-300"
+            className="absolute top-1/2 left-0 h-0.5 bg-brand-primary -translate-y-1/2 z-0 transition-all duration-300"
             style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
           />
 
@@ -454,18 +454,18 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-[background-color,border-color,color,transform] duration-200 ease-out ${
                   isActive
-                    ? "bg-white border-brand-red text-brand-red scale-110 shadow-sm"
+                    ? "bg-white border-brand-primary text-brand-primary scale-110 shadow-sm"
                     : isCompleted
-                    ? "bg-brand-red border-brand-red text-white"
+                    ? "bg-brand-primary border-brand-primary text-white"
                     : "bg-white border-brand-dark/20 text-brand-dark/40"
                 }`}>
                   {isCompleted ? <Check className="w-4 h-4" /> : s.id}
                 </div>
                 <span className={`text-xs font-bold transition-colors duration-200 ease-out hidden sm:block ${
                   isActive
-                    ? "text-brand-red font-extrabold"
+                    ? "text-brand-primary font-extrabold"
                     : isCompleted
-                    ? "text-brand-dark/70 group-hover:text-brand-red"
+                    ? "text-brand-dark/70 group-hover:text-brand-primary"
                     : "text-brand-dark/40"
                 }`}>
                   {s.name}
@@ -475,7 +475,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           })}
         </div>
         {/* Mobile active step title */}
-        <div className="text-center mt-3 sm:hidden text-sm font-extrabold text-brand-red">
+        <div className="text-center mt-3 sm:hidden text-sm font-extrabold text-brand-primary">
           Step {currentStep} of 3: {steps[currentStep - 1].name}
         </div>
       </div>
@@ -487,7 +487,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-dark flex items-center gap-2">
-              <Flame className="w-7 h-7 text-brand-red fill-current" />
+              <Flame className="w-7 h-7 text-brand-primary fill-current" />
               Customize {menuItem.name}
             </h1>
             <p className="text-sm sm:text-[15px] text-brand-dark/60 leading-relaxed max-w-2xl">
@@ -538,7 +538,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => setSelectedSize(sz)}
                               className={`flex flex-col items-center text-center p-5 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                                 isActive
-                                  ? "border-brand-red bg-brand-red/2"
+                                  ? "border-brand-primary bg-brand-primary/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
@@ -576,13 +576,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => setSelectedCrust(cr)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
                                 isActive
-                                  ? "border-brand-red bg-brand-red/2"
+                                  ? "border-brand-primary bg-brand-primary/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
-                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-primary" : "border-brand-dark/30"}`}>
+                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-primary"></div>}
                                 </div>
                                 <span className="text-[15px] font-bold text-brand-dark">{cr.name}</span>
                               </div>
@@ -618,13 +618,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => setSelectedSauce(sc)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-[border-color,background-color,transform] duration-200 ease-out active:scale-[0.98] ${
                                 isActive
-                                  ? "border-brand-red bg-brand-red/2"
+                                  ? "border-brand-primary bg-brand-primary/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-red" : "border-brand-dark/30"}`}>
-                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-red"></div>}
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? "border-brand-primary" : "border-brand-dark/30"}`}>
+                                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-brand-primary"></div>}
                                 </div>
                                 <span className="text-[15px] font-bold text-brand-dark">{sc.name}</span>
                               </div>
@@ -673,13 +673,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 onClick={() => handleToppingToggle(tp)}
                                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                   isSelected
-                                    ? "border-brand-red bg-brand-red/2"
+                                    ? "border-brand-primary bg-brand-primary/2"
                                     : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                    isSelected ? "bg-brand-primary border-brand-primary text-white" : "border-brand-dark/30 bg-white"
                                   }`}>
                                     {isSelected && <Check className="w-3.5 h-3.5" />}
                                   </div>
@@ -705,13 +705,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 onClick={() => handleToppingToggle(tp)}
                                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                   isSelected
-                                    ? "border-brand-red bg-brand-red/2"
+                                    ? "border-brand-primary bg-brand-primary/2"
                                     : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                    isSelected ? "bg-brand-primary border-brand-primary text-white" : "border-brand-dark/30 bg-white"
                                   }`}>
                                     {isSelected && <Check className="w-3.5 h-3.5" />}
                                   </div>
@@ -737,13 +737,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 onClick={() => handleToppingToggle(tp)}
                                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                   isSelected
-                                    ? "border-brand-red bg-brand-red/2"
+                                    ? "border-brand-primary bg-brand-primary/2"
                                     : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                    isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                    isSelected ? "bg-brand-primary border-brand-primary text-white" : "border-brand-dark/30 bg-white"
                                   }`}>
                                     {isSelected && <Check className="w-3.5 h-3.5" />}
                                   </div>
@@ -781,13 +781,13 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               onClick={() => handleAddonToggle(ad)}
                               className={`flex items-center justify-between p-4 rounded-xl border-2 transition-[border-color,background-color,transform] duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
                                 isSelected
-                                  ? "border-brand-red bg-brand-red/2"
+                                  ? "border-brand-primary bg-brand-primary/2"
                                   : "border-brand-dark/10 hover:border-brand-dark/20 bg-white"
                               }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                  isSelected ? "bg-brand-red border-brand-red text-white" : "border-brand-dark/30 bg-white"
+                                  isSelected ? "bg-brand-primary border-brand-primary text-white" : "border-brand-dark/30 bg-white"
                                 }`}>
                                   {isSelected && <Check className="w-3.5 h-3.5" />}
                                 </div>
@@ -830,7 +830,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 setDirection(-1);
                                 setCurrentStep(1);
                               }}
-                              className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer"
+                              className="text-xs font-extrabold text-brand-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-all cursor-pointer"
                             >
                               Edit
                             </button>
@@ -849,7 +849,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 setDirection(-1);
                                 setCurrentStep(1);
                               }}
-                              className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer"
+                              className="text-xs font-extrabold text-brand-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-all cursor-pointer"
                             >
                               Edit
                             </button>
@@ -868,7 +868,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 setDirection(-1);
                                 setCurrentStep(1);
                               }}
-                              className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer"
+                              className="text-xs font-extrabold text-brand-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-all cursor-pointer"
                             >
                               Edit
                             </button>
@@ -891,7 +891,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 setDirection(-1);
                                 setCurrentStep(2);
                               }}
-                              className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer shrink-0"
+                              className="text-xs font-extrabold text-brand-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-all cursor-pointer shrink-0"
                             >
                               Edit
                             </button>
@@ -914,7 +914,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 setDirection(-1);
                                 setCurrentStep(2);
                               }}
-                              className="text-xs font-extrabold text-brand-red hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-red/5 transition-all cursor-pointer shrink-0"
+                              className="text-xs font-extrabold text-brand-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-brand-primary/5 transition-all cursor-pointer shrink-0"
                             >
                               Edit
                             </button>
@@ -933,7 +933,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                           onChange={(e) => setNotes(e.target.value)}
                           maxLength={200}
                           rows={3}
-                          className="w-full p-3.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/70 border-0 focus:ring-2 focus:ring-brand-red/20 focus:bg-white resize-none transition-[background-color,box-shadow] duration-200 ease-out"
+                          className="w-full p-3.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/70 border-0 focus:ring-2 focus:ring-brand-primary/20 focus:bg-white resize-none transition-[background-color,box-shadow] duration-200 ease-out"
                         />
                       </div>
 
@@ -1018,7 +1018,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                           <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
                           >
                             <Minus className="w-3.5 h-3.5" />
                           </button>
@@ -1028,7 +1028,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                           <button
                             type="button"
                             onClick={() => setQuantity((q) => q + 1)}
-                            className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
                           >
                             <Plus className="w-3.5 h-3.5" />
                           </button>
@@ -1038,7 +1038,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                       {/* Price Row */}
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-extrabold text-brand-dark">Total Price</span>
-                        <span className="text-2xl font-black text-brand-red">
+                        <span className="text-2xl font-black text-brand-primary">
                           ${totalPrice.toFixed(2)}
                         </span>
                       </div>
@@ -1047,7 +1047,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                       <button 
                         type="button"
                         onClick={handleAdd} 
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[15px] shadow-md shadow-brand-red/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-[15px] shadow-md shadow-brand-primary/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer"
                       >
                         <ShoppingBag className="w-5 h-5" />
                         <span>Add Pizza to Cart</span>
@@ -1067,7 +1067,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-brand-dark/70 hover:text-brand-red bg-white border border-brand-dark/10 hover:border-brand-dark/20 text-sm font-extrabold transition-[border-color,color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-brand-dark/70 hover:text-brand-primary bg-white border border-brand-dark/10 hover:border-brand-dark/20 text-sm font-extrabold transition-[border-color,color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -1080,7 +1080,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
             {currentStep < 3 && (
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-brand-dark/5 shadow-2xs">
                 <span className="text-xs font-bold text-brand-dark/50 uppercase tracking-wider">Total:</span>
-                <span className="text-base font-black text-brand-red">${totalPrice.toFixed(2)}</span>
+                <span className="text-base font-black text-brand-primary">${totalPrice.toFixed(2)}</span>
               </div>
             )}
 
@@ -1091,7 +1091,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                 disabled={!isStepValid(currentStep)}
                 className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-extrabold transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                   isStepValid(currentStep)
-                    ? "bg-brand-red text-white hover:bg-brand-red/90 shadow-md shadow-brand-red/10"
+                    ? "bg-brand-primary text-white hover:bg-brand-primary-dark shadow-md shadow-brand-primary/10"
                     : "bg-brand-dark/10 text-brand-dark/40 cursor-not-allowed"
                 }`}
               >
@@ -1121,7 +1121,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
             <span className="text-xs text-brand-dark/50 font-semibold">({quantity}x)</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-base font-extrabold text-brand-red">${totalPrice.toFixed(2)}</span>
+            <span className="text-base font-extrabold text-brand-primary">${totalPrice.toFixed(2)}</span>
             {isSummaryExpanded ? (
               <ChevronDown className="w-4 h-4 text-brand-dark/60" />
             ) : (
@@ -1189,7 +1189,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-[color,transform] duration-150 ease-out active:scale-[0.88] cursor-pointer"
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-[color,transform] duration-150 ease-out active:scale-[0.88] cursor-pointer"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -1199,7 +1199,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-[color,transform] duration-150 ease-out active:scale-[0.88] cursor-pointer"
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-[color,transform] duration-150 ease-out active:scale-[0.88] cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -1238,7 +1238,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
               disabled={!isStepValid(currentStep)}
               className={`flex-2 flex items-center justify-center gap-1.5 py-3 rounded-xl font-extrabold text-sm transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                 isStepValid(currentStep)
-                  ? "bg-brand-red text-white shadow-md shadow-brand-red/10"
+                  ? "bg-brand-primary text-white shadow-md shadow-brand-primary/10"
                   : "bg-brand-dark/10 text-brand-dark/45 cursor-not-allowed"
               }`}
             >
@@ -1249,7 +1249,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
             <button
               type="button"
               onClick={handleAdd}
-              className="flex-2 flex items-center justify-center gap-2 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-sm transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer shadow-md shadow-brand-red/20"
+              className="flex-2 flex items-center justify-center gap-2 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-sm transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer shadow-md shadow-brand-primary/20"
             >
               <ShoppingBag className="w-4.5 h-4.5" />
               <span>Add to Cart</span>

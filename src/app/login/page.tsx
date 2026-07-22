@@ -68,7 +68,7 @@ function LoginForm() {
       className="w-full max-w-md bg-white rounded-2xl p-8 sm:p-10 shadow-md border border-brand-dark/5 flex flex-col gap-6"
     >
       <div className="flex flex-col items-center text-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-brand-red flex items-center justify-center text-white shadow-md shadow-brand-red/25">
+        <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center text-white shadow-md shadow-brand-primary/25">
           <Flame className="w-6 h-6 fill-current animate-pulse" />
         </div>
         <div className="flex flex-col gap-1">
@@ -80,7 +80,7 @@ function LoginForm() {
       </div>
 
       {errorMsg && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-brand-red/10 border border-brand-red/20 text-brand-red">
+        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
           <AlertCircle className="w-4.5 h-4.5 shrink-0 mt-0.5" />
           <span className="text-xs sm:text-sm font-semibold leading-normal">{errorMsg}</span>
         </div>
@@ -99,7 +99,7 @@ function LoginForm() {
               placeholder="Enter username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-all duration-200"
             />
           </div>
         </div>
@@ -115,7 +115,7 @@ function LoginForm() {
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-all duration-200"
             />
           </div>
         </div>
@@ -123,7 +123,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-sm shadow-md shadow-brand-red/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
+          className="w-full py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-sm shadow-md shadow-brand-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
         >
           {isLoading ? "Signing in..." : "Access Dashboard"}
         </button>
@@ -141,7 +141,7 @@ export default function LoginPage() {
     <div className="flex-1 flex items-center justify-center p-4">
       <Suspense fallback={
         <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm border border-brand-dark/5 flex flex-col items-center gap-4 text-center">
-          <div className="w-10 h-10 rounded-full border-4 border-brand-red/20 border-t-brand-red animate-spin"></div>
+          <div className="w-10 h-10 rounded-full border-4 border-brand-primary/20 border-t-brand-primary animate-spin"></div>
           <h2 className="text-lg font-bold text-brand-dark">Loading Portal...</h2>
         </div>
       }>

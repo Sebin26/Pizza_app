@@ -29,7 +29,7 @@ export default function AccessDenied({ username }: AccessDeniedProps) {
         className="w-full max-w-md bg-white rounded-2xl p-8 sm:p-10 shadow-md border border-brand-dark/5 flex flex-col gap-6"
       >
         <div className="flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-brand-red/10 flex items-center justify-center text-brand-red shrink-0">
+          <div className="w-12 h-12 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary shrink-0">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-brand-dark">Administrator Required</h2>
@@ -50,7 +50,7 @@ export default function AccessDenied({ username }: AccessDeniedProps) {
           
           <button 
             onClick={handleLogout} 
-            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-xs shadow-md shadow-brand-red/20 transition-all cursor-pointer active:scale-98"
+            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-bold text-xs shadow-md shadow-brand-primary/20 transition-all cursor-pointer active:scale-98"
           >
             <LogOut className="w-4 h-4" />
             <span>Switch Account</span>

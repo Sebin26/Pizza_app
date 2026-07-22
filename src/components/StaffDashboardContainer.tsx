@@ -18,13 +18,29 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [now, setNow] = useState<number>(() => Date.now());
   
   const prevOrdersCount = useRef<number | null>(null);
+  const ordersRef = useRef<Order[]>([]);
+  const isInitialMount = useRef(true);
+
+  // Keep ordersRef updated for fetchOrders interval
+  useEffect(() => {
+    ordersRef.current = orders;
+  }, [orders]);
+
+  // Keep now updated every minute for pure rendering of elapsed time
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Web Audio API beep synthesis (pure JS, no audio files needed)
   const playNotificationSound = () => {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       
@@ -58,48 +74,51 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
     }
   };
 
-  // Fetch orders function
-  const fetchOrders = async (silent = false) => {
-    try {
-      if (!silent) setIsLoading(true);
-      const query = new URLSearchParams();
-      if (statusFilter) query.append("status", statusFilter);
-      if (searchQuery) query.append("search", searchQuery);
-
-      const res = await fetch(`/api/orders?${query.toString()}`);
-      if (!res.ok) {
-        if (res.status === 401) {
-          router.push("/login?redirect=/staff");
-          return;
-        }
-        throw new Error("Failed to fetch orders queue");
-      }
-      
-      const data = await res.json();
-      const nextOrders = data.orders || [];
-
-      // Check if new orders arrived to play sound cue
-      if (prevOrdersCount.current !== null && nextOrders.length > prevOrdersCount.current) {
-        const receivedOrdersCount = nextOrders.filter((o: Order) => o.status === "RECEIVED").length;
-        const prevReceivedCount = orders.filter((o: Order) => o.status === "RECEIVED").length;
-        if (receivedOrdersCount > prevReceivedCount) {
-          playNotificationSound();
-        }
-      }
-      
-      prevOrdersCount.current = nextOrders.length;
-      setOrders(nextOrders);
-      setErrorMsg("");
-    } catch (err: any) {
-      console.error(err);
-      setErrorMsg(err.message || "Connection error. Failed to poll queue.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Poll orders queue every 3.5 seconds
   useEffect(() => {
+    const fetchOrders = async (silent = false) => {
+      try {
+        if (!silent && isInitialMount.current) {
+          isInitialMount.current = false;
+          setIsLoading(true);
+        }
+        const query = new URLSearchParams();
+        if (statusFilter) query.append("status", statusFilter);
+        if (searchQuery) query.append("search", searchQuery);
+
+        const res = await fetch(`/api/orders?${query.toString()}`);
+        if (!res.ok) {
+          if (res.status === 401) {
+            router.push("/login?redirect=/staff");
+            return;
+          }
+          throw new Error("Failed to fetch orders queue");
+        }
+        
+        const data = await res.json();
+        const nextOrders = data.orders || [];
+
+        // Check if new orders arrived to play sound cue
+        if (prevOrdersCount.current !== null && nextOrders.length > prevOrdersCount.current) {
+          const receivedOrdersCount = nextOrders.filter((o: Order) => o.status === "RECEIVED").length;
+          const prevReceivedCount = ordersRef.current.filter((o: Order) => o.status === "RECEIVED").length;
+          if (receivedOrdersCount > prevReceivedCount) {
+            playNotificationSound();
+          }
+        }
+        
+        prevOrdersCount.current = nextOrders.length;
+        setOrders(nextOrders);
+        setErrorMsg("");
+      } catch (err) {
+        console.error(err);
+        const message = err instanceof Error ? err.message : "Connection error. Failed to poll queue.";
+        setErrorMsg(message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchOrders(); // Initial full load
 
     const interval = setInterval(() => {
@@ -107,10 +126,10 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
     }, 3500);
 
     return () => clearInterval(interval);
-  }, [statusFilter, searchQuery]);
+  }, [statusFilter, searchQuery, router]);
 
   const handleUpdateStatus = async (orderId: string, currentStatus: string) => {
-    const statusWorkflow: Record<string, string> = {
+    const statusWorkflow: Record<string, Order["status"]> = {
       RECEIVED: "PREPARING",
       PREPARING: "READY",
       READY: "COMPLETED",
@@ -131,22 +150,25 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
         try {
           const data = await res.json();
           errorText = data.error || errorText;
-        } catch (_) {}
+        } catch {
+          // Ignore parse failure
+        }
         throw new Error(errorText);
       }
 
       // Optimistic locally updated state
       setOrders((prev) =>
         prev
-          .map((o) => (o.id === orderId ? { ...o, status: nextStatus as any } : o))
+          .map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
           .filter((o) => {
             if (statusFilter === "ACTIVE" && nextStatus === "COMPLETED") return false;
             if (statusFilter !== "ACTIVE" && o.status !== statusFilter) return false;
             return true;
           })
       );
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to update status";
+      alert(message);
     }
   };
 
@@ -162,9 +184,9 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "RECEIVED": return "bg-brand-red/10 text-brand-red border-brand-red/20";
-      case "PREPARING": return "bg-brand-orange/10 text-brand-orange border-brand-orange/20";
-      case "READY": return "bg-brand-green/10 text-brand-green border-brand-green/20";
+      case "RECEIVED": return "bg-brand-primary/10 text-brand-primary border-brand-primary/20";
+      case "PREPARING": return "bg-brand-primary/10 text-brand-primary border-brand-primary/20";
+      case "READY": return "bg-brand-gold/10 text-brand-gold border-brand-gold/20";
       case "COMPLETED": return "bg-brand-dark/10 text-brand-dark/60 border-brand-dark/15";
       default: return "";
     }
@@ -186,7 +208,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
       <header className="bg-white rounded-2xl p-6 shadow-sm border border-brand-dark/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-brand-orange" />
+            <Sparkles className="w-5 h-5 text-brand-gold" />
             <h2 className="text-xl font-extrabold text-brand-dark">Kitchen Queue Dashboard</h2>
           </div>
           <span className="text-xs text-brand-dark/50 font-semibold">
@@ -198,7 +220,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
           {user.role === "ADMIN" && (
             <button
               onClick={() => router.push("/admin")}
-              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-orange/20 hover:border-brand-orange text-brand-orange text-xs font-bold transition-[border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-brand-primary/20 hover:border-brand-primary text-brand-primary text-xs font-bold transition-[border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
             >
               <ShieldAlert className="w-4 h-4" />
               <span>Admin Panel</span>
@@ -229,7 +251,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
               placeholder="Search token / name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/40 border border-transparent focus:border-brand-red/20 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-[box-shadow,border-color,background-color] duration-200 ease-out"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/40 border border-transparent focus:border-brand-primary/20 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-[box-shadow,border-color,background-color] duration-200 ease-out"
             />
           </div>
 
@@ -259,7 +281,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                   {isActive && (
                     <motion.span
                       layoutId="activeStaffFilter"
-                      className="absolute inset-0 bg-brand-red rounded-xl shadow-sm shadow-brand-red/20 z-0"
+                      className="absolute inset-0 bg-brand-primary rounded-xl shadow-sm shadow-brand-primary/20 z-0"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -274,14 +296,14 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
         <div className="lg:col-span-9 flex flex-col gap-4">
           
           {errorMsg && (
-            <div className="p-4 rounded-xl bg-brand-red/10 border border-brand-red/25 text-brand-red text-xs font-bold">
+            <div className="p-4 rounded-xl bg-brand-primary/10 border border-brand-primary/25 text-brand-primary text-xs font-bold">
               {errorMsg}
             </div>
           )}
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center text-center p-12 bg-white rounded-2xl border border-brand-dark/5 shadow-xs">
-              <div className="w-8 h-8 rounded-full border-4 border-brand-red/20 border-t-brand-red animate-[spin_0.8s_linear_infinite] mb-3"></div>
+              <div className="w-8 h-8 rounded-full border-4 border-brand-primary/20 border-t-brand-primary animate-[spin_0.8s_linear_infinite] mb-3"></div>
               <p className="text-xs text-brand-dark/50 font-bold">Syncing kitchen database...</p>
             </div>
           ) : orders.length > 0 ? (
@@ -289,7 +311,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
               <AnimatePresence>
                 {orders.map((order) => {
                   const minutesElapsed = Math.floor(
-                    (Date.now() - new Date(order.createdAt).getTime()) / 60000
+                    (now - new Date(order.createdAt).getTime()) / 60000
                   );
                   const isNew = order.status === "RECEIVED";
 
@@ -301,22 +323,22 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                       exit={{ opacity: 0, scale: 0.95 }}
                       key={order.id}
                       className={`bg-white rounded-2xl shadow-xs border-2 flex flex-col justify-between overflow-hidden ${
-                        isNew ? "border-brand-red shadow-md shadow-brand-red/5" : "border-brand-dark/5"
+                        isNew ? "border-brand-primary shadow-md shadow-brand-primary/5" : "border-brand-dark/5"
                       }`}
                     >
                       {/* Header block */}
                       <div className="p-5 bg-brand-light border-b border-brand-dark/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-full bg-brand-red text-white flex items-center justify-center text-base font-extrabold shadow-sm shadow-brand-red/25 shrink-0">
+                          <div className="w-11 h-11 rounded-full bg-brand-primary text-white flex items-center justify-center text-base font-extrabold shadow-sm shadow-brand-primary/25 shrink-0">
                             {order.orderNumber}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-sm font-extrabold text-brand-dark truncate max-w-[120px] sm:max-w-none">
+                            <span className="text-sm font-extrabold text-brand-dark truncate max-w-30 sm:max-w-none">
                               {order.customerName}
                             </span>
                             {order.customerPhone && (
                               <div className="flex items-center gap-1 text-[10px] text-brand-dark/45 mt-0.5 font-semibold">
-                                <Phone className="w-3 h-3 text-brand-orange" />
+                                <Phone className="w-3 h-3 text-brand-primary" />
                                 <span>{order.customerPhone}</span>
                               </div>
                             )}
@@ -339,7 +361,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                           <div key={item.id} className="flex flex-col gap-1 text-xs pt-3.5 first:pt-0 first:border-t-0">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-extrabold text-brand-red bg-brand-red/5 px-1.5 py-0.5 rounded text-[10px]">
+                                <span className="font-extrabold text-brand-primary bg-brand-primary/5 px-1.5 py-0.5 rounded text-[10px]">
                                   {item.quantity}x
                                 </span>
                                 <span className="font-bold text-brand-dark leading-tight">
@@ -368,7 +390,7 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                             )}
 
                             {item.notes && (
-                              <div className="flex items-start gap-1 p-2 rounded bg-brand-orange/5 border border-brand-orange/10 text-brand-orange text-[10px] mt-1.5 ml-6">
+                              <div className="flex items-start gap-1 p-2 rounded bg-brand-primary/5 border border-brand-primary/10 text-brand-primary text-[10px] mt-1.5 ml-6">
                                 <MessageSquare className="w-3 h-3 shrink-0 mt-0.5" />
                                 <span className="italic leading-normal">Note: {item.notes}</span>
                               </div>
@@ -389,13 +411,13 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                         {order.status !== "COMPLETED" ? (
                           <button
                             onClick={() => handleUpdateStatus(order.id, order.status)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[11px] shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-[11px] shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out cursor-pointer active:scale-[0.97]"
                           >
                             <span>{getActionLabel(order.status)}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </button>
                         ) : (
-                          <div className="flex items-center gap-1 text-[11px] font-bold text-brand-green bg-brand-green/5 px-3 py-1.5 rounded-lg border border-brand-green/20">
+                          <div className="flex items-center gap-1 text-[11px] font-bold text-brand-gold bg-brand-gold/5 px-3 py-1.5 rounded-lg border border-brand-gold/20">
                             <Check className="w-3.5 h-3.5" />
                             <span>Collected</span>
                           </div>

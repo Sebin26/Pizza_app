@@ -79,33 +79,33 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
         className="relative overflow-hidden rounded-3xl bg-brand-dark text-white p-8 sm:p-12 md:p-16 shadow-xl"
       >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-br from-brand-orange/30 to-brand-red/30 rounded-full blur-3xl -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-orange/10 rounded-full blur-2xl -ml-20 -mb-20"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-br from-brand-primary/30 to-brand-gold/30 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-primary/10 rounded-full blur-2xl -ml-20 -mb-20"></div>
 
         <div className="relative max-w-2xl flex flex-col gap-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-bold uppercase tracking-wider w-fit">
-            <Flame className="w-3.5 h-3.5 fill-current animate-pulse" /> In-Store Ordering Portal
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-brand-primary text-white text-sm font-extrabold uppercase tracking-wider w-fit">
+            <Flame className="w-4 h-4 fill-current animate-pulse" /> In-Store Ordering Portal
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight">
             Gourmet Pizzas,<br />Baked for You.
           </h1>
-          <p className="text-white/70 text-[15px] sm:text-base leading-relaxed">
+          <p className="text-white/85 text-base sm:text-lg leading-relaxed font-semibold">
             Choose your size, customize toppings, and order directly from your table. Baked fresh in our wood-fired oven and served in minutes.
           </p>
         </div>
       </motion.section>
 
       {/* Toolbar: Search and Filter */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl shadow-xs border border-brand-dark/5">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4.5 rounded-2xl shadow-xs border border-brand-dark/5">
         {/* Search Box */}
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-dark/40" />
+        <div className="relative w-full md:w-88">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-brand-dark/40" />
           <input
             type="text"
             placeholder="Search our gourmet menu..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/40 border-0 focus:ring-2 focus:ring-brand-red/20 focus:bg-white transition-[box-shadow,background-color] duration-200 ease-out"
+            className="w-full pl-11 pr-4 py-3 rounded-xl bg-brand-light text-brand-dark text-base placeholder-brand-dark/40 border-0 focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-[box-shadow,background-color] duration-200 ease-out"
           />
         </div>
 
@@ -117,7 +117,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.slug)}
-                className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-[color] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
+                className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-base font-extrabold whitespace-nowrap transition-[color] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                   isActive
                     ? "text-white"
                     : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/90 hover:text-brand-dark"
@@ -126,7 +126,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                 {isActive && (
                   <motion.span
                     layoutId="activeMenuTab"
-                    className="absolute inset-0 bg-brand-red rounded-xl shadow-md shadow-brand-red/20 z-0"
+                    className="absolute inset-0 bg-brand-primary rounded-xl shadow-md shadow-brand-primary/20 z-0"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -141,7 +141,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
       </div>
 
       {/* Menu Grid Section */}
-      <section className="min-h-[300px]">
+      <section className="min-h-75">
         {activeItems.length > 0 ? (
           <motion.div 
             layout
@@ -158,7 +158,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
               >
                 {/* Visual Header */}
                 <div className="h-44 bg-brand-light relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-tr from-brand-orange/5 to-brand-red/5"></div>
+                  <div className="absolute inset-0 bg-linear-to-tr from-brand-gold/5 to-brand-primary/5"></div>
                   
                   {/* Pizza Image / Item circular illustration */}
                   {item.imageUrl && item.isPizza ? (
@@ -176,7 +176,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                       className="w-28 h-28 rounded-full shadow-lg flex items-center justify-center text-4xl animate-float transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-15"
                       style={{
                         background: item.isPizza 
-                          ? "radial-gradient(circle, #FBC02D 10%, #F57C00 50%, #C62828 100%)"
+                          ? "radial-gradient(circle, #D99A2B 10%, #E8722C 60%, #C15E22 100%)"
                           : "radial-gradient(circle, #E5E7EB 20%, #9CA3AF 80%)"
                       }}
                     >
@@ -193,7 +193,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                   )}
 
                   {item.isPizza && (
-                    <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-brand-orange text-white text-[10px] font-extrabold uppercase tracking-wide z-10">
+                    <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-brand-primary text-white text-[10px] font-extrabold uppercase tracking-wide z-10">
                       Chef Special
                     </span>
                   )}
@@ -203,14 +203,14 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                 <div className="p-6 flex flex-col flex-1 gap-4 justify-between">
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-start">
-                      <h3 className="text-[17px] font-bold text-brand-dark leading-snug hover:text-brand-red transition-colors duration-200">
+                      <h3 className="text-xl font-extrabold text-brand-dark leading-snug hover:text-brand-primary transition-colors duration-200">
                         {item.name}
                       </h3>
-                      <span className="text-[17px] font-extrabold text-brand-red shrink-0">
+                      <span className="text-xl font-black text-brand-primary shrink-0">
                         ${item.basePrice.toFixed(2)}
                       </span>
                     </div>
-                    <p className="text-sm text-brand-dark/60 line-clamp-2 leading-relaxed">
+                    <p className="text-base text-brand-dark/75 leading-relaxed font-semibold line-clamp-2">
                       {item.description}
                     </p>
                   </div>
@@ -219,14 +219,14 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                     {item.isPizza ? (
                       <button
                         onClick={() => router.push(`/builder?id=${item.id}`)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-sm shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-base shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
                       >
                         Customize Pizza
                       </button>
                     ) : (
                       <button
                         onClick={() => handleOpenQuantity(item)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-light hover:bg-brand-dark hover:text-white text-brand-dark font-bold text-sm transition-[background-color,color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-brand-light hover:bg-brand-dark hover:text-white text-brand-dark font-extrabold text-base transition-[background-color,color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
                       >
                         Add to Cart
                       </button>
@@ -290,7 +290,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                     <h2 className="text-xl font-bold text-brand-dark">{selectedItem.name}</h2>
                     <p className="text-sm text-brand-dark/60">{selectedItem.description}</p>
                   </div>
-                  <span className="text-xl font-extrabold text-brand-red shrink-0">
+                  <span className="text-xl font-extrabold text-brand-primary shrink-0">
                     ${(selectedItem.basePrice * quantity).toFixed(2)}
                   </span>
                 </div>
@@ -301,7 +301,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                   <div className="flex items-center gap-4 bg-brand-light rounded-xl p-1">
                     <button
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
@@ -310,7 +310,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                     </span>
                     <button
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-[0.88] cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -329,7 +329,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                     onChange={(e) => setNotes(e.target.value)}
                     maxLength={150}
                     rows={3}
-                    className="w-full p-3.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/40 border-0 focus:ring-2 focus:ring-brand-red/20 focus:bg-white resize-none transition-[background-color,box-shadow] duration-200 ease-out"
+                    className="w-full p-3.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/40 border-0 focus:ring-2 focus:ring-brand-primary/20 focus:bg-white resize-none transition-[background-color,box-shadow] duration-200 ease-out"
                   />
                   <div className="text-right text-[11px] text-brand-dark/40">
                     {notes.length}/150 characters
@@ -347,7 +347,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                 </button>
                 <button
                   onClick={handleAddToCart}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-sm shadow-md shadow-brand-red/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-bold text-sm shadow-md shadow-brand-primary/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>Add to Cart</span>

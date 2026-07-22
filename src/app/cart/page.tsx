@@ -109,7 +109,7 @@ export default function CartPage() {
           </div>
           <Link 
             href="/?order=true" 
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-bold text-sm shadow-md shadow-brand-red/20 transition-all active:scale-95 hover:-translate-y-0.5"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-bold text-sm shadow-md shadow-brand-primary/20 transition-all active:scale-95 hover:-translate-y-0.5"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Browse Menu</span>
@@ -132,7 +132,7 @@ export default function CartPage() {
       </div>
 
       {errorMsg && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-red/10 border border-brand-red/25 text-brand-red">
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-primary/10 border border-brand-primary/25 text-brand-primary">
           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <span className="text-sm font-semibold">{errorMsg}</span>
         </div>
@@ -183,12 +183,12 @@ export default function CartPage() {
                   )}
 
                   {item.notes && (
-                    <p className="text-xs sm:text-sm italic text-brand-orange bg-brand-orange/5 px-2.5 py-1 rounded-lg border border-brand-orange/10 w-fit mt-1">
+                    <p className="text-xs sm:text-sm italic text-brand-primary bg-brand-primary/5 px-2.5 py-1 rounded-lg border border-brand-primary/10 w-fit mt-1">
                       Note: {item.notes}
                     </p>
                   )}
                   
-                  <span className="text-base font-extrabold text-brand-red mt-1.5 flex items-baseline gap-1.5">
+                  <span className="text-base font-extrabold text-brand-primary mt-1.5 flex items-baseline gap-1.5">
                     ${(item.price * item.quantity).toFixed(2)}
                     {item.quantity > 1 && (
                       <span className="text-xs font-semibold text-brand-dark/40">
@@ -204,7 +204,7 @@ export default function CartPage() {
                 <div className="flex items-center gap-3.5 bg-brand-light rounded-xl p-1 shrink-0">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-95"
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-95"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -213,7 +213,7 @@ export default function CartPage() {
                   </span>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-red shadow-xs transition-colors active:scale-95"
+                    className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-brand-dark hover:text-brand-primary shadow-xs transition-colors active:scale-95"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -221,7 +221,7 @@ export default function CartPage() {
 
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="w-9 h-9 rounded-xl bg-brand-red/5 hover:bg-brand-red text-brand-red hover:text-white flex items-center justify-center transition-colors duration-200 active:scale-95 shrink-0"
+                  className="w-9 h-9 rounded-xl bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white flex items-center justify-center transition-colors duration-200 active:scale-95 shrink-0"
                   title="Remove item"
                 >
                   <Trash2 className="w-4.5 h-4.5" />
@@ -232,7 +232,7 @@ export default function CartPage() {
           
           <Link 
             href="/?order=true" 
-            className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/60 hover:text-brand-red transition-colors w-fit px-1.5"
+            className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/60 hover:text-brand-primary transition-colors w-fit px-1.5"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Continue Adding Food</span>
@@ -257,7 +257,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between items-center border-t border-brand-dark/5 pt-4 text-brand-dark">
                 <span className="text-base font-extrabold">Total Amount</span>
-                <span className="text-2xl font-extrabold text-brand-red">${total.toFixed(2)}</span>
+                <span className="text-2xl font-extrabold text-brand-primary">${total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -272,7 +272,7 @@ export default function CartPage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="customer-name" className="text-xs font-bold text-brand-dark/70">
-                  Your Name <span className="text-brand-red font-bold">*</span>
+                  Your Name <span className="text-brand-primary font-bold">*</span>
                 </label>
                 <input
                   id="customer-name"
@@ -281,7 +281,7 @@ export default function CartPage() {
                   placeholder="E.g., Mario Rossi"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-all duration-200"
                 />
               </div>
 
@@ -295,14 +295,14 @@ export default function CartPage() {
                   placeholder="E.g., 555-0199"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-red/30 focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-all duration-200"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-red hover:bg-brand-red/90 text-white font-extrabold text-[15px] shadow-md shadow-brand-red/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-[15px] shadow-md shadow-brand-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
               >
                 {isSubmitting ? (
                   <span>Placing Order...</span>

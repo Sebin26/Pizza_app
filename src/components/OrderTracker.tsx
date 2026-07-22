@@ -46,14 +46,14 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
   };
 
   const getStepColor = (status: "active" | "completed" | "pending") => {
-    if (status === "completed") return "bg-brand-green text-white border-brand-green";
-    if (status === "active") return "bg-brand-orange text-white border-brand-orange animate-pulse";
+    if (status === "completed") return "bg-brand-gold text-white border-brand-gold";
+    if (status === "active") return "bg-brand-primary text-white border-brand-primary animate-pulse";
     return "bg-white text-brand-dark/30 border-brand-dark/15";
   };
 
   const getStepTextColor = (status: "active" | "completed" | "pending") => {
-    if (status === "completed") return "text-brand-green font-bold";
-    if (status === "active") return "text-brand-orange font-bold";
+    if (status === "completed") return "text-brand-gold font-bold";
+    if (status === "active") return "text-brand-primary font-bold";
     return "text-brand-dark/40 font-semibold";
   };
 
@@ -66,7 +66,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-brand-dark/5 flex flex-col sm:flex-row gap-4 items-center text-center sm:text-left"
       >
-        <div className="w-14 h-14 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
+        <div className="w-14 h-14 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <div className="flex flex-col gap-0.5">
@@ -86,7 +86,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
             {/* Token Section */}
             <div className="flex flex-col items-center text-center border-b border-brand-dark/5 pb-6">
               <span className="text-xs font-extrabold tracking-wider text-brand-dark/40 uppercase">Your Token Number</span>
-              <h2 className="text-6xl sm:text-7xl font-extrabold text-brand-red tracking-tight my-2">
+              <h2 className="text-6xl sm:text-7xl font-extrabold text-brand-primary tracking-tight my-2">
                 {order.orderNumber}
               </h2>
               <p className="text-sm text-brand-dark/60 max-w-xs leading-relaxed">
@@ -105,7 +105,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                 
                 {/* Horizontal Progress Bar Fill */}
                 <div 
-                  className="absolute left-0 h-1 bg-brand-green -translate-y-4 transition-all duration-500"
+                  className="absolute left-0 h-1 bg-brand-gold -translate-y-4 transition-all duration-500"
                   style={{
                     width:
                       order.status === "RECEIVED"
@@ -143,8 +143,8 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
             {/* Banners based on order status */}
             <div className="border-t border-brand-dark/5 pt-6 mt-2">
               {order.status === "READY" ? (
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-yellow/10 border border-brand-yellow/20 text-brand-dark">
-                  <div className="w-10 h-10 rounded-full bg-brand-yellow text-brand-dark flex items-center justify-center shrink-0 animate-bounce">
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-brand-gold text-brand-dark flex items-center justify-center shrink-0 animate-bounce">
                     <Bell className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col gap-0.5">
@@ -155,12 +155,12 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                   </div>
                 </div>
               ) : order.status === "COMPLETED" ? (
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-green/10 border border-brand-green/20 text-brand-dark">
-                  <div className="w-10 h-10 rounded-full bg-brand-green text-white flex items-center justify-center shrink-0">
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-brand-gold text-white flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <h4 className="font-extrabold text-[15px] text-brand-green">Order Collected</h4>
+                    <h4 className="font-extrabold text-[15px] text-brand-gold">Order Collected</h4>
                     <p className="text-xs text-brand-dark/70 leading-relaxed">
                       Enjoy your meal! Thank you for dining with D Town Pizza.
                     </p>
@@ -168,7 +168,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                 </div>
               ) : (
                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-brand-light border border-brand-dark/5 text-brand-dark">
-                  <div className="w-10 h-10 rounded-full bg-white text-brand-orange flex items-center justify-center shrink-0 shadow-xs">
+                  <div className="w-10 h-10 rounded-full bg-white text-brand-primary flex items-center justify-center shrink-0 shadow-xs">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
@@ -191,11 +191,11 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
             </div>
             
             {/* Scrollable Items List */}
-            <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto pr-1">
+            <div className="flex flex-col gap-4 max-h-75 overflow-y-auto pr-1">
               {order.items?.map((item) => (
                 <div key={item.id} className="flex justify-between items-start gap-4 text-sm border-b border-brand-dark/5 pb-4 last:border-b-0 last:pb-0">
                   <div className="flex gap-2.5 items-start">
-                    <span className="font-extrabold text-brand-red bg-brand-red/5 px-2 py-0.5 rounded-lg text-xs mt-0.5">
+                    <span className="font-extrabold text-brand-primary bg-brand-primary/5 px-2 py-0.5 rounded-lg text-xs mt-0.5">
                       {item.quantity}x
                     </span>
                     <div className="flex flex-col gap-0.5">
@@ -219,7 +219,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                         </div>
                       )}
                       {item.notes && (
-                        <p className="text-xs italic text-brand-orange mt-1">Note: {item.notes}</p>
+                        <p className="text-xs italic text-brand-primary mt-1">Note: {item.notes}</p>
                       )}
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
               </div>
               <div className="flex justify-between border-t border-brand-dark/5 pt-3 text-brand-dark">
                 <span className="text-base font-extrabold">Total Paid</span>
-                <span className="text-lg font-extrabold text-brand-red">${order.total.toFixed(2)}</span>
+                <span className="text-lg font-extrabold text-brand-primary">${order.total.toFixed(2)}</span>
               </div>
             </div>
 
