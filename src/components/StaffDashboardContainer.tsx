@@ -333,15 +333,24 @@ export default function StaffDashboardContainer({ user }: StaffDashboardContaine
                             {order.orderNumber}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-sm font-extrabold text-brand-dark truncate max-w-30 sm:max-w-none">
+                             <span className="text-sm font-extrabold text-brand-dark truncate max-w-30 sm:max-w-none">
                               {order.customerName}
                             </span>
-                            {order.customerPhone && (
-                              <div className="flex items-center gap-1 text-[10px] text-brand-dark/45 mt-0.5 font-semibold">
-                                <Phone className="w-3 h-3 text-brand-primary" />
-                                <span>{order.customerPhone}</span>
-                              </div>
-                            )}
+                            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                              <span className={`px-1.5 py-0.2 rounded-sm text-[8px] font-extrabold uppercase tracking-wider ${
+                                order.orderType === "TAKEAWAY"
+                                  ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/20"
+                                  : "bg-brand-primary/10 text-brand-primary border border-brand-primary/20"
+                              }`}>
+                                {order.orderType === "TAKEAWAY" ? "Takeaway" : "Dine-In"}
+                              </span>
+                              {order.customerPhone && (
+                                <div className="flex items-center gap-0.5 text-[10px] text-brand-dark/45 font-semibold">
+                                  <Phone className="w-2.5 h-2.5 text-brand-primary" />
+                                  <span>{order.customerPhone}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
 

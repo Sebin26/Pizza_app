@@ -176,7 +176,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                       className="w-28 h-28 rounded-full shadow-lg flex items-center justify-center text-4xl animate-float transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-15"
                       style={{
                         background: item.isPizza 
-                          ? "radial-gradient(circle, #D99A2B 10%, #E8722C 60%, #C15E22 100%)"
+                          ? "radial-gradient(circle, #D99A2B 10%, #e36316 60%, #be5212 100%)"
                           : "radial-gradient(circle, #E5E7EB 20%, #9CA3AF 80%)"
                       }}
                     >

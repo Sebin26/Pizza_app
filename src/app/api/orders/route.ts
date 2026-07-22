@@ -86,6 +86,7 @@ const orderItemSchema = z.object({
 const createOrderSchema = z.object({
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().optional().nullable(),
+  orderType: z.enum(["DINE_IN", "TAKEAWAY"]).default("DINE_IN"),
   items: z.array(orderItemSchema).min(1, "At least one item is required"),
 });
 
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { customerName, customerPhone, items } = result.data;
+    const { customerName, customerPhone, orderType, items } = result.data;
 
     // Token generation moved inside the transaction to ensure atomic sequential ordering
 
@@ -246,6 +247,7 @@ export async function POST(request: Request) {
           orderNumber: tokenNumber,
           customerName,
           customerPhone,
+          orderType,
           status: "RECEIVED",
           estimatedPrepMin,
           subtotal: orderSubtotal,

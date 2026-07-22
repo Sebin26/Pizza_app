@@ -197,7 +197,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
                     <div 
                       className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-15"
                       style={{
-                        background: "radial-gradient(circle, #D99A2B 10%, #E8722C 60%, #C15E22 100%)"
+                        background: "radial-gradient(circle, #D99A2B 10%, #e36316 60%, #be5212 100%)"
                       }}
                     >
                       <span>🍕</span>

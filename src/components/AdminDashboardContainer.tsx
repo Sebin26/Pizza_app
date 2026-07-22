@@ -945,7 +945,16 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               {orders.map((o) => (
                 <div key={o.id} className="p-4 bg-brand-light border border-brand-dark/5 rounded-2xl text-xs flex flex-col gap-2.5">
                   <div className="flex justify-between items-center border-b border-brand-dark/5 pb-2">
-                    <span className="text-sm font-extrabold text-brand-primary">Token #{o.orderNumber}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-extrabold text-brand-primary">Token #{o.orderNumber}</span>
+                      <span className={`px-1.5 py-0.2 rounded-sm text-[8px] font-extrabold uppercase tracking-wider ${
+                        o.orderType === "TAKEAWAY"
+                          ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/20"
+                          : "bg-brand-primary/10 text-brand-primary border border-brand-primary/20"
+                      }`}>
+                        {o.orderType === "TAKEAWAY" ? "Takeaway" : "Dine-In"}
+                      </span>
+                    </div>
                     <span className="text-[10px] text-brand-dark/45 font-semibold">
                       {new Date(o.createdAt).toLocaleString()}
                     </span>

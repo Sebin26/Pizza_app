@@ -92,6 +92,7 @@ model Order {
   orderNumber      String      @unique // Human-readable e.g. token "045"
   customerName     String
   customerPhone    String?
+  orderType        String      @default("DINE_IN") // DINE_IN, TAKEAWAY
   status           String      @default("RECEIVED") // RECEIVED, PREPARING, READY, COMPLETED
   estimatedPrepMin Int         @default(20)
   subtotal         Float

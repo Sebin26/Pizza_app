@@ -14,6 +14,7 @@ export default function CartPage() {
   // Guest checkout form state
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [orderType, setOrderType] = useState<"DINE_IN" | "TAKEAWAY">("DINE_IN");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -68,6 +69,7 @@ export default function CartPage() {
         body: JSON.stringify({
           customerName,
           customerPhone: customerPhone ? customerPhone : null,
+          orderType,
           items: apiItems,
         }),
       });
@@ -270,6 +272,35 @@ export default function CartPage() {
                 </p>
               </div>
 
+              {/* Dine-In vs Takeaway segmented switcher */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-brand-dark/70">Order Option</label>
+                <div className="grid grid-cols-2 gap-2 bg-brand-light p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setOrderType("DINE_IN")}
+                    className={`py-2 px-3 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer ${
+                      orderType === "DINE_IN"
+                        ? "bg-brand-primary text-white shadow-xs"
+                        : "text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5"
+                    }`}
+                  >
+                    Dine-In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOrderType("TAKEAWAY")}
+                    className={`py-2 px-3 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer ${
+                      orderType === "TAKEAWAY"
+                        ? "bg-brand-primary text-white shadow-xs"
+                        : "text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5"
+                    }`}
+                  >
+                    Takeaway
+                  </button>
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="customer-name" className="text-xs font-bold text-brand-dark/70">
                   Your Name <span className="text-brand-primary font-bold">*</span>
@@ -306,10 +337,15 @@ export default function CartPage() {
               >
                 {isSubmitting ? (
                   <span>Placing Order...</span>
-                ) : (
+                ) : orderType === "DINE_IN" ? (
                   <>
                     <Send className="w-4.5 h-4.5" />
                     <span>Place In-Store Order</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-4.5 h-4.5" />
+                    <span>Place Takeaway Order</span>
                   </>
                 )}
               </button>

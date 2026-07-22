@@ -87,6 +87,7 @@ export interface Order {
   orderNumber: string;
   customerName: string;
   customerPhone: string | null;
+  orderType: "DINE_IN" | "TAKEAWAY";
   status: "RECEIVED" | "PREPARING" | "READY" | "COMPLETED";
   estimatedPrepMin: number;
   subtotal: number;
