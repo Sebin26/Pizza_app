@@ -632,6 +632,13 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                       className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out"
                     />
                   </div>
+                  <textarea
+                    placeholder="Item Description (Optional)"
+                    value={newItemDesc}
+                    onChange={e => setNewItemDesc(e.target.value)}
+                    rows={2}
+                    className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:bg-white focus:border-brand-primary/30 focus:ring-1 focus:ring-brand-primary/10 transition-[box-shadow,border-color,background-color] duration-200 ease-out resize-none"
+                  />
                   <div className="grid grid-cols-2 gap-3">
                     <input 
                       type="number" 

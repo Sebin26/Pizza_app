@@ -53,7 +53,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
       </div>
 
       {/* 1. CINEMATIC HERO SECTION */}
-      <section className="relative min-h-[calc(100vh-80px)] flex items-center pt-8 pb-16 px-4 sm:px-6 lg:px-8 z-10 overflow-hidden bg-brand-dark">
+      <section className="relative min-h-[70vh] flex items-center pt-8 pb-16 px-4 sm:px-6 lg:px-8 z-10 overflow-hidden bg-brand-dark">
         {/* Full-bleed rotating food photography slideshow */}
         <HeroCarousel />
         

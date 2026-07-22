@@ -176,7 +176,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
 
   const handleAdd = () => {
     addToCart(menuItem, quantity, customization, notes);
-    router.push("/");
+    router.push("/?order=true");
   };
 
   // Group toppings by category
@@ -1062,7 +1062,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
           </div>
 
           {/* Desktop inline navigation controls */}
-          <div className="hidden lg:flex justify-between items-center mt-6 p-4 bg-brand-light/50 rounded-2xl border border-brand-dark/5">
+          <div className="hidden lg:flex justify-between items-center mt-6 p-4 bg-white rounded-2xl border border-brand-dark/5">
             {currentStep > 1 ? (
               <button
                 type="button"

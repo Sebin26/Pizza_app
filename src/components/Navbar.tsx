@@ -13,7 +13,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-brand-dark/5 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="w-full px-6 md:px-12 lg:px-16 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}
         <Link 
@@ -28,17 +28,16 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-9">
           <Link 
             href="/?order=true" 
-            className="text-[17px] font-bold text-brand-dark/70 hover:text-brand-primary transition-colors duration-200"
+            className="text-[20px] font-extrabold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
           >
             Menu
           </Link>
           <Link 
             href="/builder" 
-            className="text-[17px] font-bold text-brand-dark/70 hover:text-brand-primary transition-colors duration-200"
+            className="text-[20px] font-extrabold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
           >
             Pizza Customizer
           </Link>

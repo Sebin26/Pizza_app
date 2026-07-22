@@ -46,13 +46,13 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
   };
 
   const getStepColor = (status: "active" | "completed" | "pending") => {
-    if (status === "completed") return "bg-brand-gold text-white border-brand-gold";
+    if (status === "completed") return "bg-green-600 text-white border-green-600";
     if (status === "active") return "bg-brand-primary text-white border-brand-primary animate-pulse";
     return "bg-white text-brand-dark/30 border-brand-dark/15";
   };
 
   const getStepTextColor = (status: "active" | "completed" | "pending") => {
-    if (status === "completed") return "text-brand-gold font-bold";
+    if (status === "completed") return "text-green-600 font-bold";
     if (status === "active") return "text-brand-primary font-bold";
     return "text-brand-dark/40 font-semibold";
   };
@@ -105,7 +105,7 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                 
                 {/* Horizontal Progress Bar Fill */}
                 <div 
-                  className="absolute left-0 h-1 bg-brand-gold -translate-y-4 transition-all duration-500"
+                  className="absolute left-0 h-1 bg-green-600 -translate-y-4 transition-all duration-500"
                   style={{
                     width:
                       order.status === "RECEIVED"
@@ -155,12 +155,12 @@ export default function OrderTracker({ initialOrder }: OrderTrackerProps) {
                   </div>
                 </div>
               ) : order.status === "COMPLETED" ? (
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 text-brand-dark">
-                  <div className="w-10 h-10 rounded-full bg-brand-gold text-white flex items-center justify-center shrink-0">
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-green-50 border border-green-200 text-brand-dark">
+                  <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <h4 className="font-extrabold text-[15px] text-brand-gold">Order Collected</h4>
+                    <h4 className="font-extrabold text-[15px] text-green-700">Order Collected</h4>
                     <p className="text-xs text-brand-dark/70 leading-relaxed">
                       Enjoy your meal! Thank you for dining with D Town Pizza.
                     </p>
