@@ -421,7 +421,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
       {/* Header Back Button */}
       <div className="flex items-center justify-between">
         <button 
-          onClick={() => router.push("/")} 
+          onClick={() => router.push("/?order=true")} 
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-brand-dark/70 hover:text-brand-primary bg-white border border-brand-dark/5 hover:border-brand-dark/10 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-200 ease-out active:scale-[0.97] cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />

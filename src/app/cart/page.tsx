@@ -340,7 +340,7 @@ export default function CartPage() {
                 ) : orderType === "DINE_IN" ? (
                   <>
                     <Send className="w-4.5 h-4.5" />
-                    <span>Place In-Store Order</span>
+                    <span>Place Order</span>
                   </>
                 ) : (
                   <>

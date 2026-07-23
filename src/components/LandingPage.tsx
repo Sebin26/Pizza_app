@@ -17,6 +17,8 @@ import {
   ArrowUpRight 
 } from "lucide-react";
 
+import FeaturedPizzaShowcase from "./FeaturedPizzaShowcase";
+
 // Dynamically import client-only elements to prevent hydration issues
 const HeroCarousel = dynamic(() => import("./HeroCarousel"), { ssr: false });
 
@@ -167,87 +169,8 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
             </p>
           </div>
 
-          {/* Grid of Featured Pizzas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPizzas.map((item, idx) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.08, ease: [0.23, 1, 0.32, 1] }}
-                className="group bg-brand-cream rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-2 hover:border-brand-dark/10 border border-brand-dark/5 flex flex-col justify-between transition-[transform,box-shadow,border-color] duration-300 ease-out"
-              >
-                {/* Pizza Graphic/Image Header */}
-                <div className="h-52 bg-brand-light relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-tr from-brand-gold/10 to-brand-primary/10 transition-transform duration-500 ease-out group-hover:scale-105"></div>
-                  
-                  {/* Rotating/Scaling Pizza Image on Hover */}
-                  {item.imageUrl ? (
-                    <div className="relative w-40 h-40 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-                      <Image
-                        src={`/${item.imageUrl}.png`}
-                        alt={item.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-contain rounded-full drop-shadow-xl"
-                      />
-                    </div>
-                  ) : (
-                    <div 
-                      className="w-32 h-32 rounded-full shadow-xl flex items-center justify-center text-5xl transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:rotate-15"
-                      style={{
-                        background: "radial-gradient(circle, #D99A2B 10%, #e36316 60%, #be5212 100%)"
-                      }}
-                    >
-                      <span>🍕</span>
-                    </div>
-                  )}
-
-                  <span className="absolute top-4 right-4 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xs text-brand-primary text-xs font-black uppercase tracking-wide shadow-xs">
-                    Popular
-                  </span>
-                </div>
-
-                {/* Content Details */}
-                <div className="p-6 flex flex-col flex-1 justify-between gap-6">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-start gap-4">
-                      <h3 className="text-2xl font-extrabold text-brand-dark group-hover:text-brand-primary transition-colors duration-200 leading-tight">
-                        {item.name}
-                      </h3>
-                      <span className="text-2xl font-black text-brand-primary shrink-0">
-                        ${item.basePrice.toFixed(2)}
-                      </span>
-                    </div>
-                    <p className="text-base text-brand-dark/75 leading-relaxed font-semibold line-clamp-2">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <button
-                    onClick={() => router.push(`/builder?id=${item.id}`)}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white hover:bg-brand-primary group-hover:bg-brand-primary text-brand-dark group-hover:text-white font-extrabold rounded-xl border border-brand-dark/10 group-hover:border-transparent text-base transition-[background-color,color,border-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] shadow-xs hover:shadow-md cursor-pointer"
-                  >
-                    <span>Customize & Order</span>
-                    <ArrowRight className="w-5 h-5 translate-x-0 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Quick Menu CTA */}
-          <div className="mt-16 text-center">
-            <Link
-              href="/?order=true"
-              className="group inline-flex items-center gap-2.5 text-base font-extrabold text-brand-primary hover:text-brand-primary-dark transition-colors duration-200"
-            >
-              <span>Explore full catalog of pizzas, sides, and drinks</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
-            </Link>
-          </div>
+          {/* Editorial Poster-Style Featured Pizzas Showcase */}
+          <FeaturedPizzaShowcase featuredPizzas={featuredPizzas} />
 
         </div>
       </section>
