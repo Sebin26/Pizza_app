@@ -176,7 +176,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
 
   const handleAdd = () => {
     addToCart(menuItem, quantity, customization, notes);
-    router.push("/?order=true");
+    router.push("/cart");
   };
 
   // Group toppings by category
