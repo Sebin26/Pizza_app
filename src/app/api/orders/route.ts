@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
+import { Prisma, OrderStatus } from "@prisma/client"; // FulfillmentType
 import { z } from "zod";
 import { getSession } from "@/lib/session";
 
@@ -18,12 +18,18 @@ export async function GET(request: Request) {
     const where: Prisma.OrderWhereInput = {};
 
     if (status) {
-      if (status === "ACTIVE") {
-        where.status = { in: ["RECEIVED", "PREPARING", "READY"] };
-      } else {
-        where.status = status;
-      }
-    }
+  if (status === "ACTIVE") {
+    where.status = {
+      in: [
+        OrderStatus.RECEIVED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+      ],
+    };
+  } else {
+    where.status = status as OrderStatus;
+  }
+}
 
     if (search) {
       where.OR = [
@@ -86,7 +92,9 @@ const orderItemSchema = z.object({
 const createOrderSchema = z.object({
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().optional().nullable(),
-  orderType: z.enum(["DINE_IN", "TAKEAWAY"]).default("DINE_IN"),
+  fulfillmentType: z
+    .enum(["DINE_IN", "PICKUP", "DELIVERY"])
+    .default("DINE_IN"),
   items: z.array(orderItemSchema).min(1, "At least one item is required"),
 });
 
@@ -102,7 +110,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { customerName, customerPhone, orderType, items } = result.data;
+    const {
+      customerName,
+      customerPhone,
+      fulfillmentType,
+      items,
+    } = result.data;    
 
     // Token generation moved inside the transaction to ensure atomic sequential ordering
 
@@ -110,7 +123,10 @@ export async function POST(request: Request) {
     const activeQueueCount = await prisma.order.count({
       where: {
         status: {
-          in: ["RECEIVED", "PREPARING"],
+          in: [
+            OrderStatus.RECEIVED,
+            OrderStatus.PREPARING,
+          ],
         },
       },
     });
@@ -247,8 +263,8 @@ export async function POST(request: Request) {
           orderNumber: tokenNumber,
           customerName,
           customerPhone,
-          orderType,
-          status: "RECEIVED",
+          fulfillmentType,
+          status: OrderStatus.RECEIVED,
           estimatedPrepMin,
           subtotal: orderSubtotal,
           tax: taxAmount,
