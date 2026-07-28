@@ -17,7 +17,9 @@ export async function GET(request: Request) {
 
     const where: Prisma.OrderWhereInput = {};
 
-    if (status) {
+    const validStatuses = Object.values(OrderStatus);
+
+if (status) {
   if (status === "ACTIVE") {
     where.status = {
       in: [
@@ -26,8 +28,13 @@ export async function GET(request: Request) {
         OrderStatus.READY,
       ],
     };
-  } else {
+  } else if (validStatuses.includes(status as OrderStatus)) {
     where.status = status as OrderStatus;
+  } else {
+      return NextResponse.json(
+      { error: "Invalid order status" },
+      { status: 400 }
+    );
   }
 }
 
@@ -89,13 +96,28 @@ const orderItemSchema = z.object({
   customization: orderItemCustomizationSchema.optional(),
 });
 
+const deliverySchema = z.object({
+  addressLine1: z.string().min(1),
+  addressLine2: z.string().optional(),
+  city: z.string().min(1),
+  postcode: z.string().optional(),
+  landmark: z.string().optional(),
+  deliveryInstructions: z.string().optional(),
+});
+
 const createOrderSchema = z.object({
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().optional().nullable(),
+
   fulfillmentType: z
     .enum(["DINE_IN", "PICKUP", "DELIVERY"])
     .default("DINE_IN"),
-  items: z.array(orderItemSchema).min(1, "At least one item is required"),
+
+  delivery: deliverySchema.optional(),
+
+  items: z
+    .array(orderItemSchema)
+    .min(1, "At least one item is required"),
 });
 
 export async function POST(request: Request) {
@@ -114,8 +136,23 @@ export async function POST(request: Request) {
       customerName,
       customerPhone,
       fulfillmentType,
+      delivery,
       items,
-    } = result.data;    
+    } = result.data;  
+
+    if (
+        fulfillmentType === "DELIVERY" &&
+        !delivery
+    ) {
+        return NextResponse.json(
+        {
+          error: "Delivery address is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
     // Token generation moved inside the transaction to ensure atomic sequential ordering
 
@@ -271,6 +308,23 @@ export async function POST(request: Request) {
           total: totalAmount,
         },
       });
+
+      if (
+        fulfillmentType === "DELIVERY" &&
+        delivery
+      ) {
+        await tx.delivery.create({
+          data: {
+            orderId: createdOrder.id,
+            addressLine1: delivery.addressLine1,
+            addressLine2: delivery.addressLine2,
+            city: delivery.city,
+            postcode: delivery.postcode,
+            landmark: delivery.landmark,
+            instructions: delivery.deliveryInstructions,
+          },
+        });
+      }
 
       for (const item of validatedItems) {
         const createdItem = await tx.orderItem.create({
