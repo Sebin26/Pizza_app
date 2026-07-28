@@ -117,7 +117,37 @@ model Order {
   total            Float
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+  delivery         Delivery?
   items            OrderItem[]
+}
+
+model Delivery {
+  id String @id @default(cuid())
+
+  orderId String @unique
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  addressLine1 String
+  addressLine2 String?
+
+  city String
+  postcode String?
+
+  landmark String?
+
+  instructions String?
+
+  latitude Float?
+  longitude Float?
+
+  assignedDriverId String?
+
+  assignedAt DateTime?
+  departedAt DateTime?
+  deliveredAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrderItem {
