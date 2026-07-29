@@ -1,27 +1,10 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-enum FulfillmentType {
-  DINE_IN
-  PICKUP
-  DELIVERY
-}
-
-enum OrderStatus {
-  RECEIVED
-  CONFIRMED
-  PREPARING
-  READY
-  OUT_FOR_DELIVERY
-  DELIVERED
-  COMPLETED
-  CANCELLED
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -29,7 +12,7 @@ model User {
   username     String   @unique
   passwordHash String
   name         String
-  role         String   // "STAFF" | "ADMIN"
+  role         String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -40,30 +23,30 @@ model Category {
   slug         String     @unique
   description  String?
   displayOrder Int        @default(0)
-  items        MenuItem[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  items        MenuItem[]
 }
 
 model MenuItem {
-  id           String      @id @default(uuid())
-  name         String
-  slug         String      @unique
-  description  String?
-  basePrice    Float
-  imageUrl     String?
-  isPizza      Boolean     @default(false)
-  isAvailable  Boolean     @default(true)
-  categoryId   String
-  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems   OrderItem[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  name        String
+  slug        String      @unique
+  description String?
+  basePrice   Float
+  imageUrl    String?
+  isPizza     Boolean     @default(false)
+  isAvailable Boolean     @default(true)
+  categoryId  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
 }
 
 model PizzaSize {
   id             String                   @id @default(uuid())
-  name           String                   @unique // Personal, Medium, Large
+  name           String                   @unique
   priceFactor    Float                    @default(1.0)
   priceAdd       Float                    @default(0.0)
   displayOrder   Int                      @default(0)
@@ -72,7 +55,7 @@ model PizzaSize {
 
 model PizzaCrust {
   id             String                   @id @default(uuid())
-  name           String                   @unique // Thin Crust, Pan, Stuffed Crust
+  name           String                   @unique
   price          Float                    @default(0.0)
   displayOrder   Int                      @default(0)
   customizations OrderItemCustomization[]
@@ -80,7 +63,7 @@ model PizzaCrust {
 
 model PizzaSauce {
   id             String                   @id @default(uuid())
-  name           String                   @unique // Classic Tomato, White Garlic, BBQ
+  name           String                   @unique
   price          Float                    @default(0.0)
   displayOrder   Int                      @default(0)
   customizations OrderItemCustomization[]
@@ -105,95 +88,103 @@ model PizzaAddon {
 }
 
 model Order {
-  id               String           @id @default(uuid())
-  orderNumber      String           @unique // Human-readable e.g. token "045"
+  id               String          @id @default(uuid())
+  orderNumber      String          @unique
   customerName     String
   customerPhone    String?
-  fulfillmentType  FulfillmentType  @default(DINE_IN) 
-  status           OrderStatus      @default(RECEIVED)
-  estimatedPrepMin Int              @default(20)
+  estimatedPrepMin Int             @default(20)
   subtotal         Float
   tax              Float
   total            Float
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  fulfillmentType  FulfillmentType @default(DINE_IN)
+  status           OrderStatus     @default(RECEIVED)
   delivery         Delivery?
   items            OrderItem[]
 }
 
 model Delivery {
-  id String @id @default(cuid())
-
-  orderId String @unique
-  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  addressLine1 String
-  addressLine2 String?
-
-  city String
-  postcode String?
-
-  landmark String?
-
-  instructions String?
-
-  latitude Float?
-  longitude Float?
-
+  id               String    @id @default(cuid())
+  orderId          String    @unique
+  addressLine1     String
+  addressLine2     String?
+  city             String
+  postcode         String?
+  landmark         String?
+  instructions     String?
+  latitude         Float?
+  longitude        Float?
   assignedDriverId String?
-
-  assignedAt DateTime?
-  departedAt DateTime?
-  deliveredAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  assignedAt       DateTime?
+  departedAt       DateTime?
+  deliveredAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  order            Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model OrderItem {
   id            String                  @id @default(uuid())
   orderId       String
-  order         Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   menuItemId    String
-  menuItem      MenuItem                @relation(fields: [menuItemId], references: [id])
   quantity      Int                     @default(1)
   unitPrice     Float
   totalPrice    Float
   notes         String?
+  menuItem      MenuItem                @relation(fields: [menuItemId], references: [id])
+  order         Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   customization OrderItemCustomization?
 }
 
 model OrderItemCustomization {
   id          String             @id @default(uuid())
   orderItemId String             @unique
-  orderItem   OrderItem          @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
   sizeId      String?
-  size        PizzaSize?         @relation(fields: [sizeId], references: [id])
   crustId     String?
-  crust       PizzaCrust?        @relation(fields: [crustId], references: [id])
   sauceId     String?
-  sauce       PizzaSauce?        @relation(fields: [sauceId], references: [id])
-  toppings    OrderItemTopping[]
   addons      OrderItemAddon[]
+  crust       PizzaCrust?        @relation(fields: [crustId], references: [id])
+  orderItem   OrderItem          @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  sauce       PizzaSauce?        @relation(fields: [sauceId], references: [id])
+  size        PizzaSize?         @relation(fields: [sizeId], references: [id])
+  toppings    OrderItemTopping[]
 }
 
 model OrderItemTopping {
   id                       String                 @id @default(uuid())
   orderItemCustomizationId String
-  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
   toppingId                String
+  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
   topping                  PizzaTopping           @relation(fields: [toppingId], references: [id])
 }
 
 model OrderItemAddon {
   id                       String                 @id @default(uuid())
   orderItemCustomizationId String
-  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
   addonId                  String
   addon                    PizzaAddon             @relation(fields: [addonId], references: [id])
+  customization            OrderItemCustomization @relation(fields: [orderItemCustomizationId], references: [id], onDelete: Cascade)
 }
 
 model SystemConfig {
   key   String @id
   value String
+}
+
+enum FulfillmentType {
+  DINE_IN
+  PICKUP
+  DELIVERY
+}
+
+enum OrderStatus {
+  RECEIVED
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  COMPLETED
+  CANCELLED
 }
