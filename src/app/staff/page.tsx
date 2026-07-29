@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import StaffDashboardContainer from "@/components/StaffDashboardContainer";
+import StaffDashboardContainer from "@/components/staff/StaffDashboardContainer";
 
 export const revalidate = 0;
 

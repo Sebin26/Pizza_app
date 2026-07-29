@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import OrderTracker from "@/components/OrderTracker";
+import OrderTracker from "@/components/cart/OrderTracker";
 
 export const revalidate = 0;
 

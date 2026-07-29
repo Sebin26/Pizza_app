@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import PizzaCustomizer from "@/components/PizzaCustomizer";
+import PizzaCustomizer from "@/components/pizza/PizzaCustomizer";
 import { redirect } from "next/navigation";
 
 export const revalidate = 0;

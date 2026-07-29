@@ -1,8 +1,8 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import AdminDashboardContainer from "@/components/AdminDashboardContainer";
-import AccessDenied from "@/components/AccessDenied";
+import AdminDashboardContainer from "@/components/admin/AdminDashboardContainer";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export const revalidate = 0;
 

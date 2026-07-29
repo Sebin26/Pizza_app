@@ -113,29 +113,27 @@ export default function FeaturedPizzaShowcase({ featuredPizzas }: FeaturedPizzaS
                   <DoodlePlus className="absolute top-2 left-6 w-6 sm:w-8 h-auto opacity-40 pointer-events-none" />
                 </>
               )}
-
-              {/* Pizza Floating Image */}
-              <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-full lg:max-w-md aspect-square">
-                {item.imageUrl ? (
-                  <Image
-                    src={`/${item.imageUrl}.png`}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 45vw"
-                    className="object-contain rounded-full drop-shadow-[0_25px_35px_rgba(36,28,21,0.22)] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:rotate-3"
-                    priority={idx === 0}
-                  />
-                ) : (
-                  <div
-                    className="w-full h-full rounded-full drop-shadow-[0_25px_35px_rgba(36,28,21,0.22)] flex items-center justify-center text-7xl sm:text-8xl transition-transform duration-500 ease-out group-hover:scale-105 group-hover:rotate-6"
-                    style={{
-                      background: "radial-gradient(circle, #D99A2B 10%, #E8722C 60%, #be5212 100%)",
-                    }}
-                  >
-                    <span>🍕</span>
-                  </div>
-                )}
-              </div>
+<div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-full overflow-hidden bg-white shadow-[0_30px_60px_rgba(0,0,0,0.18)]">
+  {item.imageUrl ? (
+    <Image
+      src={`/${item.imageUrl}.png`}
+      alt={item.name}
+      fill
+      sizes="(max-width: 768px) 100vw, 45vw"
+      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+      priority={idx === 0}
+    />
+  ) : (
+    <div
+      className="w-full h-full rounded-full flex items-center justify-center text-7xl sm:text-8xl"
+      style={{
+        background: "radial-gradient(circle, #D99A2B 10%, #E8722C 60%, #be5212 100%)",
+      }}
+    >
+      🍕
+    </div>
+  )}
+</div>
             </motion.div>
 
             {/* TEXT SIDE (Editorial Poster Style) */}
