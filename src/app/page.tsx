@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
-import MenuContainer from "@/components/MenuContainer";
-import LandingPage from "@/components/LandingPage";
+import MenuContainer from "@/components/menu/MenuContainer";
+import LandingPage from "@/components/home/LandingPage";
 
 export const revalidate = 0; // Keep dynamic to show admin changes instantly
 
