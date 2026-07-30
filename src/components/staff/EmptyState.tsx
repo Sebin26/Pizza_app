@@ -29,12 +29,8 @@ export default function EmptyState({
       transition={{
         duration: 0.5,
       }}
-      className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-8 py-16 backdrop-blur-xl"
+      className="relative overflow-hidden rounded-3xl border border-brand-dark/5 bg-white px-8 py-16 shadow-xs"
     >
-      {/* Background Glow */}
-
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
-
       <div className="relative flex flex-col items-center text-center">
 
         {/* Animated Icon */}
@@ -48,20 +44,20 @@ export default function EmptyState({
             duration: 4,
             repeat: Infinity,
           }}
-          className="mb-8 rounded-full bg-orange-500/10 p-6 ring-1 ring-orange-500/20"
+          className="mb-8 rounded-full bg-brand-primary/10 p-6 ring-1 ring-brand-primary/20"
         >
-          <Pizza className="h-16 w-16 text-orange-400" />
+          <Pizza className="h-16 w-16 text-brand-primary" />
         </motion.div>
 
         {/* Title */}
 
-        <h2 className="text-3xl font-bold text-white">
+        <h2 className="text-3xl font-extrabold text-brand-dark">
           {title}
         </h2>
 
         {/* Description */}
 
-        <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/60">
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-dark/60">
           {description}
         </p>
 
@@ -69,18 +65,18 @@ export default function EmptyState({
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">
 
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3">
-            <Clock3 className="h-5 w-5 text-orange-400" />
+          <div className="flex items-center gap-3 rounded-2xl border border-brand-dark/5 bg-brand-light px-5 py-3">
+            <Clock3 className="h-5 w-5 text-brand-primary" />
 
-            <span className="text-sm text-white/70">
+            <span className="text-sm font-semibold text-brand-dark/70">
               Orders update automatically
             </span>
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3">
-            <Sparkles className="h-5 w-5 text-yellow-400" />
+          <div className="flex items-center gap-3 rounded-2xl border border-brand-dark/5 bg-brand-light px-5 py-3">
+            <Sparkles className="h-5 w-5 text-brand-gold" />
 
-            <span className="text-sm text-white/70">
+            <span className="text-sm font-semibold text-brand-dark/70">
               Ready for the next customer
             </span>
           </div>

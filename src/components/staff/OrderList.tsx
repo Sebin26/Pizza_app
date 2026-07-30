@@ -4,43 +4,36 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import OrderCard from "./OrderCard";
 import EmptyState from "./EmptyState";
+import type { Order as RealOrder } from "@/types";
 
-export interface OrderItem {
-  id: string;
-  name: string;
-  quantity: number;
-}
-
-export interface Order {
-  id: string;
-  orderNumber: string;
-  customerName: string;
-  tableNumber?: string | null;
-  status: "RECEIVED" | "PREPARING" | "READY" | "COMPLETED";
-  total: number;
-  createdAt: string;
-  items: OrderItem[];
-}
+// Re-export the real, richer Order type (customization, notes, phone,
+// orderType, delivery fields, etc.) so KitchenActions.tsx and OrderCard.tsx
+// can keep importing `type { Order } from "./OrderList"` unchanged, while
+// actually getting full data instead of the old simplified shape.
+export type Order = RealOrder;
+export type OrderItem = RealOrder["items"][number];
 
 interface OrderListProps {
   orders: Order[];
   loading?: boolean;
+  onStatusChange?: (orderId: string, status: Order["status"]) => void | Promise<void>;
 }
 
 export default function OrderList({
   orders,
   loading = false,
+  onStatusChange,
 }: OrderListProps) {
   if (loading) {
     return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
-        <Loader2 className="mb-4 h-12 w-12 animate-spin text-orange-400" />
+      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-brand-dark/5 bg-white shadow-xs">
+        <Loader2 className="mb-4 h-12 w-12 animate-spin text-brand-primary" />
 
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-xl font-extrabold text-brand-dark">
           Loading Kitchen Queue
         </h2>
 
-        <p className="mt-2 text-white/60">
+        <p className="mt-2 text-brand-dark/50 text-sm font-semibold">
           Fetching the latest customer orders...
         </p>
       </div>
@@ -48,8 +41,8 @@ export default function OrderList({
   }
 
   if (orders.length === 0) {
-  return <EmptyState />;
-}
+    return <EmptyState />;
+  }
 
   return (
     <motion.div
@@ -78,7 +71,7 @@ export default function OrderList({
               delay: index * 0.05,
             }}
           >
-            <OrderCard order={order} />
+            <OrderCard order={order} onStatusChange={onStatusChange} />
           </motion.div>
         ))}
       </AnimatePresence>

@@ -16,39 +16,40 @@ export type OrderStatus =
 
 interface StatusBadgeProps {
   status: OrderStatus;
+  orderType?: "DINE_IN" | "TAKEAWAY" | "DELIVERY";
 }
 
 const statusConfig = {
   RECEIVED: {
     label: "Received",
     icon: Clock3,
-    text: "text-sky-300",
-    bg: "bg-sky-500/15",
-    border: "border-sky-500/25",
+    text: "text-sky-600",
+    bg: "bg-sky-500/10",
+    border: "border-sky-500/20",
   },
 
   PREPARING: {
     label: "Preparing",
     icon: ChefHat,
-    text: "text-orange-300",
-    bg: "bg-orange-500/15",
-    border: "border-orange-500/25",
+    text: "text-brand-primary",
+    bg: "bg-brand-primary/10",
+    border: "border-brand-primary/20",
   },
 
   READY: {
     label: "Ready",
     icon: CheckCircle2,
-    text: "text-emerald-300",
-    bg: "bg-emerald-500/15",
-    border: "border-emerald-500/25",
+    text: "text-emerald-700",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
   },
 
   COMPLETED: {
     label: "Completed",
     icon: PackageCheck,
-    text: "text-purple-300",
-    bg: "bg-purple-500/15",
-    border: "border-purple-500/25",
+    text: "text-brand-dark/60",
+    bg: "bg-brand-dark/5",
+    border: "border-brand-dark/15",
   },
 } satisfies Record<
   OrderStatus,
@@ -63,9 +64,18 @@ const statusConfig = {
 
 export default function StatusBadge({
   status,
+  orderType,
 }: StatusBadgeProps) {
   const config = statusConfig[status];
   const Icon = config.icon;
+  const isDelivery = orderType === "DELIVERY";
+
+  const label =
+    isDelivery && status === "READY"
+      ? "Out for Delivery"
+      : isDelivery && status === "COMPLETED"
+      ? "Delivered"
+      : config.label;
 
   return (
     <motion.div
@@ -104,7 +114,7 @@ export default function StatusBadge({
       <span
         className={`text-xs font-semibold uppercase tracking-wide ${config.text}`}
       >
-        {config.label}
+        {label}
       </span>
     </motion.div>
   );

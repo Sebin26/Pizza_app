@@ -37,8 +37,8 @@ export default function OrderTimer({ createdAt }: OrderTimerProps) {
     if (minutes < 5) {
       return {
         label: "Fresh",
-        text: "text-emerald-300",
-        bg: "bg-emerald-500/15",
+        text: "text-emerald-700",
+        bg: "bg-emerald-500/10",
         border: "border-emerald-500/20",
         pulse: false,
       };
@@ -47,18 +47,18 @@ export default function OrderTimer({ createdAt }: OrderTimerProps) {
     if (minutes < 10) {
       return {
         label: "Preparing",
-        text: "text-amber-300",
-        bg: "bg-amber-500/15",
-        border: "border-amber-500/20",
+        text: "text-brand-gold",
+        bg: "bg-brand-gold/10",
+        border: "border-brand-gold/20",
         pulse: false,
       };
     }
 
     return {
       label: "Urgent",
-      text: "text-red-300",
-      bg: "bg-red-500/15",
-      border: "border-red-500/20",
+      text: "text-brand-primary",
+      bg: "bg-brand-primary/10",
+      border: "border-brand-primary/25",
       pulse: true,
     };
   }, [minutes]);

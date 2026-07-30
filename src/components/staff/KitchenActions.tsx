@@ -22,7 +22,7 @@ export default function KitchenActions({
   loading = false,
   onStatusChange,
 }: KitchenActionsProps) {
-  const action = getNextAction(order.status);
+  const action = getNextAction(order.status, order.orderType === "DELIVERY");
 
   if (!action) {
     return null;
@@ -42,11 +42,11 @@ export default function KitchenActions({
       onClick={() =>
         onStatusChange?.(order.id, action.nextStatus)
       }
-      className={`group flex w-full items-center justify-center gap-3 rounded-2xl py-3 font-semibold transition-all duration-300
+      className={`group flex w-full items-center justify-center gap-3 rounded-2xl py-3 font-extrabold text-sm transition-all duration-300 cursor-pointer
         ${
           loading
-            ? "cursor-not-allowed bg-white/10 text-white/40"
-            : `${action.background} ${action.hover} text-white shadow-lg`
+            ? "cursor-not-allowed bg-brand-dark/10 text-brand-dark/40"
+            : `${action.background} text-white shadow-md`
         }`}
     >
       <Icon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" />
@@ -56,39 +56,33 @@ export default function KitchenActions({
   );
 }
 
-function getNextAction(status: Order["status"]) {
+function getNextAction(
+  status: Order["status"],
+  isDelivery: boolean
+) {
   switch (status) {
     case "RECEIVED":
       return {
         label: "Start Preparing",
         nextStatus: "PREPARING" as const,
         icon: ChefHat,
-        background:
-          "bg-gradient-to-r from-orange-500 to-orange-600",
-        hover:
-          "hover:from-orange-400 hover:to-orange-500 hover:shadow-orange-500/30",
+        background: "bg-brand-primary hover:bg-brand-primary-dark",
       };
 
     case "PREPARING":
       return {
-        label: "Mark as Ready",
+        label: isDelivery ? "Send Out for Delivery" : "Mark as Ready",
         nextStatus: "READY" as const,
         icon: CheckCircle2,
-        background:
-          "bg-gradient-to-r from-emerald-500 to-green-600",
-        hover:
-          "hover:from-emerald-400 hover:to-green-500 hover:shadow-emerald-500/30",
+        background: "bg-emerald-600 hover:bg-emerald-700",
       };
 
     case "READY":
       return {
-        label: "Complete Order",
+        label: isDelivery ? "Mark as Delivered" : "Complete Order",
         nextStatus: "COMPLETED" as const,
         icon: PackageCheck,
-        background:
-          "bg-gradient-to-r from-blue-500 to-indigo-600",
-        hover:
-          "hover:from-blue-400 hover:to-indigo-500 hover:shadow-blue-500/30",
+        background: "bg-brand-gold hover:bg-brand-gold/90",
       };
 
     case "COMPLETED":

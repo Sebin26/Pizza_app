@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
+import { OrderStatus } from "@prisma/client";
 
 export async function GET(
   request: Request,
@@ -33,6 +34,13 @@ export async function GET(
       },
     });
 
+   // if (!Object.values(OrderStatus).includes(status)) {
+//  return NextResponse.json(
+ //   { error: "Invalid status" },
+  //  { status: 400 }
+//  );
+//}
+
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
@@ -59,7 +67,14 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status } = body;
+    const { status } = body as { status: OrderStatus };
+
+    if (!Object.values(OrderStatus).includes(status)) {
+      return NextResponse.json(
+      { error: "Invalid status" },
+      { status: 400 }
+    );
+  }
 
     const validStatuses = ["RECEIVED", "PREPARING", "READY", "COMPLETED"];
     if (!validStatuses.includes(status)) {
@@ -79,5 +94,6 @@ export async function PATCH(
       { status: 500 }
     );
   }
+  
 }
 
