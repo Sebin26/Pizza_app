@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import StaffDashboardContainer from "@/components/staff/StaffDashboardContainer";
+import StaffDashboard from "@/components/staff/StaffDashboard";
 
 export const revalidate = 0;
 
@@ -13,7 +13,7 @@ export default async function StaffPage() {
 
   return (
     <div style={{ minHeight: "100%", width: "100%" }}>
-      <StaffDashboardContainer user={user} />
+      <StaffDashboard user={user} />
     </div>
   );
 }
