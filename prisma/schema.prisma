@@ -95,6 +95,7 @@ model Order {
   estimatedPrepMin Int             @default(20)
   subtotal         Float
   tax              Float
+  deliveryFee      Float           @default(0)
   total            Float
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -119,12 +120,26 @@ model Delivery {
   latitude         Float?
   longitude        Float?
   assignedDriverId String?
+  driverId         String?
   assignedAt       DateTime?
   departedAt       DateTime?
   deliveredAt      DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   order            Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver           Driver?   @relation(fields: [driverId], references: [id])
+}
+
+model Driver {
+  id          String     @id @default(uuid())
+  name        String
+  phone       String
+  vehicleType String?
+  isActive    Boolean    @default(true)
+  isAvailable Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deliveries  Delivery[]
 }
 
 model OrderItem {

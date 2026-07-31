@@ -1,28 +1,105 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, Send, AlertTriangle } from "lucide-react";
+import {
+  ShoppingBag,
+  ArrowLeft,
+  Trash2,
+  Plus,
+  Minus,
+  Send,
+  AlertTriangle,
+  Truck,
+  MapPin,
+  UtensilsCrossed,
+} from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function CartPage() {
   const router = useRouter();
-  const { cart, removeFromCart, updateQuantity, clearCart, subtotal, tax, total } = useCart();
+  const { cart, removeFromCart, updateQuantity, clearCart, subtotal, tax } = useCart();
 
   // Guest checkout form state
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [orderType, setOrderType] = useState<"DINE_IN" | "TAKEAWAY">("DINE_IN");
+  const [fulfillmentType, setFulfillmentType] = useState<"DINE_IN" | "PICKUP" | "DELIVERY">("DINE_IN");
+
+  // Delivery form state
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [landmark, setLandmark] = useState("");
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
+
+  // Config state
+  const [config, setConfig] = useState<{
+    deliveryEnabled: boolean;
+    deliveryFee: number;
+    freeDeliveryThreshold: number;
+  }>({
+    deliveryEnabled: true,
+    deliveryFee: 3.99,
+    freeDeliveryThreshold: 35.0,
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const res = await fetch("/api/config");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.config) {
+            setConfig({
+              deliveryEnabled: data.config.deliveryEnabled === "true",
+              deliveryFee: parseFloat(data.config.deliveryFee || "3.99"),
+              freeDeliveryThreshold: parseFloat(data.config.freeDeliveryThreshold || "35.00"),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load config:", err);
+      }
+    }
+    fetchConfig();
+  }, []);
+
+  const computedDeliveryFee =
+    fulfillmentType === "DELIVERY"
+      ? subtotal >= config.freeDeliveryThreshold
+        ? 0
+        : config.deliveryFee
+      : 0;
+
+  const grandTotal = subtotal + tax + computedDeliveryFee;
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!customerName.trim()) {
       setErrorMsg("Please enter your name to place the order.");
       return;
+    }
+
+    if (fulfillmentType === "DELIVERY") {
+      if (!customerPhone.trim()) {
+        setErrorMsg("Phone number is required for delivery orders.");
+        return;
+      }
+      if (!addressLine1.trim()) {
+        setErrorMsg("Address Line 1 is required for delivery.");
+        return;
+      }
+      if (!city.trim()) {
+        setErrorMsg("City is required for delivery.");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -69,7 +146,18 @@ export default function CartPage() {
         body: JSON.stringify({
           customerName,
           customerPhone: customerPhone ? customerPhone : null,
-          orderType,
+          fulfillmentType,
+          delivery:
+            fulfillmentType === "DELIVERY"
+              ? {
+                  addressLine1,
+                  addressLine2: addressLine2 || undefined,
+                  city,
+                  postcode: postcode || undefined,
+                  landmark: landmark || undefined,
+                  deliveryInstructions: deliveryInstructions || undefined,
+                }
+              : undefined,
           items: apiItems,
         }),
       });
@@ -95,7 +183,7 @@ export default function CartPage() {
   if (cart.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-brand-dark/5 flex flex-col items-center gap-6"
@@ -109,8 +197,8 @@ export default function CartPage() {
               Head back to our gourmet menu and select some delicious food to order.
             </p>
           </div>
-          <Link 
-            href="/?order=true" 
+          <Link
+            href="/?order=true"
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-bold text-sm shadow-md shadow-brand-primary/20 transition-all active:scale-95 hover:-translate-y-0.5"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -123,7 +211,6 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
-      
       <div className="flex flex-col gap-1.5 border-b border-brand-dark/5 pb-5">
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-dark">
           Review Your Order
@@ -141,13 +228,12 @@ export default function CartPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
         {/* Left Column: Cart Items List (8 Columns) */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           {cart.map((item) => (
-            <motion.div 
+            <motion.div
               layout
-              key={item.id} 
+              key={item.id}
               className="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-brand-dark/5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
             >
               <div className="flex gap-4 items-start sm:items-center flex-1">
@@ -159,15 +245,18 @@ export default function CartPage() {
                   <h3 className="text-base sm:text-lg font-bold text-brand-dark">
                     {item.menuItem.name}
                   </h3>
-                  
+
                   {item.menuItem.isPizza && item.customization && (
                     <div className="text-xs sm:text-sm text-brand-dark/50 flex flex-col gap-0.5">
                       <p>
-                        <strong className="text-brand-dark/70 font-semibold">Size:</strong> {item.customization.size.name} |{" "}
-                        <strong className="text-brand-dark/70 font-semibold">Crust:</strong> {item.customization.crust.name}
+                        <strong className="text-brand-dark/70 font-semibold">Size:</strong>{" "}
+                        {item.customization.size.name} |{" "}
+                        <strong className="text-brand-dark/70 font-semibold">Crust:</strong>{" "}
+                        {item.customization.crust.name}
                       </p>
                       <p>
-                        <strong className="text-brand-dark/70 font-semibold">Sauce:</strong> {item.customization.sauce.name}
+                        <strong className="text-brand-dark/70 font-semibold">Sauce:</strong>{" "}
+                        {item.customization.sauce.name}
                       </p>
                       {item.customization.toppings.length > 0 && (
                         <p>
@@ -189,7 +278,7 @@ export default function CartPage() {
                       Note: {item.notes}
                     </p>
                   )}
-                  
+
                   <span className="text-base font-extrabold text-brand-primary mt-1.5 flex items-baseline gap-1.5">
                     ${(item.price * item.quantity).toFixed(2)}
                     {item.quantity > 1 && (
@@ -231,9 +320,9 @@ export default function CartPage() {
               </div>
             </motion.div>
           ))}
-          
-          <Link 
-            href="/?order=true" 
+
+          <Link
+            href="/?order=true"
             className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/60 hover:text-brand-primary transition-colors w-fit px-1.5"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -247,7 +336,7 @@ export default function CartPage() {
             <h3 className="text-lg font-extrabold text-brand-dark border-b border-brand-dark/5 pb-3">
               Order Summary
             </h3>
-            
+
             <div className="flex flex-col gap-3 text-sm">
               <div className="flex justify-between items-center text-brand-dark/60">
                 <span className="font-semibold">Subtotal</span>
@@ -257,50 +346,99 @@ export default function CartPage() {
                 <span className="font-semibold">Taxes (10%)</span>
                 <span className="font-bold">${tax.toFixed(2)}</span>
               </div>
+
+              {fulfillmentType === "DELIVERY" && (
+                <div className="flex justify-between items-center text-brand-dark/60">
+                  <span className="font-semibold flex items-center gap-1">
+                    <Truck className="w-3.5 h-3.5 text-brand-primary" /> Delivery Fee
+                  </span>
+                  <span className="font-bold">
+                    {computedDeliveryFee === 0 ? (
+                      <span className="text-emerald-600 font-extrabold">FREE</span>
+                    ) : (
+                      `$${computedDeliveryFee.toFixed(2)}`
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {fulfillmentType === "DELIVERY" && subtotal < config.freeDeliveryThreshold && (
+                <p className="text-[11px] text-brand-gold bg-brand-gold/10 p-2 rounded-lg font-bold border border-brand-gold/20">
+                  Add ${(config.freeDeliveryThreshold - subtotal).toFixed(2)} more to unlock FREE Delivery!
+                </p>
+              )}
+
               <div className="flex justify-between items-center border-t border-brand-dark/5 pt-4 text-brand-dark">
                 <span className="text-base font-extrabold">Total Amount</span>
-                <span className="text-2xl font-extrabold text-brand-primary">${total.toFixed(2)}</span>
+                <span className="text-2xl font-extrabold text-brand-primary">
+                  ${grandTotal.toFixed(2)}
+                </span>
               </div>
             </div>
 
-            {/* Guest Details Form */}
+            {/* Guest Details & Fulfillment Form */}
             <form onSubmit={handleSubmitOrder} className="flex flex-col gap-4 border-t border-brand-dark/5 pt-5">
               <div className="flex flex-col gap-1">
-                <h4 className="text-sm font-extrabold text-brand-dark">Guest Information</h4>
+                <h4 className="text-sm font-extrabold text-brand-dark">Order & Fulfillment</h4>
                 <p className="text-[11px] text-brand-dark/40">
-                  Required to identify your table and call your token.
+                  Choose how you would like to receive your food.
                 </p>
               </div>
 
-              {/* Dine-In vs Takeaway segmented switcher */}
+              {/* 3-way Fulfillment Selector */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-brand-dark/70">Order Option</label>
-                <div className="grid grid-cols-2 gap-2 bg-brand-light p-1 rounded-xl">
+                <label className="text-xs font-bold text-brand-dark/70">Fulfillment Option</label>
+                <div className="grid grid-cols-3 gap-1.5 bg-brand-light p-1 rounded-xl text-center">
                   <button
                     type="button"
-                    onClick={() => setOrderType("DINE_IN")}
-                    className={`py-2 px-3 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer ${
-                      orderType === "DINE_IN"
+                    onClick={() => setFulfillmentType("DINE_IN")}
+                    className={`py-2 px-2 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer flex flex-col items-center gap-1 ${
+                      fulfillmentType === "DINE_IN"
                         ? "bg-brand-primary text-white shadow-xs"
                         : "text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5"
                     }`}
                   >
-                    Dine-In
+                    <UtensilsCrossed className="w-3.5 h-3.5" />
+                    <span>Dine In</span>
                   </button>
+
                   <button
                     type="button"
-                    onClick={() => setOrderType("TAKEAWAY")}
-                    className={`py-2 px-3 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer ${
-                      orderType === "TAKEAWAY"
+                    onClick={() => setFulfillmentType("PICKUP")}
+                    className={`py-2 px-2 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer flex flex-col items-center gap-1 ${
+                      fulfillmentType === "PICKUP"
                         ? "bg-brand-primary text-white shadow-xs"
                         : "text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5"
                     }`}
                   >
-                    Takeaway
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    <span>Pickup</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={!config.deliveryEnabled}
+                    onClick={() => config.deliveryEnabled && setFulfillmentType("DELIVERY")}
+                    className={`py-2 px-2 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer flex flex-col items-center gap-1 ${
+                      !config.deliveryEnabled
+                        ? "opacity-50 cursor-not-allowed text-brand-dark/30"
+                        : fulfillmentType === "DELIVERY"
+                        ? "bg-brand-primary text-white shadow-xs"
+                        : "text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5"
+                    }`}
+                  >
+                    <Truck className="w-3.5 h-3.5" />
+                    <span>Delivery</span>
                   </button>
                 </div>
+                {!config.deliveryEnabled && (
+                  <span className="text-[10px] text-brand-primary font-bold">
+                    Delivery is currently disabled by restaurant staff.
+                  </span>
+                )}
               </div>
 
+              {/* Basic Details */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="customer-name" className="text-xs font-bold text-brand-dark/70">
                   Your Name <span className="text-brand-primary font-bold">*</span>
@@ -318,17 +456,111 @@ export default function CartPage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="customer-phone" className="text-xs font-bold text-brand-dark/70">
-                  Phone Number <span className="text-brand-dark/40 font-semibold">(Optional)</span>
+                  Phone Number{" "}
+                  {fulfillmentType === "DELIVERY" ? (
+                    <span className="text-brand-primary font-bold">*</span>
+                  ) : (
+                    <span className="text-brand-dark/40 font-semibold">(Optional)</span>
+                  )}
                 </label>
                 <input
                   id="customer-phone"
                   type="tel"
+                  required={fulfillmentType === "DELIVERY"}
                   placeholder="E.g., 555-0199"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-brand-light text-brand-dark text-sm placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 focus:bg-white transition-all duration-200"
                 />
               </div>
+
+              {/* Delivery Specific Fields */}
+              {fulfillmentType === "DELIVERY" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="flex flex-col gap-3 border-t border-brand-dark/5 pt-3"
+                >
+                  <div className="flex items-center gap-1 text-xs font-extrabold text-brand-dark">
+                    <MapPin className="w-3.5 h-3.5 text-brand-primary" />
+                    <span>Delivery Address Details</span>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold text-brand-dark/70">
+                      Address Line 1 <span className="text-brand-primary font-bold">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Street address, P.O. box"
+                      value={addressLine1}
+                      onChange={(e) => setAddressLine1(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold text-brand-dark/70">Address Line 2</label>
+                    <input
+                      type="text"
+                      placeholder="Apt, Suite, Unit, Building (Optional)"
+                      value={addressLine2}
+                      onChange={(e) => setAddressLine2(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-bold text-brand-dark/70">
+                        City <span className="text-brand-primary font-bold">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="City name"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-bold text-brand-dark/70">Postcode</label>
+                      <input
+                        type="text"
+                        placeholder="ZIP / Postcode"
+                        value={postcode}
+                        onChange={(e) => setPostcode(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold text-brand-dark/70">Landmark</label>
+                    <input
+                      type="text"
+                      placeholder="E.g., Near City Park Main Gate"
+                      value={landmark}
+                      onChange={(e) => setLandmark(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold text-brand-dark/70">Delivery Instructions</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Gate code, drop off preference..."
+                      value={deliveryInstructions}
+                      onChange={(e) => setDeliveryInstructions(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white resize-none"
+                    />
+                  </div>
+                </motion.div>
+              )}
 
               <button
                 type="submit"
@@ -337,22 +569,26 @@ export default function CartPage() {
               >
                 {isSubmitting ? (
                   <span>Placing Order...</span>
-                ) : orderType === "DINE_IN" ? (
+                ) : fulfillmentType === "DINE_IN" ? (
                   <>
-                    <Send className="w-4.5 h-4.5" />
-                    <span>Place Order</span>
+                    <UtensilsCrossed className="w-4.5 h-4.5" />
+                    <span>Place Dine-In Order</span>
+                  </>
+                ) : fulfillmentType === "PICKUP" ? (
+                  <>
+                    <ShoppingBag className="w-4.5 h-4.5" />
+                    <span>Place Pickup Order</span>
                   </>
                 ) : (
                   <>
-                    <ShoppingBag className="w-4.5 h-4.5" />
-                    <span>Place Takeaway Order</span>
+                    <Truck className="w-4.5 h-4.5" />
+                    <span>Place Delivery Order</span>
                   </>
                 )}
               </button>
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -955,11 +955,13 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-extrabold text-brand-primary">Token #{o.orderNumber}</span>
                       <span className={`px-1.5 py-0.2 rounded-sm text-[8px] font-extrabold uppercase tracking-wider ${
-                        o.orderType === "TAKEAWAY"
+                        o.fulfillmentType === "DELIVERY"
+                          ? "bg-indigo-500/10 text-indigo-700 border border-indigo-500/20"
+                          : o.fulfillmentType === "PICKUP"
                           ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/20"
                           : "bg-brand-primary/10 text-brand-primary border border-brand-primary/20"
                       }`}>
-                        {o.orderType === "TAKEAWAY" ? "Takeaway" : "Dine-In"}
+                        {o.fulfillmentType === "DELIVERY" ? "Delivery" : o.fulfillmentType === "PICKUP" ? "Pickup" : "Dine-In"}
                       </span>
                     </div>
                     <span className="text-[10px] text-brand-dark/45 font-semibold">

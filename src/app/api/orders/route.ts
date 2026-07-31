@@ -26,6 +26,7 @@ if (status) {
         OrderStatus.RECEIVED,
         OrderStatus.PREPARING,
         OrderStatus.READY,
+        OrderStatus.OUT_FOR_DELIVERY,
       ],
     };
   } else if (validStatuses.includes(status as OrderStatus)) {
@@ -49,6 +50,7 @@ if (status) {
       where,
       orderBy: { createdAt: "desc" },
       include: {
+        delivery: true,
         items: {
           include: {
             menuItem: true,
@@ -140,18 +142,19 @@ export async function POST(request: Request) {
       items,
     } = result.data;  
 
-    if (
-        fulfillmentType === "DELIVERY" &&
-        !delivery
-    ) {
+    if (fulfillmentType === "DELIVERY") {
+      if (!customerPhone || !customerPhone.trim()) {
         return NextResponse.json(
-        {
-          error: "Delivery address is required.",
-        },
-        {
-          status: 400,
-        }
-      );
+          { error: "Phone number is required for delivery orders." },
+          { status: 400 }
+        );
+      }
+      if (!delivery || !delivery.addressLine1 || !delivery.city) {
+        return NextResponse.json(
+          { error: "Delivery address (Line 1 & City) is required for delivery orders." },
+          { status: 400 }
+        );
+      }
     }
 
     // Token generation moved inside the transaction to ensure atomic sequential ordering
@@ -260,7 +263,20 @@ export async function POST(request: Request) {
     
     orderSubtotal = parseFloat(orderSubtotal.toFixed(2));
     const taxAmount = parseFloat((orderSubtotal * taxRate).toFixed(2));
-    const totalAmount = parseFloat((orderSubtotal + taxAmount).toFixed(2));
+
+    let calculatedDeliveryFee = 0;
+    if (fulfillmentType === "DELIVERY") {
+      const feeConfig = await prisma.systemConfig.findUnique({ where: { key: "deliveryFee" } });
+      const thresholdConfig = await prisma.systemConfig.findUnique({ where: { key: "freeDeliveryThreshold" } });
+      const baseFee = feeConfig ? parseFloat(feeConfig.value) : 3.99;
+      const threshold = thresholdConfig ? parseFloat(thresholdConfig.value) : 35.00;
+
+      if (orderSubtotal < threshold) {
+        calculatedDeliveryFee = parseFloat(baseFee.toFixed(2));
+      }
+    }
+
+    const totalAmount = parseFloat((orderSubtotal + taxAmount + calculatedDeliveryFee).toFixed(2));
 
     // 4. Create the Order in a transaction
     const newOrder = await prisma.$transaction(async (tx) => {
@@ -299,12 +315,13 @@ export async function POST(request: Request) {
         data: {
           orderNumber: tokenNumber,
           customerName,
-          customerPhone,
+          customerPhone: customerPhone || null,
           fulfillmentType,
           status: OrderStatus.RECEIVED,
           estimatedPrepMin,
           subtotal: orderSubtotal,
           tax: taxAmount,
+          deliveryFee: calculatedDeliveryFee,
           total: totalAmount,
         },
       });

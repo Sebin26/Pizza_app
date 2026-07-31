@@ -5,6 +5,7 @@ import {
   ChefHat,
   CheckCircle2,
   PackageCheck,
+  Truck,
 } from "lucide-react";
 import type { Order } from "./OrderList";
 
@@ -22,7 +23,8 @@ export default function KitchenActions({
   loading = false,
   onStatusChange,
 }: KitchenActionsProps) {
-  const action = getNextAction(order.status, order.orderType === "DELIVERY");
+  const isDelivery = order.fulfillmentType === "DELIVERY";
+  const action = getNextAction(order.status, isDelivery);
 
   if (!action) {
     return null;
@@ -32,16 +34,13 @@ export default function KitchenActions({
 
   return (
     <motion.button
-      whileHover={{
-        scale: loading ? 1 : 1.02,
-      }}
-      whileTap={{
-        scale: loading ? 1 : 0.98,
-      }}
+      whileHover={{ scale: loading ? 1 : 1.02 }}
+      whileTap={{ scale: loading ? 1 : 0.98 }}
       disabled={loading}
-      onClick={() =>
-        onStatusChange?.(order.id, action.nextStatus)
-      }
+      onClick={(e) => {
+        e.stopPropagation(); // Stop card drawer click trigger
+        onStatusChange?.(order.id, action.nextStatus);
+      }}
       className={`group flex w-full items-center justify-center gap-3 rounded-2xl py-3 font-extrabold text-sm transition-all duration-300 cursor-pointer
         ${
           loading
@@ -50,16 +49,12 @@ export default function KitchenActions({
         }`}
     >
       <Icon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" />
-
       {loading ? "Updating..." : action.label}
     </motion.button>
   );
 }
 
-function getNextAction(
-  status: Order["status"],
-  isDelivery: boolean
-) {
+function getNextAction(status: Order["status"], isDelivery: boolean) {
   switch (status) {
     case "RECEIVED":
       return {
@@ -71,23 +66,42 @@ function getNextAction(
 
     case "PREPARING":
       return {
-        label: isDelivery ? "Send Out for Delivery" : "Mark as Ready",
+        label: "Mark as Ready",
         nextStatus: "READY" as const,
         icon: CheckCircle2,
         background: "bg-emerald-600 hover:bg-emerald-700",
       };
 
     case "READY":
+      if (isDelivery) {
+        return {
+          label: "Send Out for Delivery",
+          nextStatus: "OUT_FOR_DELIVERY" as const,
+          icon: Truck,
+          background: "bg-indigo-600 hover:bg-indigo-700",
+        };
+      }
       return {
-        label: isDelivery ? "Mark as Delivered" : "Complete Order",
+        label: "Complete Order",
         nextStatus: "COMPLETED" as const,
         icon: PackageCheck,
         background: "bg-brand-gold hover:bg-brand-gold/90",
       };
 
-    case "COMPLETED":
+    case "OUT_FOR_DELIVERY":
+      if (isDelivery) {
+        return {
+          label: "Mark as Delivered",
+          nextStatus: "DELIVERED" as const,
+          icon: PackageCheck,
+          background: "bg-emerald-600 hover:bg-emerald-700",
+        };
+      }
       return null;
 
+    case "COMPLETED":
+    case "DELIVERED":
+    case "CANCELLED":
     default:
       return null;
   }

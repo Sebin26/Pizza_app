@@ -11,18 +11,30 @@ import type { Order as RealOrder } from "@/types";
 // can keep importing `type { Order } from "./OrderList"` unchanged, while
 // actually getting full data instead of the old simplified shape.
 export type Order = RealOrder;
-export type OrderItem = RealOrder["items"][number];
+export type OrderItem = NonNullable<RealOrder["items"]>[number];
 
 interface OrderListProps {
   orders: Order[];
   loading?: boolean;
-  onStatusChange?: (orderId: string, status: Order["status"]) => void | Promise<void>;
+  onStatusChange?: (
+    orderId: string,
+    status: Order["status"]
+  ) => void | Promise<void>;
+
+  onSelectOrder?: (order: Order) => void;
+
+  onDriverChange?: (
+    orderId: string,
+    driverId: string
+  ) => void | Promise<void>;
 }
 
 export default function OrderList({
   orders,
   loading = false,
   onStatusChange,
+  onSelectOrder,
+  onDriverChange,
 }: OrderListProps) {
   if (loading) {
     return (
@@ -71,7 +83,12 @@ export default function OrderList({
               delay: index * 0.05,
             }}
           >
-            <OrderCard order={order} onStatusChange={onStatusChange} />
+            <OrderCard
+              order={order}
+              onStatusChange={onStatusChange}
+              onSelectOrder={onSelectOrder}
+              onDriverChange={onDriverChange}
+            />
           </motion.div>
         ))}
       </AnimatePresence>

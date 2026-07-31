@@ -82,6 +82,25 @@ export interface CartItem {
   price: number; // Single item price including customization additions
 }
 
+export interface Delivery {
+  id: string;
+  orderId: string;
+  addressLine1: string;
+  addressLine2?: string | null;
+  city: string;
+  postcode?: string | null;
+  landmark?: string | null;
+  instructions?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  assignedDriverId?: string | null;
+  assignedAt?: string | null;
+  departedAt?: string | null;
+  deliveredAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -90,14 +109,24 @@ export interface Order {
   completedAt?: string | null;
   preparingAt?: string | null;
   readyAt?: string | null;
-  orderType: "DINE_IN" | "TAKEAWAY";
-  status: "RECEIVED" | "PREPARING" | "READY" | "COMPLETED";
+  fulfillmentType: "DINE_IN" | "PICKUP" | "DELIVERY";
+  status:
+    | "RECEIVED"
+    | "CONFIRMED"
+    | "PREPARING"
+    | "READY"
+    | "OUT_FOR_DELIVERY"
+    | "DELIVERED"
+    | "COMPLETED"
+    | "CANCELLED";
   estimatedPrepMin: number;
   subtotal: number;
   tax: number;
+  deliveryFee: number;
   total: number;
   createdAt: string;
   updatedAt: string;
+  delivery?: Delivery | null;
   items?: OrderItem[];
 }
 

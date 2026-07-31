@@ -8,6 +8,7 @@ import { LogOut, ShieldAlert, Sparkles } from "lucide-react";
 import DashboardStats from "@/components/staff/DashboardStats";
 import QueueFilters, { OrderStatus } from "@/components/staff/QueueFilters";
 import OrderList from "@/components/staff/OrderList";
+import OrderDetailsDrawer from "@/components/staff/OrderDetailsDrawer";
 
 interface StaffDashboardProps {
   user: SessionUser;
@@ -16,6 +17,8 @@ interface StaffDashboardProps {
 export default function StaffDashboard({ user }: StaffDashboardProps) {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -109,6 +112,16 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
     return () => clearInterval(interval);
   }, [router]);
 
+  useEffect(() => {
+    if (!selectedOrder) return;
+
+    const updated = orders.find((o) => o.id === selectedOrder.id);
+
+    if (updated && updated !== selectedOrder) {
+      setSelectedOrder(updated);
+    }
+  }, [orders, selectedOrder]);
+
   const handleStatusChange = async (orderId: string, nextStatus: Order["status"]) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -129,12 +142,54 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
       }
 
       // Optimistic local update
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
+      const data = await res.json();
+
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderId ? data.order : o
+        )
       );
+
+        if (selectedOrder?.id === orderId) {
+            setSelectedOrder(data.order);
+      }} catch (err) {
+        const message =
+        err instanceof Error ? err.message : "Failed to update status";
+        alert(message);
+      }
+  };
+
+  const handleDriverChange = async (
+  orderId: string,
+  driverId: string
+) => {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        assignedDriverId: driverId,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to assign driver");
+    }
+
+    const data = await res.json();
+
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? data.order : o))
+    );
+
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(data.order);
+    }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update status";
-      alert(message);
+        console.error(err);
+        alert("Failed to update driver.");
     }
   };
 
@@ -181,7 +236,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
   // regardless of the current search/status filter selection.
   const dashboardStats = useMemo(() => {
     const activeOrders = orders.filter((o) =>
-      ["RECEIVED", "PREPARING", "READY"].includes(o.status)
+      ["RECEIVED", "PREPARING", "READY", "OUT_FOR_DELIVERY"].includes(o.status)
     );
     const preparingOrders = orders.filter((o) => o.status === "PREPARING").length;
     const readyOrders = orders.filter((o) => o.status === "READY").length;
@@ -254,11 +309,26 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
         counts={counts}
       />
 
-      <OrderList
+     <OrderList
         orders={filteredOrders}
         loading={isLoading}
         onStatusChange={handleStatusChange}
+        onSelectOrder={(order) => {
+            setSelectedOrder(order);
+            setDrawerOpen(true);
+        }}
+        onDriverChange={handleDriverChange}
       />
+
+      <OrderDetailsDrawer
+        order={selectedOrder}
+        isOpen={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedOrder(null);
+        }}
+  onDriverChange={handleDriverChange}
+/>
 
     </div>
   );

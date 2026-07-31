@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, FulfillmentType, Prisma } from "@prisma/client";
 
 export async function GET(
   request: Request,
@@ -13,6 +13,7 @@ export async function GET(
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
+        delivery: true,
         items: {
           include: {
             menuItem: true,
@@ -34,13 +35,6 @@ export async function GET(
       },
     });
 
-   // if (!Object.values(OrderStatus).includes(status)) {
-//  return NextResponse.json(
- //   { error: "Invalid status" },
-  //  { status: 400 }
-//  );
-//}
-
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
@@ -55,6 +49,39 @@ export async function GET(
   }
 }
 
+// Explicit allowed state transitions enforced server-side
+const ALLOWED_TRANSITIONS: Array<{
+  from: OrderStatus;
+  to: OrderStatus;
+  allowedTypes: FulfillmentType[];
+}> = [
+  {
+    from: OrderStatus.RECEIVED,
+    to: OrderStatus.PREPARING,
+    allowedTypes: [FulfillmentType.DINE_IN, FulfillmentType.PICKUP, FulfillmentType.DELIVERY],
+  },
+  {
+    from: OrderStatus.PREPARING,
+    to: OrderStatus.READY,
+    allowedTypes: [FulfillmentType.DINE_IN, FulfillmentType.PICKUP, FulfillmentType.DELIVERY],
+  },
+  {
+    from: OrderStatus.READY,
+    to: OrderStatus.COMPLETED,
+    allowedTypes: [FulfillmentType.DINE_IN, FulfillmentType.PICKUP],
+  },
+  {
+    from: OrderStatus.READY,
+    to: OrderStatus.OUT_FOR_DELIVERY,
+    allowedTypes: [FulfillmentType.DELIVERY],
+  },
+  {
+    from: OrderStatus.OUT_FOR_DELIVERY,
+    to: OrderStatus.DELIVERED,
+    allowedTypes: [FulfillmentType.DELIVERY],
+  },
+];
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -67,56 +94,122 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status } = body as { status: OrderStatus };
-
-    if (!Object.values(OrderStatus).includes(status)) {
-      return NextResponse.json(
-      { error: "Invalid status" },
-      { status: 400 }
-    );
-  }
-
-    const validStatuses = ["RECEIVED", "PREPARING", "READY", "COMPLETED"];
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-    }
-
-    const updateData: {
-     status: OrderStatus;
-     preparingAt?: Date;
-     readyAt?: Date;
-     completedAt?: Date;
-      } = {
-        status,
+    const { status, assignedDriverId } = body as {
+      status?: OrderStatus;
+      assignedDriverId?: string | null;
     };
 
-switch (status) {
-  case OrderStatus.PREPARING:
-    updateData.preparingAt = new Date();
-    break;
+    const currentOrder = await prisma.order.findUnique({
+      where: { id },
+      include: { delivery: true },
+    });
 
-  case OrderStatus.READY:
-    updateData.readyAt = new Date();
-    break;
+    if (!currentOrder) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
 
-  case OrderStatus.COMPLETED:
-    updateData.completedAt = new Date();
-    break;
-}
+    // Handle driver assignment update if provided
+    if (assignedDriverId !== undefined && currentOrder.delivery) {
+      await prisma.delivery.update({
+        where: { orderId: id },
+        data: {
+          assignedDriverId,
+          assignedAt: currentOrder.delivery.assignedAt || new Date(),
+        },
+      });
+    }
 
-const updatedOrder = await prisma.order.update({
-  where: { id },
-  data: updateData,
-});
+    // Handle status update if provided
+    if (status) {
+      if (!Object.values(OrderStatus).includes(status)) {
+        return NextResponse.json(
+          { error: "Invalid order status enum" },
+          { status: 400 }
+        );
+      }
+
+      if (currentOrder.status !== status) {
+        const transitionAllowed = ALLOWED_TRANSITIONS.some(
+          (t) =>
+            t.from === currentOrder.status &&
+            t.to === status &&
+            t.allowedTypes.includes(currentOrder.fulfillmentType)
+        );
+
+        if (!transitionAllowed) {
+          return NextResponse.json(
+            {
+              error: `Invalid status transition from ${currentOrder.status} to ${status} for ${currentOrder.fulfillmentType} order.`,
+            },
+            { status: 400 }
+          );
+        }
+
+        const updateData: Prisma.OrderUpdateInput = { status };
+
+        switch (status) {
+          case OrderStatus.PREPARING:
+            updateData.preparingAt = new Date();
+            break;
+          case OrderStatus.READY:
+            updateData.readyAt = new Date();
+            break;
+          case OrderStatus.COMPLETED:
+            updateData.completedAt = new Date();
+            break;
+          case OrderStatus.OUT_FOR_DELIVERY:
+            if (currentOrder.delivery) {
+              await prisma.delivery.update({
+                where: { orderId: id },
+                data: { departedAt: new Date() },
+              });
+            }
+            break;
+          case OrderStatus.DELIVERED:
+            updateData.completedAt = new Date();
+            if (currentOrder.delivery) {
+              await prisma.delivery.update({
+                where: { orderId: id },
+                data: { deliveredAt: new Date() },
+              });
+            }
+            break;
+        }
+
+        await prisma.order.update({
+          where: { id },
+          data: updateData,
+        });
+      }
+    }
+
+    const updatedOrder = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        delivery: true,
+        items: {
+          include: {
+            menuItem: true,
+            customization: {
+              include: {
+                size: true,
+                crust: true,
+                sauce: true,
+                toppings: { include: { topping: true } },
+                addons: { include: { addon: true } },
+              },
+            },
+          },
+        },
+      },
+    });
 
     return NextResponse.json({ success: true, order: updatedOrder });
   } catch (error) {
-    console.error("Update order status error:", error);
+    console.error("Update order error:", error);
     return NextResponse.json(
       { error: "Failed to update order status" },
       { status: 500 }
     );
   }
-  
 }
-

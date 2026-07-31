@@ -14,6 +14,7 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
   const order = await prisma.order.findUnique({
     where: { id },
     include: {
+      delivery: true,
       items: {
         include: {
           menuItem: true,
