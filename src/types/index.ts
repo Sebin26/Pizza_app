@@ -82,6 +82,15 @@ export interface CartItem {
   price: number; // Single item price including customization additions
 }
 
+export interface Driver {
+  id: string;
+  name: string;
+  phone: string;
+  vehicleType?: string | null;
+  isActive?: boolean;
+  isAvailable?: boolean;
+}
+
 export interface Delivery {
   id: string;
   orderId: string;
@@ -94,6 +103,8 @@ export interface Delivery {
   latitude?: number | null;
   longitude?: number | null;
   assignedDriverId?: string | null;
+  driverId?: string | null;
+  driver?: Driver | null;
   assignedAt?: string | null;
   departedAt?: string | null;
   deliveredAt?: string | null;

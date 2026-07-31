@@ -94,9 +94,10 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status, assignedDriverId } = body as {
+    const { status, assignedDriverId, driverId } = body as {
       status?: OrderStatus;
       assignedDriverId?: string | null;
+      driverId?: string | null;
     };
 
     const currentOrder = await prisma.order.findUnique({
@@ -108,7 +109,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Handle driver assignment update if provided
+    // Handle free-text driver assignment update if provided
     if (assignedDriverId !== undefined && currentOrder.delivery) {
       await prisma.delivery.update({
         where: { orderId: id },
@@ -117,6 +118,24 @@ export async function PATCH(
           assignedAt: currentOrder.delivery.assignedAt || new Date(),
         },
       });
+    }
+
+    // Handle relational driver assignment update if provided
+    if (driverId !== undefined && currentOrder.delivery) {
+      await prisma.delivery.update({
+        where: { orderId: id },
+        data: {
+          driverId,
+          assignedAt: new Date(),
+        },
+      });
+
+      if (driverId) {
+        await prisma.driver.update({
+          where: { id: driverId },
+          data: { isAvailable: false },
+        });
+      }
     }
 
     // Handle status update if provided
@@ -172,6 +191,15 @@ export async function PATCH(
                 where: { orderId: id },
                 data: { deliveredAt: new Date() },
               });
+
+              const assignedDriverIdToFree =
+                currentOrder.delivery.driverId || driverId;
+              if (assignedDriverIdToFree) {
+                await prisma.driver.update({
+                  where: { id: assignedDriverIdToFree },
+                  data: { isAvailable: true },
+                });
+              }
             }
             break;
         }

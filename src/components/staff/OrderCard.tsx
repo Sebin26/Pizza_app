@@ -19,6 +19,7 @@ import StatusBadge from "./StatusBadge";
 import OrderTimer from "./OrderTimer";
 import KitchenActions from "./KitchenActions";
 import type { Order } from "./OrderList";
+import type { Driver } from "@/types";
 
 interface OrderCardProps {
   order: Order;
@@ -33,11 +34,22 @@ export default function OrderCard({
   onSelectOrder,
   onDriverChange,
 }: OrderCardProps) {
-  const [driverInput, setDriverInput] = useState(order.delivery?.assignedDriverId || "");
+  const [drivers, setDrivers] = useState<Driver[]>([]);
 
   useEffect(() => {
-    setDriverInput(order.delivery?.assignedDriverId || "");
-  }, [order.delivery?.assignedDriverId]);
+    async function fetchDrivers() {
+      try {
+        const res = await fetch("/api/drivers");
+        if (res.ok) {
+          const data = await res.json();
+          setDrivers(data.drivers || []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch drivers:", e);
+      }
+    }
+    fetchDrivers();
+  }, []);
 
   const itemCount = order.items?.reduce((total, item) => total + item.quantity, 0) || 0;
   const isDelivery = order.fulfillmentType === "DELIVERY";
@@ -46,12 +58,6 @@ export default function OrderCard({
   if (isDelivery && order.delivery) {
     deliveryAddressLabel = `${order.delivery.addressLine1}, ${order.delivery.city}`.trim();
   }
-
-  const handleDriverBlur = () => {
-    if (onDriverChange) {
-      onDriverChange(order.id, driverInput);
-    }
-  };
 
   return (
     <motion.article
@@ -131,7 +137,7 @@ export default function OrderCard({
                   </p>
                 )}
 
-                {/* Driver Input */}
+                {/* Driver Select */}
                 <div
                   className="flex items-center gap-2 mt-2 pt-2 border-t border-brand-dark/5"
                   onClick={(e) => e.stopPropagation()}
@@ -139,14 +145,21 @@ export default function OrderCard({
                   <label className="text-[11px] font-bold text-brand-dark/70 shrink-0 flex items-center gap-1">
                     <UserCheck className="w-3.5 h-3.5 text-brand-primary" /> Driver:
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Unassigned"
-                    value={driverInput}
-                    onChange={(e) => setDriverInput(e.target.value)}
-                    onBlur={handleDriverBlur}
-                    className="w-full px-2.5 py-1 rounded-lg bg-white border border-brand-dark/15 text-xs text-brand-dark placeholder-brand-dark/40 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20"
-                  />
+                  <select
+                    value={order.delivery?.driverId || ""}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      onDriverChange?.(order.id, e.target.value);
+                    }}
+                    className="w-full px-2.5 py-1 rounded-lg bg-white border border-brand-dark/15 text-xs text-brand-dark focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20 cursor-pointer"
+                  >
+                    <option value="">Unassigned</option>
+                    {drivers.map((driver) => (
+                      <option key={driver.id} value={driver.id}>
+                        {driver.name} {driver.vehicleType ? `(${driver.vehicleType})` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             )}
