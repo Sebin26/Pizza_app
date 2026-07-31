@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const includeInactive = searchParams.get("includeInactive") === "true";
+    const where = includeInactive ? {} : { isActive: true };
+
     const drivers = await prisma.driver.findMany({
-      where: { isActive: true },
+      where,
       orderBy: { name: "asc" },
     });
 

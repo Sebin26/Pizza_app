@@ -17,7 +17,9 @@ import {
   Calendar,
   AlertCircle,
   Store,
+  Truck,
 } from "lucide-react";
+import DriverManagement from "./DriverManagement";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Category,
@@ -55,7 +57,7 @@ interface AdminDashboardContainerProps {
 
 export default function AdminDashboardContainer({ user, initialData }: AdminDashboardContainerProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"analytics" | "menu" | "config" | "users" | "orders">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "menu" | "config" | "users" | "drivers" | "orders">("analytics");
 
   // Local collections state for real-time reactive edits
   const [categories, setCategories] = useState(initialData.categories);
@@ -391,6 +393,7 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
             { id: "menu", label: "Menu & Categories", icon: <Grid className="w-4.5 h-4.5" /> },
             { id: "config", label: "Pizza Customizer", icon: <Settings className="w-4.5 h-4.5" /> },
             { id: "users", label: "Staff & Logins", icon: <Users className="w-4.5 h-4.5" /> },
+            { id: "drivers", label: "Driver Management", icon: <Truck className="w-4.5 h-4.5" /> },
             { id: "orders", label: "Order History", icon: <ShoppingBag className="w-4.5 h-4.5" /> }
           ] as const).map((tab) => {
             const isActive = activeTab === tab.id;
@@ -940,7 +943,10 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
           </div>
         )}
 
-        {/* 5. TAB: ORDER HISTORY */}
+        {/* 5. TAB: DRIVER MANAGEMENT */}
+        {activeTab === "drivers" && <DriverManagement />}
+
+        {/* 6. TAB: ORDER HISTORY */}
         {activeTab === "orders" && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1 border-b border-brand-dark/5 pb-4">
