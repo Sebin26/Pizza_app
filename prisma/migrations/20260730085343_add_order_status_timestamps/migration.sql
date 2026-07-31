@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Order" ADD COLUMN     "completedAt" TIMESTAMP(3),
+ADD COLUMN     "preparingAt" TIMESTAMP(3),
+ADD COLUMN     "readyAt" TIMESTAMP(3),
+ADD COLUMN     "receivedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

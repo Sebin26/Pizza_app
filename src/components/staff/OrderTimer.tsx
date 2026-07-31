@@ -6,25 +6,35 @@ import { Clock3 } from "lucide-react";
 
 interface OrderTimerProps {
   createdAt: string;
+  completedAt?: string | null;
 }
-
-export default function OrderTimer({ createdAt }: OrderTimerProps) {
+export default function OrderTimer({ createdAt, completedAt }: OrderTimerProps) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  useEffect(() => {
-    const updateTimer = () => {
-      const created = new Date(createdAt).getTime();
-      const now = Date.now();
+useEffect(() => {
+  const updateTimer = () => {
+    const created = new Date(createdAt).getTime();
 
-      setElapsedSeconds(Math.max(0, Math.floor((now - created) / 1000)));
-    };
+    const endTime = completedAt
+      ? new Date(completedAt).getTime()
+      : Date.now();
 
-    updateTimer();
+    setElapsedSeconds(
+      Math.max(0, Math.floor((endTime - created) / 1000))
+    );
+  };
 
-    const interval = setInterval(updateTimer, 1000);
+  updateTimer();
 
-    return () => clearInterval(interval);
-  }, [createdAt]);
+  // Don't keep updating once completed
+  if (completedAt) {
+    return;
+  }
+
+  const interval = setInterval(updateTimer, 1000);
+
+  return () => clearInterval(interval);
+}, [createdAt, completedAt]);
 
   const minutes = Math.floor(elapsedSeconds / 60);
   const seconds = elapsedSeconds % 60;

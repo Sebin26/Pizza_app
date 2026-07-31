@@ -186,7 +186,10 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                 Elapsed Time
               </p>
 
-              <OrderTimer createdAt={order.createdAt} />
+              <OrderTimer
+                createdAt={order.createdAt}
+                completedAt={order.completedAt}
+              />
             </div>
 
             <div className="text-right">

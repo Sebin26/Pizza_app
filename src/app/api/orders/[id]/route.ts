@@ -81,10 +81,33 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const updatedOrder = await prisma.order.update({
-      where: { id },
-      data: { status },
-    });
+    const updateData: {
+     status: OrderStatus;
+     preparingAt?: Date;
+     readyAt?: Date;
+     completedAt?: Date;
+      } = {
+        status,
+    };
+
+switch (status) {
+  case OrderStatus.PREPARING:
+    updateData.preparingAt = new Date();
+    break;
+
+  case OrderStatus.READY:
+    updateData.readyAt = new Date();
+    break;
+
+  case OrderStatus.COMPLETED:
+    updateData.completedAt = new Date();
+    break;
+}
+
+const updatedOrder = await prisma.order.update({
+  where: { id },
+  data: updateData,
+});
 
     return NextResponse.json({ success: true, order: updatedOrder });
   } catch (error) {
