@@ -12,7 +12,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-brand-dark/5 shadow-xs">
+    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-brand-dark/5 shadow-xs transition-shadow">
       <div className="w-full px-6 md:px-12 lg:px-16 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}

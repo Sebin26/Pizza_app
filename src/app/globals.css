@@ -33,7 +33,7 @@
     background-color: var(--color-brand-cream);
     color: var(--color-brand-dark);
     font-family: var(--font-sans);
-    overflow-x: hidden;
+    overflow-x: clip;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
   }

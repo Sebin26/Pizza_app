@@ -14,9 +14,12 @@ import {
   Truck,
   MapPin,
   UtensilsCrossed,
+  X,
+  Edit2,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CartPage() {
   const router = useRouter();
@@ -34,6 +37,10 @@ export default function CartPage() {
   const [postcode, setPostcode] = useState("");
   const [landmark, setLandmark] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
+
+  // Delivery address pop-up modal state
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [modalErrorMsg, setModalErrorMsg] = useState("");
 
   // Config state
   const [config, setConfig] = useState<{
@@ -418,7 +425,12 @@ export default function CartPage() {
                   <button
                     type="button"
                     disabled={!config.deliveryEnabled}
-                    onClick={() => config.deliveryEnabled && setFulfillmentType("DELIVERY")}
+                    onClick={() => {
+                      if (config.deliveryEnabled) {
+                        setFulfillmentType("DELIVERY");
+                        setIsAddressModalOpen(true);
+                      }
+                    }}
                     className={`py-2 px-2 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer flex flex-col items-center gap-1 ${
                       !config.deliveryEnabled
                         ? "opacity-50 cursor-not-allowed text-brand-dark/30"
@@ -474,92 +486,70 @@ export default function CartPage() {
                 />
               </div>
 
-              {/* Delivery Specific Fields */}
+              {/* Compact Delivery Address Summary & Trigger Button */}
               {fulfillmentType === "DELIVERY" && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="flex flex-col gap-3 border-t border-brand-dark/5 pt-3"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col gap-2 border-t border-brand-dark/5 pt-3"
                 >
-                  <div className="flex items-center gap-1 text-xs font-extrabold text-brand-dark">
-                    <MapPin className="w-3.5 h-3.5 text-brand-primary" />
-                    <span>Delivery Address Details</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-brand-dark flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-brand-primary" />
+                      <span>Delivery Destination</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="text-[11px] font-bold text-brand-primary hover:text-brand-primary-dark flex items-center gap-1 hover:underline cursor-pointer"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      <span>{addressLine1.trim() && city.trim() ? "Edit Address" : "Add Address"}</span>
+                    </button>
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-bold text-brand-dark/70">
-                      Address Line 1 <span className="text-brand-primary font-bold">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Street address, P.O. box"
-                      value={addressLine1}
-                      onChange={(e) => setAddressLine1(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-bold text-brand-dark/70">Address Line 2</label>
-                    <input
-                      type="text"
-                      placeholder="Apt, Suite, Unit, Building (Optional)"
-                      value={addressLine2}
-                      onChange={(e) => setAddressLine2(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-bold text-brand-dark/70">
-                        City <span className="text-brand-primary font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="City name"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
-                      />
+                  {addressLine1.trim() && city.trim() ? (
+                    <div
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="p-3 rounded-xl bg-brand-light border border-brand-dark/5 hover:border-brand-primary/30 transition-all cursor-pointer flex flex-col gap-1 group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-xs font-bold text-brand-dark group-hover:text-brand-primary transition-colors leading-snug">
+                          {addressLine1}
+                          {addressLine2 ? `, ${addressLine2}` : ""}
+                        </p>
+                        <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-500/10 px-1.5 py-0.5 rounded shrink-0">
+                          Address Set
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-brand-dark/60 font-medium">
+                        {city}
+                        {postcode ? `, ${postcode}` : ""}
+                      </p>
+                      {(landmark || deliveryInstructions) && (
+                        <p className="text-[10px] text-brand-dark/45 truncate mt-0.5">
+                          {landmark ? `Near: ${landmark}` : deliveryInstructions}
+                        </p>
+                      )}
                     </div>
-
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-bold text-brand-dark/70">Postcode</label>
-                      <input
-                        type="text"
-                        placeholder="ZIP / Postcode"
-                        value={postcode}
-                        onChange={(e) => setPostcode(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-bold text-brand-dark/70">Landmark</label>
-                    <input
-                      type="text"
-                      placeholder="E.g., Near City Park Main Gate"
-                      value={landmark}
-                      onChange={(e) => setLandmark(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-bold text-brand-dark/70">Delivery Instructions</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Gate code, drop off preference..."
-                      value={deliveryInstructions}
-                      onChange={(e) => setDeliveryInstructions(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-brand-light text-brand-dark text-xs border border-transparent focus:border-brand-primary/30 focus:bg-white resize-none"
-                    />
-                  </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="p-3 rounded-xl bg-brand-primary/5 hover:bg-brand-primary/10 border border-dashed border-brand-primary/30 text-brand-primary text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Enter Delivery Address Details</span>
+                    </button>
+                  )}
                 </motion.div>
+              )}
+
+              {errorMsg && (
+                <div className="p-3 rounded-xl bg-brand-primary/10 text-brand-primary text-xs font-bold flex items-center gap-2 border border-brand-primary/20">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
               )}
 
               <button
@@ -590,6 +580,156 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      {/* Delivery Address Details Pop-up Modal */}
+      <AnimatePresence>
+        {isAddressModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-2xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-brand-dark/10 flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-brand-dark/5 pb-3.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary shrink-0">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-brand-dark">Delivery Address</h3>
+                    <p className="text-[11px] text-brand-dark/50 font-medium">Enter location for fast delivery</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAddressModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-brand-light hover:bg-brand-dark/10 flex items-center justify-center text-brand-dark/60 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-dark/70">
+                    Address Line 1 <span className="text-brand-primary font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Street address, P.O. box"
+                    value={addressLine1}
+                    onChange={(e) => {
+                      setAddressLine1(e.target.value);
+                      if (modalErrorMsg) setModalErrorMsg("");
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-dark/70">Address Line 2</label>
+                  <input
+                    type="text"
+                    placeholder="Apt, Suite, Unit, Building (Optional)"
+                    value={addressLine2}
+                    onChange={(e) => setAddressLine2(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-brand-dark/70">
+                      City <span className="text-brand-primary font-bold">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="City name"
+                      value={city}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        if (modalErrorMsg) setModalErrorMsg("");
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white transition-all"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-brand-dark/70">Postcode</label>
+                    <input
+                      type="text"
+                      placeholder="ZIP / Postcode"
+                      value={postcode}
+                      onChange={(e) => setPostcode(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-dark/70">Landmark</label>
+                  <input
+                    type="text"
+                    placeholder="E.g., Near City Park Main Gate"
+                    value={landmark}
+                    onChange={(e) => setLandmark(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-dark/70">Delivery Instructions</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Gate code, drop off preference..."
+                    value={deliveryInstructions}
+                    onChange={(e) => setDeliveryInstructions(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-brand-light text-brand-dark text-xs placeholder-brand-dark/30 border border-transparent focus:border-brand-primary/30 focus:bg-white resize-none transition-all"
+                  />
+                </div>
+
+                {modalErrorMsg && (
+                  <div className="p-2.5 rounded-xl bg-brand-primary/10 text-brand-primary text-xs font-bold flex items-center gap-2 border border-brand-primary/20">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>{modalErrorMsg}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-2.5 border-t border-brand-dark/5 pt-3.5">
+                <button
+                  type="button"
+                  onClick={() => setIsAddressModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-brand-dark/10 text-brand-dark/70 text-xs font-bold hover:bg-brand-light transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!addressLine1.trim() || !city.trim()) {
+                      setModalErrorMsg("Please fill in required fields (Address Line 1 & City).");
+                      return;
+                    }
+                    setModalErrorMsg("");
+                    setIsAddressModalOpen(false);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Save Address</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
