@@ -36,15 +36,30 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [createdAt, completedAt]);
 
-  const minutes = Math.floor(elapsedSeconds / 60);
+  const totalMinutes = Math.floor(elapsedSeconds / 60);
+  const hours = Math.floor(elapsedSeconds / 3600);
+  const remainingMinutes = Math.floor((elapsedSeconds % 3600) / 60);
   const seconds = elapsedSeconds % 60;
 
-  const time = `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
+  const time =
+    hours > 0
+      ? `${hours}h ${remainingMinutes}m`
+      : `${totalMinutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
 
   const urgency = useMemo(() => {
-    if (minutes < 5) {
+    if (completedAt) {
+      return {
+        label: "Completed",
+        text: "text-brand-dark/60",
+        bg: "bg-brand-dark/5",
+        border: "border-brand-dark/10",
+        pulse: false,
+      };
+    }
+
+    if (totalMinutes < 5) {
       return {
         label: "Fresh",
         text: "text-emerald-700",
@@ -54,7 +69,7 @@ useEffect(() => {
       };
     }
 
-    if (minutes < 10) {
+    if (totalMinutes < 10) {
       return {
         label: "Preparing",
         text: "text-brand-gold",
@@ -71,7 +86,7 @@ useEffect(() => {
       border: "border-brand-primary/25",
       pulse: true,
     };
-  }, [minutes]);
+  }, [totalMinutes, completedAt]);
 
   return (
     <motion.div
