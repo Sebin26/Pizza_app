@@ -8,12 +8,10 @@ import {
   Phone,
   Car,
   CheckCircle2,
-  XCircle,
   Loader2,
   AlertCircle,
   UserCheck,
   UserX,
-  Power,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,13 +36,12 @@ export default function DriverManagement() {
 
   const fetchDrivers = useCallback(async () => {
     try {
-      setLoading(true);
-      setFetchError("");
       const res = await fetch("/api/drivers?includeInactive=true");
       if (!res.ok) {
         throw new Error("Failed to load drivers");
       }
       const data = await res.json();
+      setFetchError("");
       setDrivers(data.drivers || []);
     } catch (err) {
       setFetchError(err instanceof Error ? err.message : "Error fetching drivers");
@@ -54,8 +51,32 @@ export default function DriverManagement() {
   }, []);
 
   useEffect(() => {
-    fetchDrivers();
-  }, [fetchDrivers]);
+    let ignore = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/drivers?includeInactive=true");
+        if (!res.ok) {
+          throw new Error("Failed to load drivers");
+        }
+        const data = await res.json();
+        if (!ignore) {
+          setFetchError("");
+          setDrivers(data.drivers || []);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setFetchError(err instanceof Error ? err.message : "Error fetching drivers");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleAddDriver = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +303,7 @@ export default function DriverManagement() {
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2.5 max-h-[520px] overflow-y-auto pr-1">
+            <div className="flex flex-col gap-2.5 max-h-130 overflow-y-auto pr-1">
               <AnimatePresence>
                 {drivers.map((driver) => {
                   const isActive = driver.isActive ?? true;

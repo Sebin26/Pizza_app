@@ -17,7 +17,7 @@ interface StaffDashboardProps {
 export default function StaffDashboard({ user }: StaffDashboardProps) {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
@@ -112,15 +112,15 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
     return () => clearInterval(interval);
   }, [router]);
 
-  useEffect(() => {
-    if (!selectedOrder) return;
-
-    const updated = orders.find((o) => o.id === selectedOrder.id);
-
-    if (updated && updated !== selectedOrder) {
-      setSelectedOrder(updated);
-    }
-  }, [orders, selectedOrder]);
+  // selectedOrder is derived directly from orders + selectedOrderId rather
+  // than kept as its own duplicated state. This avoids needing an effect
+  // that calls setState every time `orders` refreshes (every 3.5s poll),
+  // which was previously causing an extra cascading render each cycle
+  // whenever the drawer was open.
+  const selectedOrder = useMemo(
+    () => orders.find((o) => o.id === selectedOrderId) ?? null,
+    [orders, selectedOrderId]
+  );
 
   const handleStatusChange = async (orderId: string, nextStatus: Order["status"]) => {
     try {
@@ -141,7 +141,8 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
         throw new Error(errorText);
       }
 
-      // Optimistic local update
+      // Optimistic local update. selectedOrder derives from `orders`, so
+      // it updates automatically here too - no manual sync needed.
       const data = await res.json();
 
         setOrders((prev) =>
@@ -149,16 +150,18 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
             o.id === orderId ? data.order : o
         )
       );
-
-        if (selectedOrder?.id === orderId) {
-            setSelectedOrder(data.order);
-      }} catch (err) {
+      } catch (err) {
         const message =
         err instanceof Error ? err.message : "Failed to update status";
         alert(message);
       }
   };
 
+  // Assigns a driver via the real Driver relation (driverId), NOT the
+  // legacy free-text assignedDriverId field. Previously this sent
+  // { assignedDriverId: driverId }, which wrote the driver's UUID into
+  // the wrong field - OrderCard/OrderDetailsDrawer read from `driverId`,
+  // so the assignment silently never showed up as expected.
   const handleDriverChange = async (
   orderId: string,
   driverId: string
@@ -170,7 +173,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        assignedDriverId: driverId,
+        driverId: driverId || null,
       }),
     });
 
@@ -183,10 +186,6 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? data.order : o))
     );
-
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder(data.order);
-    }
     } catch (err) {
         console.error(err);
         alert("Failed to update driver.");
@@ -314,7 +313,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
         loading={isLoading}
         onStatusChange={handleStatusChange}
         onSelectOrder={(order) => {
-            setSelectedOrder(order);
+            setSelectedOrderId(order.id);
             setDrawerOpen(true);
         }}
         onDriverChange={handleDriverChange}
@@ -325,7 +324,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
         isOpen={drawerOpen}
         onClose={() => {
           setDrawerOpen(false);
-          setSelectedOrder(null);
+          setSelectedOrderId(null);
         }}
   onDriverChange={handleDriverChange}
 />

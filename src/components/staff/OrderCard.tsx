@@ -9,7 +9,6 @@ import {
   CookingPot,
   Phone,
   MessageSquare,
-  Truck,
   MapPin,
   UserCheck,
   Maximize2,
@@ -53,6 +52,7 @@ export default function OrderCard({
 
   const itemCount = order.items?.reduce((total, item) => total + item.quantity, 0) || 0;
   const isDelivery = order.fulfillmentType === "DELIVERY";
+  const isTerminal = order.status === "COMPLETED" || order.status === "DELIVERED";
 
   let deliveryAddressLabel: string | null = null;
   if (isDelivery && order.delivery) {
@@ -137,7 +137,9 @@ export default function OrderCard({
                   </p>
                 )}
 
-                {/* Driver Select */}
+                {/* Driver Select - locked once the order is terminal
+                    (DELIVERED/COMPLETED), since reassigning a driver after
+                    the fact would be editing history, not live dispatch. */}
                 <div
                   className="flex items-center gap-2 mt-2 pt-2 border-t border-brand-dark/5"
                   onClick={(e) => e.stopPropagation()}
@@ -147,11 +149,14 @@ export default function OrderCard({
                   </label>
                   <select
                     value={order.delivery?.driverId || ""}
+                    disabled={isTerminal}
                     onChange={(e) => {
                       e.stopPropagation();
                       onDriverChange?.(order.id, e.target.value);
                     }}
-                    className="w-full px-2.5 py-1 rounded-lg bg-white border border-brand-dark/15 text-xs text-brand-dark focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20 cursor-pointer"
+                    className={`w-full px-2.5 py-1 rounded-lg bg-white border border-brand-dark/15 text-xs text-brand-dark focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20 ${
+                      isTerminal ? "opacity-60 cursor-not-allowed bg-brand-dark/5" : "cursor-pointer"
+                    }`}
                   >
                     <option value="">Unassigned</option>
                     {drivers.map((driver) => (
@@ -219,7 +224,10 @@ export default function OrderCard({
               <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-brand-dark/50 uppercase">
                 <Clock3 className="h-3.5 w-3.5" /> Elapsed Time
               </p>
-              <OrderTimer createdAt={order.createdAt} completedAt={order.completedAt} />
+              <OrderTimer
+                createdAt={order.createdAt}
+                completedAt={order.completedAt}
+              />
             </div>
 
             <div className="text-right">

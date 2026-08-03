@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import type { Order } from "./OrderList";
+import type { Driver } from "@/types";
 
 interface OrderDetailsDrawerProps {
   order: Order | null;
@@ -29,19 +30,27 @@ export default function OrderDetailsDrawer({
   onClose,
   onDriverChange,
 }: OrderDetailsDrawerProps) {
-  const [driverInput, setDriverInput] = useState("");
+  const [drivers, setDrivers] = useState<Driver[]>([]);
 
   useEffect(() => {
-    if (order?.delivery?.assignedDriverId) {
-      setDriverInput(order.delivery.assignedDriverId);
-    } else {
-      setDriverInput("");
+    async function fetchDrivers() {
+      try {
+        const res = await fetch("/api/drivers");
+        if (res.ok) {
+          const data = await res.json();
+          setDrivers(data.drivers || []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch drivers:", e);
+      }
     }
-  }, [order]);
+    fetchDrivers();
+  }, []);
 
   if (!order) return null;
 
   const isDelivery = order.fulfillmentType === "DELIVERY";
+  const isTerminal = order.status === "COMPLETED" || order.status === "DELIVERED";
 
   const formatTimestamp = (ts?: string | Date | null) => {
     if (!ts) return null;
@@ -65,12 +74,6 @@ export default function OrderDetailsDrawer({
       : []),
     { label: "Completed", time: formatTimestamp(order.completedAt) },
   ].filter((e) => e.time !== null);
-
-  const handleDriverBlur = () => {
-    if (onDriverChange && order) {
-      onDriverChange(order.id, driverInput);
-    }
-  };
 
   return (
     <AnimatePresence>
@@ -148,19 +151,30 @@ export default function OrderDetailsDrawer({
                     </p>
                   )}
 
-                  {/* Driver Assignment Field */}
+                  {/* Driver Assignment — real dropdown bound to the driverId
+                      relation, matching OrderCard.tsx exactly. Previously this
+                      was a free-text input bound to the legacy assignedDriverId
+                      field, which caused a mismatch with OrderCard's dropdown
+                      (two different fields representing "the same" assignment). */}
                   <div className="mt-2 border-t border-brand-dark/5 pt-3 flex flex-col gap-1">
                     <label className="text-xs font-bold text-brand-dark/70 flex items-center gap-1.5">
                       <UserCheck className="w-3.5 h-3.5 text-brand-primary" /> Driver
                     </label>
-                    <input
-                      type="text"
-                      placeholder="Unassigned"
-                      value={driverInput}
-                      onChange={(e) => setDriverInput(e.target.value)}
-                      onBlur={handleDriverBlur}
-                      className="w-full px-3 py-2 rounded-xl bg-white border border-brand-dark/15 text-xs text-brand-dark placeholder-brand-dark/30 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20"
-                    />
+                    <select
+                      value={order.delivery?.driverId || ""}
+                      disabled={isTerminal}
+                      onChange={(e) => onDriverChange?.(order.id, e.target.value)}
+                      className={`w-full px-3 py-2 rounded-xl bg-white border border-brand-dark/15 text-xs text-brand-dark focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/20 ${
+                        isTerminal ? "opacity-60 cursor-not-allowed bg-brand-dark/5" : "cursor-pointer"
+                      }`}
+                    >
+                      <option value="">Unassigned</option>
+                      {drivers.map((driver) => (
+                        <option key={driver.id} value={driver.id}>
+                          {driver.name} {driver.vehicleType ? `(${driver.vehicleType})` : ""}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               )}
