@@ -444,7 +444,11 @@ async function main() {
     sizePrices: { sizeId: string; price: number }[];
     availableFor?: FulfillmentType[]; // defaults to all three if omitted
   }) {
-    const slug = /* unchanged */;
+    const slug =
+      opts.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") + (opts.slugSuffix ? `-${opts.slugSuffix}` : "");
     const basePrice = opts.sizePrices[0]?.price ?? 0;
     const availableFor = opts.availableFor ?? ["DINE_IN", "PICKUP", "DELIVERY"];
 
@@ -454,7 +458,7 @@ async function main() {
         name: opts.name,
         description: opts.description,
         basePrice,
-        sPizza: opts.isPizza,
+        isPizza: opts.isPizza,
         categoryId: categoryMap.get(opts.categorySlug)!,
         availableFor, // <-- add
      },

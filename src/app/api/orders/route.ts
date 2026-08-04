@@ -186,6 +186,24 @@ export async function POST(request: Request) {
 
     const menuItemMap = new Map(menuItems.map((m) => [m.id, m]));
 
+    // Enforce fulfillment-type restrictions server-side (source of truth — never trust the client)
+    const unavailableItems = items
+      .map((item) => menuItemMap.get(item.menuItemId))
+      .filter(
+        (dbItem): dbItem is NonNullable<typeof dbItem> =>
+          !!dbItem && !dbItem.availableFor.includes(fulfillmentType)
+      );
+
+    if (unavailableItems.length > 0) {
+      const names = [...new Set(unavailableItems.map((i) => i.name))].join(", ");
+      return NextResponse.json(
+        {
+          error: `${names} ${unavailableItems.length > 1 ? "are" : "is"} not available for ${fulfillmentType.replace("_", " ").toLowerCase()} orders.`,
+        },
+        { status: 400 }
+      );
+    }
+
     // Fetch all needed customizer options
     const sizeIds = items.map((i) => i.customization?.sizeId).filter(Boolean) as string[];
     const crustIds = items.map((i) => i.customization?.crustId).filter(Boolean) as string[];
@@ -257,28 +275,6 @@ export async function POST(request: Request) {
         totalPrice: itemTotalPrice,
       };
     });
-
-    const menuItemMap = new Map(menuItems.map((m) => [m.id, m]));
-
-// Enforce fulfillment-type restrictions server-side (source of truth — never trust the client)
-  const unavailableItems = items
-    .map((item) => menuItemMap.get(item.menuItemId))
-    .filter(
-      (dbItem): dbItem is NonNullable<typeof dbItem> =>
-        !!dbItem && !dbItem.availableFor.includes(fulfillmentType)
-    );
-
-  if (unavailableItems.length > 0) {
-    const names = [...new Set(unavailableItems.map((i) => i.name))].join(", ");
-      return NextResponse.json(
-      {
-        error: `${names} ${unavailableItems.length > 1 ? "are" : "is"} not available for ${fulfillmentType.replace("_", " ").toLowerCase()} orders.`,
-      },
-      { status: 400 }
-    );
-  }
-
-// Fetch all needed customizer options
 
     const taxRateConfig = await prisma.systemConfig.findUnique({ where: { key: "taxRate" } });
     const taxRate = taxRateConfig ? parseFloat(taxRateConfig.value) : 0.10;

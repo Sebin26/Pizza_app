@@ -36,7 +36,7 @@ export default function SalesChart() {
   const totalOrders = data?.orders?.reduce((sum, o) => sum + o, 0) || 0;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-[360px] justify-between">
+    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-90 justify-between">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-brand-dark/5 pb-3">
         <div className="flex items-center gap-2">

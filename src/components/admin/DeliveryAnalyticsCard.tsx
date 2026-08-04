@@ -14,7 +14,7 @@ export default function DeliveryAnalyticsCard() {
   );
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-[360px] justify-between">
+    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-90 justify-between">
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-brand-dark/5 pb-3">
         <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-extrabold">

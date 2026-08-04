@@ -56,7 +56,7 @@ export default function RecentActivityFeed() {
   );
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-[360px] justify-between">
+    <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4 min-h-90 justify-between">
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-brand-dark/5 pb-3">
         <div className="w-8 h-8 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-extrabold">
@@ -86,7 +86,7 @@ export default function RecentActivityFeed() {
       )}
 
       {!isLoading && data && (
-        <div className="flex flex-col gap-2 max-h-[260px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-2 max-h-65 overflow-y-auto pr-1">
           {data.items.map((item) => (
             <div
               key={item.id}

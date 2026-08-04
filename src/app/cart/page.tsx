@@ -9,7 +9,6 @@ import {
   Trash2,
   Plus,
   Minus,
-  Send,
   AlertTriangle,
   Truck,
   MapPin,
@@ -468,7 +467,7 @@ export default function CartPage() {
               {restrictedItems.length > 0 && (
                 <div className="p-3 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-xs font-bold text-brand-primary flex flex-col gap-2">
                   <span>
-                    {restrictedItems.map((i) => i.menuItem.name).join(", ")} can't be ordered for{" "}
+                    {restrictedItems.map((i) => i.menuItem.name).join(", ")} can&apos;t be ordered for{" "}
                     {fulfillmentType.replace("_", " ").toLowerCase()}.
                   </span>
                   {restrictedItems.map((item) => (

@@ -17,6 +17,7 @@ export interface MenuItem {
   isPizza: boolean;
   isAvailable: boolean;
   categoryId: string;
+  availableFor: ("DINE_IN" | "PICKUP" | "DELIVERY")[];
 }
 
 export interface PizzaSize {
