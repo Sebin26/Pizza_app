@@ -10,7 +10,11 @@ export async function GET() {
           where: { isAvailable: true },
           orderBy: { name: "asc" },
           include: {
-            sizePrices: { select: { sizeId: true, price: true } },
+            sizePrices: {
+              include: {
+                size: true,
+              },
+            },
           },
         },
       },

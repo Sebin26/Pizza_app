@@ -10,6 +10,7 @@ export interface Category {
 export interface SizePrice {
   sizeId: string;
   price: number;
+  size?: PizzaSize;
 }
 
 export interface MenuItem {
@@ -79,10 +80,10 @@ export interface PizzaConfig {
 
 export interface CartCustomization {
   size: PizzaSize;
-  crust: PizzaCrust;
-  sauce: PizzaSauce;
-  toppings: PizzaTopping[];
-  addons: PizzaAddon[];
+  crust?: PizzaCrust;
+  sauce?: PizzaSauce;
+  toppings?: PizzaTopping[];
+  addons?: PizzaAddon[];
 }
 
 export interface CartItem {

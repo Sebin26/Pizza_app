@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { Category, MenuItem } from "@/types";
+import { useToast } from "@/context/ToastContext";
+import { Category, MenuItem, CartCustomization } from "@/types";
 import { Search, ShoppingBag, Plus, Minus, Info, Flame, Wine, Cake, Disc } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -15,13 +16,15 @@ interface MenuContainerProps {
 export default function MenuContainer({ initialCategories }: MenuContainerProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { push } = useToast();
   const [activeCategory, setActiveCategory] = useState<string>(
     initialCategories[0]?.slug || "pizzas"
   );
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Non-pizza item quantity modal state
+  // Non-pizza item quantity & size modal state
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [selectedSizeId, setSelectedSizeId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
 
@@ -29,15 +32,62 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
     setSelectedItem(item);
     setQuantity(1);
     setNotes("");
+    if (item.sizePrices && item.sizePrices.length > 0) {
+      setSelectedSizeId(item.sizePrices[0].sizeId);
+    } else {
+      setSelectedSizeId("");
+    }
+  };
+
+  const getDefaultPizzaCustomization = (menuItem: MenuItem): CartCustomization | undefined => {
+    if (!menuItem.isPizza || !menuItem.sizePrices?.length) return undefined;
+    const firstSize = menuItem.sizePrices[0];
+    if (firstSize.size) {
+      return { size: firstSize.size };
+    }
+    return {
+      size: {
+        id: firstSize.sizeId,
+        name: "Regular",
+        priceFactor: 1,
+        priceAdd: 0,
+        displayOrder: 0,
+      },
+    };
+  };
+
+  const handleAddPizzaDirect = (item: MenuItem) => {
+    const customization = getDefaultPizzaCustomization(item);
+    addToCart(item, 1, customization);
+    push(`${item.name} added to cart`, "success");
   };
 
   const handleCloseQuantity = () => {
     setSelectedItem(null);
+    setSelectedSizeId("");
   };
+
+  const selectedSizePriceObj = selectedItem?.sizePrices?.find((sp) => sp.sizeId === selectedSizeId);
+  const currentUnitPrice = selectedSizePriceObj ? selectedSizePriceObj.price : selectedItem?.basePrice || 0;
+  const currentTotalPrice = currentUnitPrice * quantity;
 
   const handleAddToCart = () => {
     if (selectedItem) {
-      addToCart(selectedItem, quantity, undefined, notes);
+      const selectedSizeObj = selectedSizePriceObj?.size ?? (selectedSizePriceObj
+        ? {
+            id: selectedSizePriceObj.sizeId,
+            name: "Size",
+            priceFactor: 1,
+            priceAdd: 0,
+            displayOrder: 0,
+          }
+        : undefined);
+
+      const customization = selectedSizeObj
+        ? { size: selectedSizeObj }
+        : undefined;
+
+      addToCart(selectedItem, quantity, customization, notes);
       handleCloseQuantity();
     }
   };
@@ -207,7 +257,11 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                         {item.name}
                       </h3>
                       <span className="text-xl font-black text-brand-primary shrink-0">
-                        ${item.basePrice.toFixed(2)}
+                        {item.sizePrices && item.sizePrices.length > 1
+                          ? `From $${Math.min(...item.sizePrices.map((sp) => sp.price)).toFixed(2)}`
+                          : item.sizePrices && item.sizePrices.length === 1
+                          ? `$${item.sizePrices[0].price.toFixed(2)}`
+                          : `$${item.basePrice.toFixed(2)}`}
                       </span>
                     </div>
                     <p className="text-base text-brand-dark/75 leading-relaxed font-semibold line-clamp-2">
@@ -218,17 +272,17 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                   <div className="mt-2">
                     {item.isPizza ? (
                       <button
-                        onClick={() => router.push(`/builder?id=${item.id}`)}
+                        onClick={() => handleAddPizzaDirect(item)}
                         className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-base shadow-sm hover:shadow-md transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
                       >
-                        Customize Pizza
+                        Add
                       </button>
                     ) : (
                       <button
                         onClick={() => handleOpenQuantity(item)}
                         className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-brand-light hover:bg-brand-dark hover:text-white text-brand-dark font-extrabold text-base transition-[background-color,color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] cursor-pointer"
                       >
-                        Add to Cart
+                        {item.sizePrices && item.sizePrices.length > 1 ? "Select Size" : "Add to Cart"}
                       </button>
                     )}
                   </div>
@@ -291,9 +345,39 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                     <p className="text-sm text-brand-dark/60">{selectedItem.description}</p>
                   </div>
                   <span className="text-xl font-extrabold text-brand-primary shrink-0">
-                    ${(selectedItem.basePrice * quantity).toFixed(2)}
+                    ${currentTotalPrice.toFixed(2)}
                   </span>
                 </div>
+
+                {/* Size Selector if item has multiple sizes */}
+                {selectedItem.sizePrices && selectedItem.sizePrices.length > 1 && (
+                  <div className="flex flex-col gap-2.5 border-t border-brand-dark/5 pt-4">
+                    <span className="text-sm font-bold text-brand-dark">Choose Size</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                      {selectedItem.sizePrices.map((sp) => {
+                        const isSelected = selectedSizeId === sp.sizeId;
+                        const sizeLabel = sp.size?.name || "Size";
+                        return (
+                          <button
+                            key={sp.sizeId}
+                            type="button"
+                            onClick={() => setSelectedSizeId(sp.sizeId)}
+                            className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+                              isSelected
+                                ? "bg-brand-primary/10 border-brand-primary text-brand-dark shadow-xs ring-1 ring-brand-primary/30"
+                                : "bg-brand-light/60 border-brand-dark/5 text-brand-dark/70 hover:bg-brand-light"
+                            }`}
+                          >
+                            <span className="text-xs font-bold text-brand-dark">{sizeLabel}</span>
+                            <span className="text-sm font-extrabold text-brand-primary mt-1">
+                              ${sp.price.toFixed(2)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Quantity Controller */}
                 <div className="flex items-center justify-between border-t border-b border-brand-dark/5 py-4">

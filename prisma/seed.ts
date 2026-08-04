@@ -13,6 +13,11 @@ async function main() {
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.user.deleteMany();
+  // delete size-price relation tables that reference sizes/items
+  await prisma.menuItemSizePrice.deleteMany();
+  await prisma.toppingSizePrice.deleteMany();
+  await prisma.sauceSizePrice.deleteMany();
+
   await prisma.menuItem.deleteMany();
   await prisma.category.deleteMany();
   await prisma.pizzaSize.deleteMany();

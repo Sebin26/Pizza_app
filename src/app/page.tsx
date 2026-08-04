@@ -19,6 +19,13 @@ export default async function Home({ searchParams }: HomeProps) {
         items: {
           where: { isAvailable: true },
           orderBy: { name: "asc" },
+          include: {
+            sizePrices: {
+              include: {
+                size: true,
+              },
+            },
+          },
         },
       },
     });

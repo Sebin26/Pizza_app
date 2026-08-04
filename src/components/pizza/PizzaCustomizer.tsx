@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart, calculateItemPrice } from "@/context/CartContext";
 import { MenuItem, PizzaConfig, PizzaSize, PizzaCrust, PizzaSauce, PizzaTopping, PizzaAddon } from "@/types";
 import { ChevronLeft, ShoppingBag, Plus, Minus, Check, Flame, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
@@ -10,11 +10,34 @@ import { motion, AnimatePresence } from "framer-motion";
 interface PizzaCustomizerProps {
   menuItem: MenuItem;
   config: PizzaConfig;
+  // modal mode: when provided, component will call onClose/onSave instead of navigating
+  isModal?: boolean;
+  modalCartItemId?: string | null;
+  onClose?: () => void;
+  onSave?: () => void;
 }
 
-export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerProps) {
+export default function PizzaCustomizer({ menuItem, config, isModal = false, modalCartItemId = null, onClose, onSave }: PizzaCustomizerProps) {
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, updateItem, cart } = useCart();
+  const searchParams = useSearchParams();
+  const editCartItemId = isModal ? modalCartItemId : searchParams?.get("edit") || null;
+  const isEditMode = Boolean(editCartItemId);
+
+  // If editing, find the cart item and use its customization as initial state
+  useEffect(() => {
+    if (!isEditMode) return;
+    const cartItem = cart.find((c) => c.id === editCartItemId);
+    if (!cartItem) return;
+    if (cartItem.customization?.size) setSelectedSize(cartItem.customization.size);
+    if (cartItem.customization?.crust) setSelectedCrust(cartItem.customization.crust);
+    if (cartItem.customization?.sauce) setSelectedSauce(cartItem.customization.sauce);
+    if (cartItem.customization?.toppings) setSelectedToppings(cartItem.customization.toppings);
+    if (cartItem.customization?.addons) setSelectedAddons(cartItem.customization.addons);
+    setQuantity(cartItem.quantity || 1);
+    setNotes(cartItem.notes || "");
+    setIsEditingFromReview(true);
+  }, [isEditMode, editCartItemId, cart]);
 
   // Initialize selections with intelligent defaults
   const [selectedSize, setSelectedSize] = useState<PizzaSize>(config.sizes[0]);
@@ -175,7 +198,23 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
   };
 
   const handleAdd = () => {
+    if (isEditMode && editCartItemId) {
+      // update existing cart item
+      updateItem(editCartItemId, { customization, notes, quantity });
+      if (isModal) {
+        onSave?.();
+        onClose?.();
+        return;
+      }
+      router.push("/cart");
+      return;
+    }
     addToCart(menuItem, quantity, customization, notes);
+    if (isModal) {
+      onSave?.();
+      onClose?.();
+      return;
+    }
     router.push("/cart");
   };
 

@@ -2,9 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { MenuItem } from "@/types";
+import { MenuItem, CartCustomization } from "@/types";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/context/ToastContext";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -73,8 +74,32 @@ const ACCENT_PHRASES = [
   "Handcrafted Daily",
 ];
 
+function getDefaultPizzaCustomization(menuItem: MenuItem): CartCustomization | undefined {
+  if (!menuItem.isPizza || !menuItem.sizePrices?.length) return undefined;
+  const firstSize = menuItem.sizePrices[0];
+  if (firstSize.size) {
+    return { size: firstSize.size };
+  }
+  return {
+    size: {
+      id: firstSize.sizeId,
+      name: "Regular",
+      priceFactor: 1,
+      priceAdd: 0,
+      displayOrder: 0,
+    },
+  };
+}
+
 export default function FeaturedPizzaShowcase({ featuredPizzas }: FeaturedPizzaShowcaseProps) {
-  const router = useRouter();
+  const { addToCart } = useCart();
+  const { push } = useToast();
+
+  const handleAdd = (item: MenuItem) => {
+    const customization = getDefaultPizzaCustomization(item);
+    addToCart(item, 1, customization);
+    push(`${item.name} added to cart`, "success");
+  };
 
   return (
     <div className="w-full flex flex-col gap-24 lg:gap-32">
@@ -168,10 +193,10 @@ export default function FeaturedPizzaShowcase({ featuredPizzas }: FeaturedPizzaS
               <div>
                 <button
                   type="button"
-                  onClick={() => router.push(`/builder?id=${item.id}`)}
+                  onClick={() => handleAdd(item)}
                   className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#E8722C] hover:bg-[#be5212] text-white font-poppins font-extrabold text-base sm:text-lg rounded-2xl shadow-lg shadow-[#E8722C]/25 hover:shadow-xl hover:shadow-[#E8722C]/35 transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] cursor-pointer"
                 >
-                  <span>Customize &amp; Order</span>
+                  <span>Add</span>
                   <ArrowRight className="w-5.5 h-5.5 group-hover:translate-x-1 transition-transform duration-200 ease-out" />
                 </button>
               </div>

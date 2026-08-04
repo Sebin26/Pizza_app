@@ -574,7 +574,10 @@ if (process.env.ALLOW_ORDER_WIPE === "true") {
       "One Medium Gourmet, Traditional, or Classic pizza, 10 Wings, one regular Cheese Stick, and 2L drinks. Upgrade to Large pizza for an extra $5.",
     categorySlug: "combos-specials",
     isPizza: false,
-    sizePrices: [{ sizeId: mediumId, price: 35.95 }],
+    sizePrices: [
+      { sizeId: mediumId, price: 35.95 },
+      { sizeId: largeId, price: 40.95 },
+    ],
   });
 
   await upsertSizedItem({

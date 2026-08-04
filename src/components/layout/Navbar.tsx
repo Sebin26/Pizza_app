@@ -5,11 +5,13 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart, Flame, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import SideDrawer from "./SideDrawer";
 
 export default function Navbar() {
   const { cart } = useCart();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const [isOpen, setIsOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-brand-dark/5 shadow-xs transition-shadow">
@@ -45,18 +47,32 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          <Link 
-            href="/cart" 
-            className="relative flex items-center gap-2.5 px-5 sm:px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white text-base font-bold shadow-md shadow-brand-primary/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] hover:-translate-y-0.5"
+          {/* Cart: only visible when there are items */}
+          {cartCount > 0 && (
+            <Link 
+              href="/cart" 
+              className="relative flex items-center gap-2.5 px-5 sm:px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white text-base font-bold shadow-md shadow-brand-primary/20 transition-[background-color,transform,box-shadow] duration-200 ease-out active:scale-[0.97] hover:-translate-y-0.5"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span className="hidden sm:inline">Cart</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-brand-gold text-white text-[12px] font-extrabold w-5.5 h-5.5 rounded-full flex items-center justify-center border-2 border-white animate-bounce" aria-live="polite">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
+
+          {/* Profile Avatar */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-brand-light hover:bg-brand-light/95 border border-brand-dark/5 text-brand-dark focus:outline-none active:scale-[0.9] transition-transform duration-100 cursor-pointer"
+            aria-label="Open account drawer"
           >
-            <ShoppingCart className="w-5 h-5" />
-            <span className="hidden sm:inline">Cart</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-brand-gold text-white text-[12px] font-extrabold w-5.5 h-5.5 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
-                {cartCount}
-              </span>
-            )}
-          </Link>
+            <div className="w-8 h-8 rounded-full overflow-hidden">
+              <img src="/img/avatar-placeholder.png" alt="avatar" className="w-full h-full object-cover" />
+            </div>
+          </button>
 
           {/* Hamburger button (Mobile) */}
           <button
@@ -67,6 +83,7 @@ export default function Navbar() {
             {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
           </button>
         </div>
+        <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
       </div>
 
       {/* Mobile dropdown navigation menu */}

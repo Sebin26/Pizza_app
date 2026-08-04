@@ -19,10 +19,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import PizzaCustomizer from "@/components/pizza/PizzaCustomizer";
+import { useToast } from "@/context/ToastContext";
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, removeFromCart, updateQuantity, clearCart, subtotal, tax } = useCart();
+
+  const { push } = useToast();
 
   // Guest checkout form state
   const [customerName, setCustomerName] = useState("");
@@ -58,6 +62,11 @@ export default function CartPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Modal editing state
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [pizzaConfig, setPizzaConfig] = useState<any | null>(null);
+  const [isCustomizerLoading, setIsCustomizerLoading] = useState(false);
 
   useEffect(() => {
     async function fetchConfig() {
@@ -146,13 +155,13 @@ export default function CartPage() {
           notes: item.notes || "",
         };
 
-        if (item.menuItem.isPizza && item.customization) {
+        if (item.customization) {
           payload.customization = {
-            sizeId: item.customization.size.id,
-            crustId: item.customization.crust.id,
-            sauceId: item.customization.sauce.id,
-            toppingIds: item.customization.toppings.map((t) => t.id),
-            addonIds: item.customization.addons.map((a) => a.id),
+            sizeId: item.customization.size?.id || "",
+            crustId: item.customization.crust?.id || "",
+            sauceId: item.customization.sauce?.id || "",
+            toppingIds: (item.customization.toppings || []).map((t) => t.id),
+            addonIds: (item.customization.addons || []).map((a) => a.id),
           };
         }
 
@@ -267,25 +276,32 @@ export default function CartPage() {
                     {item.menuItem.name}
                   </h3>
 
-                  {item.menuItem.isPizza && item.customization && (
+                  {item.customization?.size && (
                     <div className="text-xs sm:text-sm text-brand-dark/50 flex flex-col gap-0.5">
                       <p>
                         <strong className="text-brand-dark/70 font-semibold">Size:</strong>{" "}
-                        {item.customization.size.name} |{" "}
-                        <strong className="text-brand-dark/70 font-semibold">Crust:</strong>{" "}
-                        {item.customization.crust.name}
+                        {item.customization.size.name}
+                        {item.customization.crust?.name ? (
+                          <>
+                            {" | "}
+                            <strong className="text-brand-dark/70 font-semibold">Crust:</strong>{" "}
+                            {item.customization.crust.name}
+                          </>
+                        ) : null}
                       </p>
-                      <p>
-                        <strong className="text-brand-dark/70 font-semibold">Sauce:</strong>{" "}
-                        {item.customization.sauce.name}
-                      </p>
-                      {item.customization.toppings.length > 0 && (
+                      {item.customization.sauce?.name ? (
+                        <p>
+                          <strong className="text-brand-dark/70 font-semibold">Sauce:</strong>{" "}
+                          {item.customization.sauce.name}
+                        </p>
+                      ) : null}
+                      {item.customization.toppings && item.customization.toppings.length > 0 && (
                         <p>
                           <strong className="text-brand-dark/70 font-semibold">Toppings:</strong>{" "}
                           {item.customization.toppings.map((t) => t.name).join(", ")}
                         </p>
                       )}
-                      {item.customization.addons.length > 0 && (
+                      {item.customization.addons && item.customization.addons.length > 0 && (
                         <p>
                           <strong className="text-brand-dark/70 font-semibold">Add-ons:</strong>{" "}
                           {item.customization.addons.map((a) => a.name).join(", ")}
@@ -330,14 +346,38 @@ export default function CartPage() {
                     <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
-
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="w-9 h-9 rounded-xl bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white flex items-center justify-center transition-colors duration-200 active:scale-95 shrink-0"
-                  title="Remove item"
-                >
-                  <Trash2 className="w-4.5 h-4.5" />
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={async () => {
+                      setEditingItem(item);
+                      setIsCustomizerLoading(true);
+                      try {
+                        const res = await fetch("/api/pizza-config");
+                        const json = await res.json();
+                        setPizzaConfig(json);
+                      } catch (err) {
+                        console.error("Failed to load pizza config", err);
+                        push("Failed to open customizer", "error");
+                      } finally {
+                        setIsCustomizerLoading(false);
+                      }
+                    }}
+                    className="text-xs text-brand-primary underline"
+                    title="Customize item"
+                  >
+                    Customize
+                  </button>
+                  <button
+                    onClick={() => {
+                      removeFromCart(item.id);
+                      push("Removed item from cart", "info");
+                    }}
+                    className="w-9 h-9 rounded-xl bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white flex items-center justify-center transition-colors duration-200 active:scale-95 shrink-0"
+                    title="Remove item"
+                  >
+                    <Trash2 className="w-4.5 h-4.5" />
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -759,6 +799,34 @@ export default function CartPage() {
                   <span>Save Address</span>
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Pizza Customizer Modal (Edit in place) */}
+      <AnimatePresence>
+        {editingItem && pizzaConfig && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 15 }}
+              className="bg-white rounded-2xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl border border-brand-dark/10 flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-extrabold">Edit: {editingItem.menuItem.name}</h3>
+                <button onClick={() => setEditingItem(null)} className="text-brand-dark/60">✕</button>
+              </div>
+
+              <PizzaCustomizer
+                menuItem={editingItem.menuItem}
+                config={pizzaConfig}
+                isModal
+                modalCartItemId={editingItem.id}
+                onClose={() => setEditingItem(null)}
+                onSave={() => push("Updated item in cart", "success")}
+              />
             </motion.div>
           </div>
         )}

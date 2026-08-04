@@ -264,7 +264,7 @@ export async function POST(request: Request) {
 
       let unitPrice = dbMenuItem.basePrice;
 
-      if (dbMenuItem.isPizza && item.customization) {
+      if (item.customization) {
         const cust = item.customization;
         const sizeId = cust.sizeId;
         const crust = cust.crustId ? crustMap.get(cust.crustId) : null;
@@ -406,14 +406,14 @@ export async function POST(request: Request) {
           },
         });
 
-        if (item.customization && menuItemMap.get(item.menuItemId)?.isPizza) {
+        if (item.customization) {
           const cust = item.customization;
           const createdCust = await tx.orderItemCustomization.create({
             data: {
               orderItemId: createdItem.id,
-              sizeId: cust.sizeId,
-              crustId: cust.crustId,
-              sauceId: cust.sauceId,
+              sizeId: cust.sizeId || null,
+              crustId: cust.crustId || null,
+              sauceId: cust.sauceId || null,
             },
           });
 

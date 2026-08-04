@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { ToastProvider } from "@/context/ToastContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import StickyCartBar from "@/components/cart/StickyCartBar";
 
 export const metadata: Metadata = {
   title: "D Town Pizza | In-Store Digital Ordering",
@@ -18,13 +20,16 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <CartProvider>
-          <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            <Navbar />
-            <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <ToastProvider>
+            <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+              <Navbar />
+              <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                {children}
+              </main>
+              <StickyCartBar />
+              <Footer />
+            </div>
+          </ToastProvider>
         </CartProvider>
       </body>
     </html>

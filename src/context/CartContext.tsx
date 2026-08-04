@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useMemo, useSyncExternalStore } from "react";
 import { CartItem, CartCustomization, MenuItem } from "@/types";
 
 interface CartContextType {
@@ -8,6 +8,11 @@ interface CartContextType {
   addToCart: (menuItem: MenuItem, quantity: number, customization?: CartCustomization, notes?: string) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  updateItem: (id: string, updates: Partial<{
+    customization: any;
+    notes: string | undefined;
+    quantity: number;
+  }>) => void;
   clearCart: () => void;
   subtotal: number;
   tax: number;
@@ -17,6 +22,35 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const TAX_RATE = 0.10; // 10% tax rate
+
+const STORAGE_KEY = "pizza_app_cart";
+const EMPTY_CART_JSON = "[]";
+
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("cart_updated", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("cart_updated", callback);
+  };
+}
+
+function getSnapshot(): string {
+  return localStorage.getItem(STORAGE_KEY) ?? EMPTY_CART_JSON;
+}
+
+function getServerSnapshot(): string {
+  return EMPTY_CART_JSON;
+}
+
+function saveCart(cart: CartItem[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    window.dispatchEvent(new Event("cart_updated"));
+  } catch (e) {
+    console.error("Error saving cart:", e);
+  }
+}
 
 /** Look up the price for a specific sizeId in a sizePrices array, falling back to a flat fallback price. */
 function getSizePrice(
@@ -30,7 +64,7 @@ function getSizePrice(
 }
 
 export function calculateItemPrice(menuItem: MenuItem, customization?: CartCustomization): number {
-  if (!menuItem.isPizza || !customization) {
+  if (!customization) {
     return menuItem.basePrice;
   }
 
@@ -39,47 +73,39 @@ export function calculateItemPrice(menuItem: MenuItem, customization?: CartCusto
   // Base price: look up MenuItemSizePrice for the selected size
   const sizeBase = getSizePrice(menuItem.sizePrices, size.id, menuItem.basePrice);
 
+  if (!menuItem.isPizza) {
+    return sizeBase;
+  }
+
   // Crust: all crusts are $0 per menu doc, but respect DB value for future flexibility
-  const crustPrice = crust.price;
+  const crustPrice = crust?.price ?? 0;
 
   // Sauce: look up SauceSizePrice for the selected size
-  const saucePrice = getSizePrice(sauce.sizePrices, size.id, sauce.price);
+  const saucePrice = sauce ? getSizePrice(sauce.sizePrices, size.id, sauce.price) : 0;
 
   // Toppings: look up ToppingSizePrice for each topping at the selected size
-  const toppingsPrice = toppings.reduce(
+  const toppingsPrice = (toppings || []).reduce(
     (sum, t) => sum + getSizePrice(t.sizePrices, size.id, t.price),
     0
   );
 
   // Addons: flat price (no per-size table for addons)
-  const addonsPrice = addons.reduce((sum, a) => sum + a.price, 0);
+  const addonsPrice = (addons || []).reduce((sum, a) => sum + a.price, 0);
 
   return parseFloat((sizeBase + crustPrice + saucePrice + toppingsPrice + addonsPrice).toFixed(2));
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const cartString = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Load from LocalStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("pizza_app_cart");
-    if (stored) {
-      try {
-        setCart(JSON.parse(stored));
-      } catch (e) {
-        console.error("Error loading cart:", e);
-      }
+  const cart = useMemo<CartItem[]>(() => {
+    try {
+      return JSON.parse(cartString);
+    } catch (e) {
+      console.error("Error loading cart:", e);
+      return [];
     }
-    setIsLoaded(true);
-  }, []);
-
-  // Save to LocalStorage
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("pizza_app_cart", JSON.stringify(cart));
-    }
-  }, [cart, isLoaded]);
+  }, [cartString]);
 
   const addToCart = (
     menuItem: MenuItem,
@@ -89,48 +115,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   ) => {
     const price = calculateItemPrice(menuItem, customization);
     
-    setCart((prev) => {
-      // Check if item with same customization and notes already exists
-      const existingIndex = prev.findIndex((item) => {
-        if (item.menuItem.id !== menuItem.id) return false;
-        if (item.notes !== notes) return false;
-        
-        if (menuItem.isPizza) {
-          if (!item.customization || !customization) return false;
-          
-          // Compare size, crust, sauce
-          if (item.customization.size.id !== customization.size.id) return false;
-          if (item.customization.crust.id !== customization.crust.id) return false;
-          if (item.customization.sauce.id !== customization.sauce.id) return false;
-          
-          // Compare toppings (sort by id first)
-          const t1 = item.customization.toppings.map(t => t.id).sort();
-          const t2 = customization.toppings.map(t => t.id).sort();
-          if (t1.length !== t2.length || !t1.every((val, index) => val === t2[index])) return false;
-
-          // Compare addons
-          const a1 = item.customization.addons.map(a => a.id).sort();
-          const a2 = customization.addons.map(a => a.id).sort();
-          if (a1.length !== a2.length || !a1.every((val, index) => val === a2[index])) return false;
-        }
-        
-        return true;
-      });
-
-      if (existingIndex > -1) {
-        const next = [...prev];
-        next[existingIndex] = {
-          ...next[existingIndex],
-          quantity: next[existingIndex].quantity + quantity,
-        };
-        return next;
+    // Check if item with same customization and notes already exists
+    const existingIndex = cart.findIndex((item) => {
+      if (item.menuItem.id !== menuItem.id) return false;
+      if (item.notes !== notes) return false;
+      
+      if (customization?.size || item.customization?.size) {
+        if (item.customization?.size?.id !== customization?.size?.id) return false;
       }
 
-      // Generate a unique ID for this cart line
-      const uniqueId = `${menuItem.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      if (menuItem.isPizza) {
+        if (!item.customization || !customization) return false;
+        
+        // Compare crust, sauce
+        if (item.customization.crust?.id !== customization.crust?.id) return false;
+        if (item.customization.sauce?.id !== customization.sauce?.id) return false;
+        
+        // Compare toppings (sort by id first)
+        const t1 = (item.customization.toppings || []).map(t => t.id).sort();
+        const t2 = (customization.toppings || []).map(t => t.id).sort();
+        if (t1.length !== t2.length || !t1.every((val, index) => val === t2[index])) return false;
 
-      return [
-        ...prev,
+        // Compare addons
+        const a1 = (item.customization.addons || []).map(a => a.id).sort();
+        const a2 = (customization.addons || []).map(a => a.id).sort();
+        if (a1.length !== a2.length || !a1.every((val, index) => val === a2[index])) return false;
+      }
+      
+      return true;
+    });
+
+    let nextCart: CartItem[];
+    if (existingIndex > -1) {
+      nextCart = [...cart];
+      nextCart[existingIndex] = {
+        ...nextCart[existingIndex],
+        quantity: nextCart[existingIndex].quantity + quantity,
+      };
+    } else {
+      const uniqueId = `${menuItem.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      nextCart = [
+        ...cart,
         {
           id: uniqueId,
           menuItem,
@@ -140,11 +165,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           price,
         },
       ];
-    });
+    }
+    saveCart(nextCart);
   };
 
   const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+    saveCart(cart.filter((item) => item.id !== id));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -152,13 +178,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(id);
       return;
     }
-    setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+    saveCart(
+      cart.map((item) => (item.id === id ? { ...item, quantity } : item))
+    );
+  };
+
+  const updateItem = (id: string, updates: Partial<{ customization: any; notes: string | undefined; quantity: number; }>) => {
+    saveCart(
+      cart.map((item) => {
+        if (item.id !== id) return item;
+        const newCustomization = updates.customization ?? item.customization;
+        const newQuantity = updates.quantity ?? item.quantity;
+        const newNotes = updates.notes ?? item.notes;
+        const newPrice = calculateItemPrice(item.menuItem, newCustomization);
+        return { ...item, customization: newCustomization, notes: newNotes, quantity: newQuantity, price: newPrice };
+      })
     );
   };
 
   const clearCart = () => {
-    setCart([]);
+    saveCart([]);
   };
 
   // Calculations
@@ -175,6 +214,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+          updateItem,
         clearCart,
         subtotal,
         tax,
