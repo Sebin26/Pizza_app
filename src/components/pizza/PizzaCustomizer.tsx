@@ -545,7 +545,7 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                               <span className="text-3xl mb-2">🍕</span>
                               <span className="text-[15px] font-bold text-brand-dark">{sz.name}</span>
                               <span className="text-xs text-brand-dark/50 mt-1 font-semibold">
-                                {sz.priceAdd > 0 ? `+$${sz.priceAdd.toFixed(2)}` : "Base Price"}
+                                ${(menuItem.sizePrices?.find((sp) => sp.sizeId === sz.id)?.price ?? menuItem.basePrice).toFixed(2)}
                               </span>
                             </button>
                           );
@@ -628,9 +628,12 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                 </div>
                                 <span className="text-[15px] font-bold text-brand-dark">{sc.name}</span>
                               </div>
-                              <span className="text-sm font-semibold text-brand-dark/60">
-                                {sc.price > 0 ? `+$${sc.price.toFixed(2)}` : "+$0.00"}
-                              </span>
+                                <span className="text-sm font-semibold text-brand-dark/60">
+                                  {(() => {
+                                    const p = sc.sizePrices?.find((sp) => sp.sizeId === selectedSize?.id)?.price ?? sc.price;
+                                    return p > 0 ? `+$${p.toFixed(2)}` : "+$0.00";
+                                  })()}
+                                </span>
                             </div>
                           );
                         })}
@@ -685,7 +688,9 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                   </div>
                                   <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
                                 </div>
-                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                                <span className="text-xs font-semibold text-brand-dark/50">
+                                  +${(tp.sizePrices?.find((sp) => sp.sizeId === selectedSize?.id)?.price ?? tp.price).toFixed(2)}
+                                </span>
                               </button>
                             );
                           })}
@@ -717,7 +722,9 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                   </div>
                                   <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
                                 </div>
-                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                                 <span className="text-xs font-semibold text-brand-dark/50">
+                                   +${(tp.sizePrices?.find((sp) => sp.sizeId === selectedSize.id)?.price ?? tp.price).toFixed(2)}
+                                 </span>
                               </button>
                             );
                           })}
@@ -749,7 +756,9 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                                   </div>
                                   <span className="text-[15px] font-bold text-brand-dark">{tp.name}</span>
                                 </div>
-                                <span className="text-xs font-semibold text-brand-dark/50">+${tp.price.toFixed(2)}</span>
+                                 <span className="text-xs font-semibold text-brand-dark/50">
+                                   +${(tp.sizePrices?.find((sp) => sp.sizeId === selectedSize.id)?.price ?? tp.price).toFixed(2)}
+                                 </span>
                               </button>
                             );
                           })}
@@ -955,42 +964,43 @@ export default function PizzaCustomizer({ menuItem, config }: PizzaCustomizerPro
                           <span>Item</span>
                           <span>Price</span>
                         </div>
-                        
-                        <div className="flex justify-between items-center text-xs font-bold text-brand-dark border-t border-brand-dark/5 pt-2">
-                          <span>Base Pizza ({menuItem.name})</span>
-                          <span>${menuItem.basePrice.toFixed(2)}</span>
-                        </div>
-
-                        {selectedSize.priceAdd > 0 && (
-                          <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
-                            <span>Size upcharge ({selectedSize.name})</span>
-                            <span>+${selectedSize.priceAdd.toFixed(2)}</span>
-                          </div>
-                        )}
-
-                        {selectedCrust.price > 0 && (
-                          <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
-                            <span>Crust upcharge ({selectedCrust.name})</span>
-                            <span>+${selectedCrust.price.toFixed(2)}</span>
-                          </div>
-                        )}
-
-                        {selectedSauce.price > 0 && (
-                          <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
-                            <span>Sauce upcharge ({selectedSauce.name})</span>
-                            <span>+${selectedSauce.price.toFixed(2)}</span>
-                          </div>
-                        )}
-
-                        {selectedToppings.map((t) => {
-                          if (t.price === 0) return null;
+                        {(() => {
+                          const basePizzaPrice = menuItem.sizePrices?.find((sp) => sp.sizeId === selectedSize.id)?.price ?? menuItem.basePrice;
+                          const saucePrice = selectedSauce.sizePrices?.find((sp) => sp.sizeId === selectedSize.id)?.price ?? selectedSauce.price;
                           return (
-                            <div key={t.id} className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
-                              <span>{t.name}</span>
-                              <span>+${t.price.toFixed(2)}</span>
-                            </div>
+                            <>
+                              <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
+                                <span>Base Pizza ({menuItem.name} - {selectedSize.name})</span>
+                                <span>${basePizzaPrice.toFixed(2)}</span>
+                              </div>
+
+                              {selectedCrust.price > 0 && (
+                                <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
+                                  <span>Crust upcharge ({selectedCrust.name})</span>
+                                  <span>+${selectedCrust.price.toFixed(2)}</span>
+                                </div>
+                              )}
+
+                              {saucePrice > 0 && (
+                                <div className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
+                                  <span>Sauce upcharge ({selectedSauce.name})</span>
+                                  <span>+${saucePrice.toFixed(2)}</span>
+                                </div>
+                              )}
+
+                              {selectedToppings.map((t) => {
+                                const tPrice = t.sizePrices?.find((sp) => sp.sizeId === selectedSize.id)?.price ?? t.price;
+                                if (tPrice === 0) return null;
+                                return (
+                                  <div key={t.id} className="flex justify-between items-center text-xs text-brand-dark/80 font-semibold">
+                                    <span>{t.name}</span>
+                                    <span>+${tPrice.toFixed(2)}</span>
+                                  </div>
+                                );
+                              })}
+                            </>
                           );
-                        })}
+                        })()}
 
                         {selectedAddons.map((a) => {
                           if (a.price === 0) return null;

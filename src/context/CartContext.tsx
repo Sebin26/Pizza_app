@@ -18,18 +18,40 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const TAX_RATE = 0.10; // 10% tax rate
 
+/** Look up the price for a specific sizeId in a sizePrices array, falling back to a flat fallback price. */
+function getSizePrice(
+  sizePrices: { sizeId: string; price: number }[] | undefined,
+  sizeId: string,
+  fallback: number
+): number {
+  if (!sizePrices || sizePrices.length === 0) return fallback;
+  const row = sizePrices.find((sp) => sp.sizeId === sizeId);
+  return row !== undefined ? row.price : fallback;
+}
+
 export function calculateItemPrice(menuItem: MenuItem, customization?: CartCustomization): number {
   if (!menuItem.isPizza || !customization) {
     return menuItem.basePrice;
   }
 
   const { size, crust, sauce, toppings, addons } = customization;
-  
-  // Calculate price: (basePrice * sizeFactor) + sizePriceAdd + crust + sauce + toppings + addons
-  const sizeBase = (menuItem.basePrice * size.priceFactor) + size.priceAdd;
+
+  // Base price: look up MenuItemSizePrice for the selected size
+  const sizeBase = getSizePrice(menuItem.sizePrices, size.id, menuItem.basePrice);
+
+  // Crust: all crusts are $0 per menu doc, but respect DB value for future flexibility
   const crustPrice = crust.price;
-  const saucePrice = sauce.price;
-  const toppingsPrice = toppings.reduce((sum, t) => sum + t.price, 0);
+
+  // Sauce: look up SauceSizePrice for the selected size
+  const saucePrice = getSizePrice(sauce.sizePrices, size.id, sauce.price);
+
+  // Toppings: look up ToppingSizePrice for each topping at the selected size
+  const toppingsPrice = toppings.reduce(
+    (sum, t) => sum + getSizePrice(t.sizePrices, size.id, t.price),
+    0
+  );
+
+  // Addons: flat price (no per-size table for addons)
   const addonsPrice = addons.reduce((sum, a) => sum + a.price, 0);
 
   return parseFloat((sizeBase + crustPrice + saucePrice + toppingsPrice + addonsPrice).toFixed(2));

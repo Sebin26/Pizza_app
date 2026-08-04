@@ -205,25 +205,54 @@ export async function POST(request: Request) {
     }
 
     // Fetch all needed customizer options
-    const sizeIds = items.map((i) => i.customization?.sizeId).filter(Boolean) as string[];
-    const crustIds = items.map((i) => i.customization?.crustId).filter(Boolean) as string[];
-    const sauceIds = items.map((i) => i.customization?.sauceId).filter(Boolean) as string[];
-    const toppingIds = items.flatMap((i) => i.customization?.toppingIds || []);
-    const addonIds = items.flatMap((i) => i.customization?.addonIds || []);
+    const sizeIds = [...new Set(items.map((i) => i.customization?.sizeId).filter(Boolean) as string[])];
+    const crustIds = [...new Set(items.map((i) => i.customization?.crustId).filter(Boolean) as string[])];
+    const sauceIds = [...new Set(items.map((i) => i.customization?.sauceId).filter(Boolean) as string[])];
+    const toppingIds = [...new Set(items.flatMap((i) => i.customization?.toppingIds || []))];
+    const addonIds = [...new Set(items.flatMap((i) => i.customization?.addonIds || []))];
+    const menuItemIds = [...new Set(items.map((i) => i.menuItemId))];
 
-    const [sizes, crusts, sauces, toppings, addons] = await Promise.all([
-      prisma.pizzaSize.findMany({ where: { id: { in: sizeIds } } }),
+    const [crusts, sauces, toppings, addons, menuItemSizePrices, toppingSizePrices, sauceSizePrices] = await Promise.all([
       prisma.pizzaCrust.findMany({ where: { id: { in: crustIds } } }),
       prisma.pizzaSauce.findMany({ where: { id: { in: sauceIds } } }),
       prisma.pizzaTopping.findMany({ where: { id: { in: toppingIds } } }),
       prisma.pizzaAddon.findMany({ where: { id: { in: addonIds } } }),
+      // Per-size prices — the source of truth
+      prisma.menuItemSizePrice.findMany({
+        where: { menuItemId: { in: menuItemIds }, sizeId: { in: sizeIds } },
+      }),
+      prisma.toppingSizePrice.findMany({
+        where: { toppingId: { in: toppingIds }, sizeId: { in: sizeIds } },
+      }),
+      prisma.sauceSizePrice.findMany({
+        where: { sauceId: { in: sauceIds }, sizeId: { in: sizeIds } },
+      }),
     ]);
 
-    const sizeMap = new Map(sizes.map((s) => [s.id, s]));
     const crustMap = new Map(crusts.map((c) => [c.id, c]));
     const sauceMap = new Map(sauces.map((s) => [s.id, s]));
     const toppingMap = new Map(toppings.map((t) => [t.id, t]));
     const addonMap = new Map(addons.map((a) => [a.id, a]));
+
+    // Build price lookup maps: key = "entityId|sizeId"
+    const menuItemSizePriceMap = new Map(
+      menuItemSizePrices.map((p) => [`${p.menuItemId}|${p.sizeId}`, p.price])
+    );
+    const toppingSizePriceMap = new Map(
+      toppingSizePrices.map((p) => [`${p.toppingId}|${p.sizeId}`, p.price])
+    );
+    const sauceSizePriceMap = new Map(
+      sauceSizePrices.map((p) => [`${p.sauceId}|${p.sizeId}`, p.price])
+    );
+
+    /** Helper: look up a size-specific price, falling back to a flat price. */
+    function getPrice(map: Map<string, number>, entityId: string, sizeId: string | undefined, fallback: number): number {
+      if (!sizeId) return fallback;
+      const key = `${entityId}|${sizeId}`;
+      const val = map.get(key);
+      return val !== undefined ? val : fallback;
+    }
+
 
     let orderSubtotal = 0;
 
@@ -237,28 +266,32 @@ export async function POST(request: Request) {
 
       if (dbMenuItem.isPizza && item.customization) {
         const cust = item.customization;
-        const size = cust.sizeId ? sizeMap.get(cust.sizeId) : null;
+        const sizeId = cust.sizeId;
         const crust = cust.crustId ? crustMap.get(cust.crustId) : null;
-        const sauce = cust.sauceId ? sauceMap.get(cust.sauceId) : null;
 
-        // Base pizza price factor
-        if (size) {
-          unitPrice = (unitPrice * size.priceFactor) + size.priceAdd;
-        }
+        // Base price: look up MenuItemSizePrice for (menuItemId, sizeId)
+        unitPrice = getPrice(menuItemSizePriceMap, dbMenuItem.id, sizeId, dbMenuItem.basePrice);
+
+        // Crust upcharge (flat per DB, $0 per current menu doc)
         if (crust) {
           unitPrice += crust.price;
         }
-        if (sauce) {
-          unitPrice += sauce.price;
+
+        // Sauce upcharge: look up SauceSizePrice for (sauceId, sizeId)
+        if (cust.sauceId) {
+          const sauce = sauceMap.get(cust.sauceId);
+          const sauceFlat = sauce?.price ?? 0;
+          unitPrice += getPrice(sauceSizePriceMap, cust.sauceId, sizeId, sauceFlat);
         }
 
-        // Add toppings
+        // Toppings: look up ToppingSizePrice for each (toppingId, sizeId)
         for (const tId of cust.toppingIds) {
           const top = toppingMap.get(tId);
-          if (top) unitPrice += top.price;
+          const fallback = top?.price ?? 0;
+          unitPrice += getPrice(toppingSizePriceMap, tId, sizeId, fallback);
         }
 
-        // Add addons
+        // Addons: flat price only (no per-size table)
         for (const aId of cust.addonIds) {
           const add = addonMap.get(aId);
           if (add) unitPrice += add.price;

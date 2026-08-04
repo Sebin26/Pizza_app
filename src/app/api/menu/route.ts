@@ -9,6 +9,9 @@ export async function GET() {
         items: {
           where: { isAvailable: true },
           orderBy: { name: "asc" },
+          include: {
+            sizePrices: { select: { sizeId: true, price: true } },
+          },
         },
       },
     });

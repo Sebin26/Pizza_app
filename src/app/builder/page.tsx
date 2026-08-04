@@ -15,6 +15,9 @@ export default async function BuilderPage({ searchParams }: BuilderPageProps) {
   if (id) {
     menuItem = await prisma.menuItem.findFirst({
       where: { id, isPizza: true, isAvailable: true },
+      include: {
+        sizePrices: { select: { sizeId: true, price: true } },
+      },
     });
   }
 
@@ -22,6 +25,9 @@ export default async function BuilderPage({ searchParams }: BuilderPageProps) {
   if (!menuItem) {
     menuItem = await prisma.menuItem.findFirst({
       where: { isPizza: true, isAvailable: true },
+      include: {
+        sizePrices: { select: { sizeId: true, price: true } },
+      },
     });
   }
 
@@ -33,8 +39,14 @@ export default async function BuilderPage({ searchParams }: BuilderPageProps) {
   const [sizes, crusts, sauces, toppings, addons] = await Promise.all([
     prisma.pizzaSize.findMany({ orderBy: { displayOrder: "asc" } }),
     prisma.pizzaCrust.findMany({ orderBy: { displayOrder: "asc" } }),
-    prisma.pizzaSauce.findMany({ orderBy: { displayOrder: "asc" } }),
-    prisma.pizzaTopping.findMany({ where: { isAvailable: true } }),
+    prisma.pizzaSauce.findMany({
+      orderBy: { displayOrder: "asc" },
+      include: { sizePrices: { select: { sizeId: true, price: true } } },
+    }),
+    prisma.pizzaTopping.findMany({
+      where: { isAvailable: true },
+      include: { sizePrices: { select: { sizeId: true, price: true } } },
+    }),
     prisma.pizzaAddon.findMany({ where: { isAvailable: true } }),
   ]);
 

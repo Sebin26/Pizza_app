@@ -6,8 +6,14 @@ export async function GET() {
     const [sizes, crusts, sauces, toppings, addons] = await Promise.all([
       prisma.pizzaSize.findMany({ orderBy: { displayOrder: "asc" } }),
       prisma.pizzaCrust.findMany({ orderBy: { displayOrder: "asc" } }),
-      prisma.pizzaSauce.findMany({ orderBy: { displayOrder: "asc" } }),
-      prisma.pizzaTopping.findMany({ where: { isAvailable: true } }),
+      prisma.pizzaSauce.findMany({
+        orderBy: { displayOrder: "asc" },
+        include: { sizePrices: { select: { sizeId: true, price: true } } },
+      }),
+      prisma.pizzaTopping.findMany({
+        where: { isAvailable: true },
+        include: { sizePrices: { select: { sizeId: true, price: true } } },
+      }),
       prisma.pizzaAddon.findMany({ where: { isAvailable: true } }),
     ]);
 

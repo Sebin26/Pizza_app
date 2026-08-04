@@ -7,6 +7,11 @@ export interface Category {
   items?: MenuItem[];
 }
 
+export interface SizePrice {
+  sizeId: string;
+  price: number;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -18,6 +23,8 @@ export interface MenuItem {
   isAvailable: boolean;
   categoryId: string;
   availableFor: ("DINE_IN" | "PICKUP" | "DELIVERY")[];
+  /** Per-size prices from MenuItemSizePrice; present when fetched with sizePrices include */
+  sizePrices?: SizePrice[];
 }
 
 export interface PizzaSize {
@@ -40,6 +47,8 @@ export interface PizzaSauce {
   name: string;
   price: number;
   displayOrder: number;
+  /** Per-size prices from SauceSizePrice; present when fetched with sizePrices include */
+  sizePrices?: SizePrice[];
 }
 
 export interface PizzaTopping {
@@ -49,6 +58,8 @@ export interface PizzaTopping {
   isVegetarian: boolean;
   isVegan: boolean;
   isAvailable: boolean;
+  /** Per-size prices from ToppingSizePrice; present when fetched with sizePrices include */
+  sizePrices?: SizePrice[];
 }
 
 export interface PizzaAddon {
