@@ -82,6 +82,31 @@ const SIZES = [
 // wrapped safely so it never crashes the script if they don't exist or
 // are still referenced by old order data.
 const OLD_SIZE_NAMES = ['Personal (8")', "Medium (12\")", 'Large (16")', "Personal", "Large"];
+const OLD_MENU_ITEM_SLUGS = [
+  "margherita-pizza", "pepperoni-feast", "garden-veggie-pizza",
+  "bbq-chicken-supreme", "hawaiian-wave-pizza",
+  "garlic-breadsticks", "cheesy-garlic-bread", "chicken-wings-8pcs", "french-fries",
+  "coca-cola-can", "diet-coke-can", "sprite-can", "bottled-water",
+  "chocolate-lava-cake", "cinnamon-pull-aparts", "ny-style-cheesecake-slice",
+];
+const OLD_ADDON_NAMES = [
+  "Garlic Dipping Sauce", "Ranch Cup", "Marinara Dipping Sauce",
+  "Red Pepper Flakes Packet", "Parmesan Cheese Packet",
+];
+
+// Only the ones that DIDN'T name-collide with real menu toppings (those got
+// auto-updated in place by the real seed's upsert-by-name, no action needed)
+const OLD_TOPPING_NAMES = [
+  "Extra Mozzarella", "Feta Cheese", "Smoked Ham", "Crispy Bacon",
+  "Jalapeños", "Sweet Pineapple", "Fresh Basil",
+];
+
+const OLD_SAUCE_NAMES = ["Classic Tomato", "Smoky BBQ", "Creamy White Garlic", "Spicy Buffalo"];
+const OLD_CRUST_NAMES = ["Classic Hand-Tossed", "Thin & Crispy", "Deep Dish Pan", "Cheese-Stuffed Crust"];
+
+// "sides" and "desserts" slugs are REUSED by the real menu's categories -
+// those get updated in place, not deleted. Only these two are truly orphaned.
+const OLD_CATEGORY_SLUGS = ["pizzas", "drinks"];
 
 // ---------- Crusts (no price difference in source doc) ----------
 const CRUSTS = ["Regular", "Traditional", "Regular Thin"];
@@ -336,6 +361,18 @@ const GOURMET_PIZZAS: PizzaDef[] = [
 
 async function main() {
   console.log("Seeding real D Town Pizza menu...\n");
+
+if (process.env.ALLOW_ORDER_WIPE === "true") {
+  await prisma.orderItemTopping.deleteMany();
+  await prisma.orderItemAddon.deleteMany();
+  await prisma.orderItemCustomization.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  console.log("Cleared test order data.\n");
+} else {
+  console.log("Skipped order wipe (set ALLOW_ORDER_WIPE=true to enable locally).\n");
+}
+
 
   // ---------- Categories ----------
   const categoryMap = new Map<string, string>();
@@ -786,6 +823,73 @@ async function main() {
   }
   console.log(`Beverages: ${beverages.length} upserted.`);
 
+
+
+  // ---------- Cleanup: remove old placeholder data by name ----------
+  console.log("\nCleaning up old placeholder data...");
+
+  for (const slug of OLD_MENU_ITEM_SLUGS) {
+    const existing = await prisma.menuItem.findUnique({ where: { slug } });
+    if (existing) {
+      await prisma.menuItem.delete({ where: { id: existing.id } });
+      console.log(`  Removed old menu item: "${existing.name}"`);
+    }
+  }
+
+  for (const name of OLD_TOPPING_NAMES) {
+    const existing = await prisma.pizzaTopping.findUnique({ where: { name } });
+    if (existing) {
+      await prisma.pizzaTopping.delete({ where: { id: existing.id } });
+      console.log(`  Removed old topping: "${name}"`);
+    }
+  }
+
+  for (const name of OLD_ADDON_NAMES) {
+    const existing = await prisma.pizzaAddon.findUnique({ where: { name } });
+    if (existing) {
+      await prisma.pizzaAddon.delete({ where: { id: existing.id } });
+      console.log(`  Removed old addon: "${name}"`);
+    }
+  }
+
+  for (const name of OLD_SAUCE_NAMES) {
+    try {
+      const existing = await prisma.pizzaSauce.findUnique({ where: { name } });
+      if (existing) {
+        await prisma.pizzaSauce.delete({ where: { id: existing.id } });
+        console.log(`  Removed old sauce: "${name}"`);
+      }
+    } catch {
+      console.warn(`  Could not remove old sauce "${name}" (referenced by existing orders) - leaving in place, please review manually.`);
+    }
+  }
+
+  for (const name of OLD_CRUST_NAMES) {
+    try {
+      const existing = await prisma.pizzaCrust.findUnique({ where: { name } });
+      if (existing) {
+        await prisma.pizzaCrust.delete({ where: { id: existing.id } });
+        console.log(`  Removed old crust: "${name}"`);
+      }
+    } catch {
+      console.warn(`  Could not remove old crust "${name}" (referenced by existing orders) - leaving in place, please review manually.`);
+    }
+  }
+
+  // Categories: only delete if now empty (their items were just cleaned up above)
+  for (const slug of OLD_CATEGORY_SLUGS) {
+    try {
+      const cat = await prisma.category.findUnique({ where: { slug }, include: { items: true } });
+      if (cat && cat.items.length === 0) {
+        await prisma.category.delete({ where: { id: cat.id } });
+        console.log(`  Removed old category: "${cat.name}"`);
+      } else if (cat) {
+        console.warn(`  Category "${cat.name}" still has ${cat.items.length} item(s) - not removed.`);
+      }
+    } catch (e) {
+      console.warn(`  Skipped cleanup for category slug "${slug}":`, e);
+    }
+  }
   console.log("\n✅ Real menu seed complete.");
   console.log("⚠️  Please review the ASSUMPTIONS block at the top of this file -");
   console.log("   several ambiguous pricing decisions were made and flagged there.");

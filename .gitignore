@@ -50,4 +50,5 @@ next-env.d.ts
 .agents/
 skills-lock.json
 
-
+# database dumps
+*.sql
