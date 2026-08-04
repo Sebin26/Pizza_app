@@ -8,14 +8,51 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique
+  id           String     @id @default(uuid())
+  username     String     @unique
   passwordHash String
   name         String
   role         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
+
+model Customer {
+  id           String     @id @default(uuid())
+  phone        String     @unique
+  name         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  addresses    Address[] 
+  orders       Order[]
+}
+
+model Address {
+  id           String     @id @default(uuid())
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  label        String?
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  postcode     String?
+  landmark     String?
+  latitude     Float?
+  longitude    Float?
+  isDefault    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+}
+
+model OtpCode {
+  id          String      @id @default(uuid())
+  phone       String
+  code        String
+  expiresAt   DateTime
+  verified    Boolean     @default(false)
+  attempts    Int         @default(0)
+  createdAt   DateTime    @default(now())
+}
+
 
 model Category {
   id           String     @id @default(uuid())
@@ -105,6 +142,8 @@ model Order {
   fulfillmentType  FulfillmentType @default(DINE_IN)
   status           OrderStatus     @default(RECEIVED)
   delivery         Delivery?
+  customerId       String?
+  customer         Customer?       @relation(fields: [customerId], references: [id])
   items            OrderItem[]
 }
 

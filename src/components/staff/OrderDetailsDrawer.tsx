@@ -71,8 +71,7 @@ export default function OrderDetailsDrawer({
           { label: "Departed for Delivery", time: formatTimestamp(order.delivery?.departedAt) },
           { label: "Delivered", time: formatTimestamp(order.delivery?.deliveredAt) },
         ]
-      : []),
-    { label: "Completed", time: formatTimestamp(order.completedAt) },
+      : [{ label: "Completed", time: formatTimestamp(order.completedAt) }]),
   ].filter((e) => e.time !== null);
 
   return (

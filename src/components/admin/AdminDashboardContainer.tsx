@@ -20,6 +20,11 @@ import {
   Truck,
 } from "lucide-react";
 import DriverManagement from "./DriverManagement";
+import SalesChart from "./SalesChart";
+import DeliveryAnalyticsCard from "./DeliveryAnalyticsCard";
+import FulfillmentBreakdownCard from "./FulfillmentBreakdownCard";
+import KitchenStatusCard from "./KitchenStatusCard";
+import RecentActivityFeed from "./RecentActivityFeed";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Category,
@@ -501,8 +506,8 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
               ))}
             </div>
 
-            {/* Popular and Live info grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+            {/* First Row: Top Selling Items | Sales Chart | Kitchen Status */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
               {/* Popular Items Panel */}
               <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 flex flex-col gap-4">
                 <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Top 5 Gourmet Items</h3>
@@ -527,20 +532,18 @@ export default function AdminDashboardContainer({ user, initialData }: AdminDash
                 </div>
               </div>
 
-              {/* Prep logic quick info card */}
-              <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-dark/5 border-l-4 border-l-brand-primary flex flex-col gap-3 justify-center">
-                <h3 className="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Branch Prep Engine</h3>
-                <div className="text-xs text-brand-dark/65 flex flex-col gap-2 leading-relaxed">
-                  <p>Prep time is computed dynamically based on cooking orders in queue:</p>
-                  <ul className="list-disc pl-4 flex flex-col gap-1 font-bold text-brand-dark/80">
-                    <li>Base Prep Time: 15 minutes</li>
-                    <li>Increments: +5 minutes per pending order</li>
-                  </ul>
-                  <p className="mt-2 text-brand-dark/50">
-                    Use this center to manage categories, menu listings, customizer parameters, and staff dashboard credentials.
-                  </p>
-                </div>
-              </div>
+              {/* Sales Chart */}
+              <SalesChart />
+
+              {/* Kitchen Status Card (Replaces Branch Prep Engine) */}
+              <KitchenStatusCard />
+            </div>
+
+            {/* Second Row: Fulfillment Breakdown | Delivery Analytics | Recent Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <FulfillmentBreakdownCard />
+              <DeliveryAnalyticsCard />
+              <RecentActivityFeed />
             </div>
           </div>
         )}
