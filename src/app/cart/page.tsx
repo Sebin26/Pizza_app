@@ -30,6 +30,10 @@ export default function CartPage() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [fulfillmentType, setFulfillmentType] = useState<"DINE_IN" | "PICKUP" | "DELIVERY">("DINE_IN");
 
+  const restrictedItems = cart.filter(
+    (item) => !item.menuItem.availableFor.includes(fulfillmentType)
+  );
+
   // Delivery form state
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
@@ -91,6 +95,17 @@ export default function CartPage() {
 
     if (!customerName.trim()) {
       setErrorMsg("Please enter your name to place the order.");
+      return;
+    }
+
+    if (restrictedItems.length > 0) {
+      setErrorMsg(
+        `${restrictedItems.map((i) => i.menuItem.name).join(", ")} ${
+          restrictedItems.length > 1 ? "aren't" : "isn't"
+        } available for ${fulfillmentType.replace("_", " ").toLowerCase()}. Remove ${
+          restrictedItems.length > 1 ? "them" : "it"
+        } to continue.`
+      );
       return;
     }
 
@@ -450,6 +465,25 @@ export default function CartPage() {
                 )}
               </div>
 
+              {restrictedItems.length > 0 && (
+                <div className="p-3 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-xs font-bold text-brand-primary flex flex-col gap-2">
+                  <span>
+                    {restrictedItems.map((i) => i.menuItem.name).join(", ")} can't be ordered for{" "}
+                    {fulfillmentType.replace("_", " ").toLowerCase()}.
+                  </span>
+                  {restrictedItems.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => removeFromCart(item.id)}
+                      className="self-start underline hover:no-underline"
+                    >
+                      Remove {item.menuItem.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Basic Details */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="customer-name" className="text-xs font-bold text-brand-dark/70">
@@ -554,7 +588,7 @@ export default function CartPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || restrictedItems.length > 0}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white font-extrabold text-[15px] shadow-md shadow-brand-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-99"
               >
                 {isSubmitting ? (

@@ -66,19 +66,21 @@ model Category {
 }
 
 model MenuItem {
-  id          String      @id @default(uuid())
-  name        String
-  slug        String      @unique
-  description String?
-  basePrice   Float
-  imageUrl    String?
-  isPizza     Boolean     @default(false)
-  isAvailable Boolean     @default(true)
-  categoryId  String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems  OrderItem[]
+  id            String      @id @default(uuid())
+  name          String
+  slug          String      @unique
+  description   String?
+  basePrice     Float
+  imageUrl      String?
+  isPizza       Boolean     @default(false)
+  isAvailable   Boolean     @default(true)
+  categoryId    String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sizePrices    MenuItemSizePrice[]
+  availableFor  FulfillmentType[] @default([DINE_IN, PICKUP, DELIVERY])
+  orderItems    OrderItem[]
 }
 
 model PizzaSize {
@@ -87,6 +89,9 @@ model PizzaSize {
   priceFactor    Float                    @default(1.0)
   priceAdd       Float                    @default(0.0)
   displayOrder   Int                      @default(0)
+  menuItemPrices MenuItemSizePrice[]
+  toppingPrices  ToppingSizePrice[]
+  saucePrices    SauceSizePrice[]
   customizations OrderItemCustomization[]
 }
 
@@ -103,6 +108,7 @@ model PizzaSauce {
   name           String                   @unique
   price          Float                    @default(0.0)
   displayOrder   Int                      @default(0)
+  sizePrices     SauceSizePrice[]
   customizations OrderItemCustomization[]
 }
 
@@ -113,6 +119,7 @@ model PizzaTopping {
   isVegetarian  Boolean            @default(false)
   isVegan       Boolean            @default(false)
   isAvailable   Boolean            @default(true)
+  sizePrices    ToppingSizePrice[]
   orderToppings OrderItemTopping[]
 }
 
@@ -122,6 +129,36 @@ model PizzaAddon {
   price       Float            @default(0.0)
   isAvailable Boolean          @default(true)
   orderAddons OrderItemAddon[]
+}
+
+model MenuItemSizePrice {
+  id         String    @id @default(uuid())
+  menuItemId String
+  menuItem   MenuItem  @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  sizeId     String
+  size       PizzaSize @relation(fields: [sizeId], references: [id])
+  price      Float
+  @@unique([menuItemId, sizeId])
+}
+
+model ToppingSizePrice {
+  id        String       @id @default(uuid())
+  toppingId String
+  topping   PizzaTopping @relation(fields: [toppingId], references: [id], onDelete: Cascade)
+  sizeId    String
+  size      PizzaSize    @relation(fields: [sizeId], references: [id])
+  price     Float
+  @@unique([toppingId, sizeId])
+}
+
+model SauceSizePrice {
+  id      String     @id @default(uuid())
+  sauceId String
+  sauce   PizzaSauce @relation(fields: [sauceId], references: [id], onDelete: Cascade)
+  sizeId  String
+  size    PizzaSize  @relation(fields: [sizeId], references: [id])
+  price   Float
+  @@unique([sauceId, sizeId])
 }
 
 model Order {
