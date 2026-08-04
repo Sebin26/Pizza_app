@@ -24,12 +24,12 @@ export default function SideDrawer({ open, onClose }: { open: boolean; onClose: 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className={`fixed inset-0 z-50`}
+          className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm`}
         >
           <motion.button
             onClick={onClose}
             aria-label="Close drawer"
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-black/0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -44,7 +44,7 @@ export default function SideDrawer({ open, onClose }: { open: boolean; onClose: 
             animate={{ x: 0 }}
             exit={{ x: -320 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="absolute left-0 top-0 h-full w-80 bg-white border-r border-brand-dark/10 shadow-2xl"
+            className="absolute left-0 top-0 h-full w-80 max-w-full min-h-screen bg-white shadow-2xl ring-1 ring-black/10 border-r border-brand-dark/10"
           >
             <div className="p-4 border-b border-brand-dark/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
