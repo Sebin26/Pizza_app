@@ -51,7 +51,8 @@ export default function Footer() {
             <h4 className="text-[21px] font-black uppercase tracking-wider text-brand-primary">Explore</h4>
             <ul className="flex flex-col gap-3.5 text-[15px] font-bold tracking-wider text-white/70">
               <li><Link href="/?order=true" className="hover:text-white transition-colors duration-150 uppercase">Menu Catalog</Link></li>
-              <li><Link href="/builder" className="hover:text-white transition-colors duration-150 uppercase">Pizza Customizer</Link></li>
+              <li><Link href="/story" className="hover:text-white transition-colors duration-150 uppercase">Our Story</Link></li>
+              <li><Link href="/support" className="hover:text-white transition-colors duration-150 uppercase">Support</Link></li>
               <li><Link href="/cart" className="hover:text-white transition-colors duration-150 uppercase">My Cart</Link></li>
             </ul>
           </div>

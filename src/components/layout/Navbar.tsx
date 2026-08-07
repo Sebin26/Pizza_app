@@ -38,10 +38,16 @@ export default function Navbar() {
             Menu
           </Link>
           <Link 
-            href="/builder" 
+            href="/story" 
             className="text-base font-bold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
           >
-            Pizza Customizer
+            Our Story
+          </Link>
+          <Link 
+            href="/support" 
+            className="text-base font-bold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
+          >
+            Support
           </Link>
         </nav>
 
@@ -105,11 +111,18 @@ export default function Navbar() {
                 Menu
               </Link>
               <Link 
-                href="/builder" 
+                href="/story" 
                 onClick={() => setIsOpen(false)}
                 className="text-lg font-bold text-brand-dark/70 hover:text-brand-primary py-1.5 transition-colors duration-200"
               >
-                Pizza Customizer
+                Our Story
+              </Link>
+              <Link 
+                href="/support" 
+                onClick={() => setIsOpen(false)}
+                className="text-lg font-bold text-brand-dark/70 hover:text-brand-primary py-1.5 transition-colors duration-200"
+              >
+                Support
               </Link>
             </nav>
           </motion.div>

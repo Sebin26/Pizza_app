@@ -97,18 +97,26 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
     }
   };
 
-  const categoriesFiltered = initialCategories.map((cat) => {
-    const items = cat.items || [];
-    const filteredItems = items.filter((item) => {
-      const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchSearch;
-    });
-    return { ...cat, items: filteredItems };
-  });
+  const isSearching = searchQuery.trim().length > 0;
 
-  const activeCategoryData = categoriesFiltered.find((c) => c.slug === activeCategory);
-  const activeItems = activeCategoryData?.items || [];
+  // Global search across ALL categories when search query is active
+  const allMenuItems = initialCategories.flatMap((cat) => cat.items || []);
+  const searchResults = isSearching
+    ? allMenuItems.filter((item) => {
+        const q = searchQuery.toLowerCase().trim();
+        return (
+          item.name.toLowerCase().includes(q) ||
+          (item.description && item.description.toLowerCase().includes(q))
+        );
+      })
+    : [];
+
+  // Standard category filtering when search box is empty
+  const activeCategoryData = initialCategories.find((c) => c.slug === activeCategory);
+  const categoryItems = activeCategoryData?.items || [];
+
+  // Search results take precedence over category tabs
+  const activeItems = isSearching ? searchResults : categoryItems;
 
   // Helper to get category icons
   const getCategoryIcon = (slug: string) => {
@@ -167,7 +175,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
         {/* Categories Tab selector */}
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto scrollbar-none py-1">
           {initialCategories.map((cat) => {
-            const isActive = activeCategory === cat.slug;
+            const isActive = !isSearching && activeCategory === cat.slug;
             return (
               <button
                 key={cat.id}
@@ -175,7 +183,7 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
                 className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-base font-extrabold whitespace-nowrap transition-[color] duration-200 ease-out active:scale-[0.97] cursor-pointer ${
                   isActive
                     ? "text-white"
-                    : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/90 hover:text-brand-dark"
+                    : "bg-brand-light text-brand-dark/70 hover:bg-brand-light/90 hover:text-brand-dark opacity-90"
                 }`}
               >
                 {isActive && (
@@ -197,6 +205,20 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
 
       {/* Menu Grid Section */}
       <section className="min-h-75">
+        {isSearching && (
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-brand-primary/10 border border-brand-primary/20 p-4 sm:px-6 rounded-2xl">
+            <div className="flex items-center gap-2 text-brand-dark">
+              <span className="font-extrabold text-base sm:text-lg">Global Search Results for &ldquo;{searchQuery}&rdquo;</span>
+              <span className="text-xs sm:text-sm text-brand-dark/70 font-bold">({activeItems.length} {activeItems.length === 1 ? "item" : "items"} across all categories)</span>
+            </div>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="text-xs font-extrabold text-brand-primary hover:underline cursor-pointer"
+            >
+              Clear Search
+            </button>
+          </div>
+        )}
         {activeItems.length > 0 ? (
           <motion.div 
             layout
