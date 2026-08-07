@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, Flame, Menu, X } from "lucide-react";
+import { ShoppingCart, Flame, Menu, X, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SideDrawer from "./SideDrawer";
 
@@ -69,8 +69,8 @@ export default function Navbar() {
             className="flex items-center justify-center w-11 h-11 rounded-full bg-brand-light hover:bg-brand-light/95 border border-brand-dark/5 text-brand-dark focus:outline-none active:scale-[0.9] transition-transform duration-100 cursor-pointer"
             aria-label="Open account drawer"
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden">
-              <img src="/img/avatar-placeholder.png" alt="avatar" className="w-full h-full object-cover" />
+            <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-brand-dark/5">
+              <User className="w-5 h-5 text-brand-dark/75" />
             </div>
           </button>
 

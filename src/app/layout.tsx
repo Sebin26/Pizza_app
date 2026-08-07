@@ -24,13 +24,16 @@ export default function RootLayout({
             <div className="relative min-h-screen" style={{ display: "flex", flexDirection: "column" }}>
               {/* Crisp white base background */}
               <div className="fixed inset-0 -z-20 bg-white pointer-events-none" />
-              {/* Black & White pizza pattern overlay */}
+              {/* Black & White pizza pattern overlay with radial mask fade */}
               <div
-                className="fixed inset-0 -z-10 opacity-10 mix-blend-multiply bg-repeat pointer-events-none grayscale"
+                className="fixed inset-0 -z-10 mix-blend-multiply bg-repeat pointer-events-none grayscale"
                 style={{
                   backgroundImage: "url('/patterns/pizza-pattern.jpeg')",
                   backgroundSize: "380px",
+                  opacity: 0.08,
                   filter: "grayscale(100%)",
+                  WebkitMaskImage: "radial-gradient(circle at center, black 40%, transparent 90%)",
+                  maskImage: "radial-gradient(circle at center, black 40%, transparent 90%)",
                 }}
               />
               <Navbar />
