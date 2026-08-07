@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
-import { Category, MenuItem, CartCustomization } from "@/types";
+import { Category, MenuItem, PizzaConfig } from "@/types";
 import { Search, ShoppingBag, Plus, Minus, Info, Flame, Wine, Cake, Disc } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { buildDefaultPizzaCustomization } from "@/utils/cart";
 
 interface MenuContainerProps {
   initialCategories: Category[];
@@ -27,6 +28,24 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
+  const [pizzaConfig, setPizzaConfig] = useState<PizzaConfig | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/pizza-config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active) return;
+        setPizzaConfig(data);
+      })
+      .catch(() => {
+        if (active) setPizzaConfig(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleOpenQuantity = (item: MenuItem) => {
     setSelectedItem(item);
@@ -39,25 +58,8 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
     }
   };
 
-  const getDefaultPizzaCustomization = (menuItem: MenuItem): CartCustomization | undefined => {
-    if (!menuItem.isPizza || !menuItem.sizePrices?.length) return undefined;
-    const firstSize = menuItem.sizePrices[0];
-    if (firstSize.size) {
-      return { size: firstSize.size };
-    }
-    return {
-      size: {
-        id: firstSize.sizeId,
-        name: "Regular",
-        priceFactor: 1,
-        priceAdd: 0,
-        displayOrder: 0,
-      },
-    };
-  };
-
   const handleAddPizzaDirect = (item: MenuItem) => {
-    const customization = getDefaultPizzaCustomization(item);
+    const customization = buildDefaultPizzaCustomization(item, pizzaConfig ?? undefined);
     addToCart(item, 1, customization);
     push(`${item.name} added to cart`, "success");
   };
@@ -84,8 +86,11 @@ export default function MenuContainer({ initialCategories }: MenuContainerProps)
         : undefined);
 
       const customization = selectedSizeObj
-        ? { size: selectedSizeObj }
-        : undefined;
+        ? {
+            ...buildDefaultPizzaCustomization(selectedItem, pizzaConfig ?? undefined),
+            size: selectedSizeObj,
+          }
+        : buildDefaultPizzaCustomization(selectedItem, pizzaConfig ?? undefined);
 
       addToCart(selectedItem, quantity, customization, notes);
       handleCloseQuantity();

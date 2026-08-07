@@ -1,13 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { MenuItem, CartCustomization } from "@/types";
+import { MenuItem, PizzaConfig } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { buildDefaultPizzaCustomization } from "@/utils/cart";
 
 interface FeaturedPizzaShowcaseProps {
   featuredPizzas: MenuItem[];
@@ -74,29 +75,30 @@ const ACCENT_PHRASES = [
   "Handcrafted Daily",
 ];
 
-function getDefaultPizzaCustomization(menuItem: MenuItem): CartCustomization | undefined {
-  if (!menuItem.isPizza || !menuItem.sizePrices?.length) return undefined;
-  const firstSize = menuItem.sizePrices[0];
-  if (firstSize.size) {
-    return { size: firstSize.size };
-  }
-  return {
-    size: {
-      id: firstSize.sizeId,
-      name: "Regular",
-      priceFactor: 1,
-      priceAdd: 0,
-      displayOrder: 0,
-    },
-  };
-}
-
 export default function FeaturedPizzaShowcase({ featuredPizzas }: FeaturedPizzaShowcaseProps) {
   const { addToCart } = useCart();
   const { push } = useToast();
+  const [pizzaConfig, setPizzaConfig] = useState<PizzaConfig | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/pizza-config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active) return;
+        setPizzaConfig(data);
+      })
+      .catch(() => {
+        if (active) setPizzaConfig(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleAdd = (item: MenuItem) => {
-    const customization = getDefaultPizzaCustomization(item);
+    const customization = buildDefaultPizzaCustomization(item, pizzaConfig ?? undefined);
     addToCart(item, 1, customization);
     push(`${item.name} added to cart`, "success");
   };

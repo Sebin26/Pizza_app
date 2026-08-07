@@ -1,4 +1,62 @@
-import { CartCustomization, CartItem, MenuItem } from "@/types";
+import { CartCustomization, CartItem, MenuItem, PizzaConfig } from "@/types";
+
+function createFallbackPizzaSize(menuItem: MenuItem) {
+  if (menuItem.sizePrices?.length) {
+    const firstSize = menuItem.sizePrices[0];
+    if (firstSize.size) {
+      return firstSize.size;
+    }
+    return {
+      id: firstSize.sizeId,
+      name: "Regular",
+      priceFactor: 1,
+      priceAdd: 0,
+      displayOrder: 0,
+    };
+  }
+
+  return {
+    id: "default-size",
+    name: "Regular",
+    priceFactor: 1,
+    priceAdd: 0,
+    displayOrder: 0,
+  };
+}
+
+function createFallbackPizzaCrust() {
+  return {
+    id: "default-crust",
+    name: "Classic",
+    price: 0,
+    displayOrder: 0,
+  };
+}
+
+function createFallbackPizzaSauce() {
+  return {
+    id: "default-sauce",
+    name: "Tomato",
+    price: 0,
+    displayOrder: 0,
+  };
+}
+
+export function buildDefaultPizzaCustomization(menuItem: MenuItem, config?: PizzaConfig): CartCustomization | undefined {
+  if (!menuItem.isPizza) return undefined;
+
+  const size = config?.sizes?.[0] ?? createFallbackPizzaSize(menuItem);
+  const crust = config?.crusts?.[0] ?? createFallbackPizzaCrust();
+  const sauce = config?.sauces?.[0] ?? createFallbackPizzaSauce();
+
+  return {
+    size,
+    crust,
+    sauce,
+    toppings: [],
+    addons: [],
+  };
+}
 
 export function getCartItemSignature(
   menuItem: MenuItem,
@@ -89,4 +147,36 @@ export function isSameCartItem(
   }
 
   return true;
+}
+
+export function addOrMergeCartItem(
+  cart: CartItem[],
+  menuItem: MenuItem,
+  quantity: number,
+  customization: CartCustomization | undefined,
+  notes: string | undefined,
+  price: number
+): CartItem[] {
+  const existingIndex = cart.findIndex((item) =>
+    isSameCartItem(item, menuItem, customization, notes)
+  );
+
+  if (existingIndex > -1) {
+    return cart.map((item, index) =>
+      index === existingIndex ? { ...item, quantity: item.quantity + quantity } : item
+    );
+  }
+
+  const uniqueId = `${menuItem.id}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  return [
+    ...cart,
+    {
+      id: uniqueId,
+      menuItem,
+      quantity,
+      customization,
+      notes,
+      price,
+    },
+  ];
 }

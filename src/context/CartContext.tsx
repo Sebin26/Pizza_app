@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useMemo, useSyncExternalStore } from "react";
 import { CartItem, CartCustomization, MenuItem } from "@/types";
-import { isSameCartItem } from "@/utils/cart";
+import { addOrMergeCartItem } from "@/utils/cart";
 
 interface CartContextType {
   cart: CartItem[];
@@ -115,32 +115,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     notes?: string
   ) => {
     const price = calculateItemPrice(menuItem, customization);
-
-    const existingIndex = cart.findIndex((item) =>
-      isSameCartItem(item, menuItem, customization, notes)
-    );
-
-    let nextCart: CartItem[];
-    if (existingIndex > -1) {
-      nextCart = [...cart];
-      nextCart[existingIndex] = {
-        ...nextCart[existingIndex],
-        quantity: nextCart[existingIndex].quantity + quantity,
-      };
-    } else {
-      const uniqueId = `${menuItem.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      nextCart = [
-        ...cart,
-        {
-          id: uniqueId,
-          menuItem,
-          quantity,
-          customization,
-          notes,
-          price,
-        },
-      ];
-    }
+    const nextCart = addOrMergeCartItem(cart, menuItem, quantity, customization, notes, price);
     saveCart(nextCart);
   };
 
