@@ -21,7 +21,18 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <ToastProvider>
-            <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+            <div className="relative min-h-screen" style={{ display: "flex", flexDirection: "column" }}>
+              {/* Crisp white base background */}
+              <div className="fixed inset-0 -z-20 bg-white pointer-events-none" />
+              {/* Black & White pizza pattern overlay */}
+              <div
+                className="fixed inset-0 -z-10 opacity-10 mix-blend-multiply bg-repeat pointer-events-none grayscale"
+                style={{
+                  backgroundImage: "url('/patterns/pizza-pattern.jpeg')",
+                  backgroundSize: "380px",
+                  filter: "grayscale(100%)",
+                }}
+              />
               <Navbar />
               <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                 {children}

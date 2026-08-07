@@ -41,7 +41,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
   };
 
   return (
-    <div className="relative min-h-screen bg-brand-cream text-brand-dark overflow-x-hidden selection:bg-brand-primary/10 selection:text-brand-primary">
+    <div className="relative min-h-screen bg-transparent text-brand-dark overflow-x-hidden selection:bg-brand-primary/10 selection:text-brand-primary">
       
       {/* Background Gradients & Ambient Blobs */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -153,7 +153,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
       </section>
 
       {/* 2. FEATURED PIZZAS SECTION */}
-      <section id="featured-pizzas" className="py-24 px-4 sm:px-6 lg:px-8 bg-white border-t border-brand-dark/5 relative z-10">
+      <section id="featured-pizzas" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent border-t border-brand-dark/5 relative z-10">
         <div className="max-w-7xl mx-auto">
           
           {/* Header */}
@@ -176,7 +176,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
       </section>
 
       {/* 3. WHY CHOOSE US SECTION */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-brand-cream border-t border-brand-dark/5 relative z-10">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent border-t border-brand-dark/5 relative z-10">
         <div className="max-w-7xl mx-auto">
               {/* Header */}
           <div className="text-center flex flex-col items-center gap-4 mb-16">
@@ -249,7 +249,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
       </section>
 
       {/* 4. CHEF STORY SECTION */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white border-t border-brand-dark/5 relative z-10">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent border-t border-brand-dark/5 relative z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left: Chef Portrait */}
@@ -314,7 +314,7 @@ export default function LandingPage({ featuredPizzas }: LandingPageProps) {
       </section>
 
       {/* 5. TESTIMONIALS SECTION (GLASSMORPHISM) */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-brand-cream border-t border-brand-dark/5 relative z-10">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent border-t border-brand-dark/5 relative z-10">
         <div className="max-w-7xl mx-auto">
           
           {/* Header */}

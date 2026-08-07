@@ -30,16 +30,16 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-9">
+        <nav className="hidden md:flex items-center gap-8">
           <Link 
             href="/?order=true" 
-            className="text-[20px] font-extrabold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
+            className="text-base font-bold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
           >
             Menu
           </Link>
           <Link 
             href="/builder" 
-            className="text-[20px] font-extrabold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
+            className="text-base font-bold tracking-tight text-brand-dark/80 hover:text-brand-primary transition-colors duration-200"
           >
             Pizza Customizer
           </Link>
