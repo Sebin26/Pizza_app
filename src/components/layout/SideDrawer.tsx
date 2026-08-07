@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import useFocusTrap from "@/hooks/useFocusTrap";
 import { useToast } from "@/context/ToastContext";
+import AddressManager from "@/components/profile/AddressManager";
 
 interface CustomerSessionCustomer {
   id: string;
@@ -27,6 +28,7 @@ export default function SideDrawer({ open, onClose }: { open: boolean; onClose: 
   const [error, setError] = useState("");
   const [customer, setCustomer] = useState<CustomerSessionState>(null);
   const [cooldown, setCooldown] = useState(0);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -251,12 +253,20 @@ export default function SideDrawer({ open, onClose }: { open: boolean; onClose: 
                   <div className="flex flex-col gap-2 rounded-xl border border-brand-dark/10 bg-brand-light/70 p-3">
                     <div className="text-sm font-bold text-brand-dark">Signed in</div>
                     <div className="text-xs text-brand-dark/70">{customer.phone}</div>
-                    <button
-                      onClick={handleLogout}
-                      className="mt-1 px-3 py-2 rounded-lg bg-white text-brand-dark font-semibold border border-brand-dark/10"
-                    >
-                      Logout
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setIsProfileOpen(true)}
+                        className="mt-1 flex-1 px-3 py-2 rounded-lg bg-white text-brand-dark font-semibold border border-brand-dark/10"
+                      >
+                        Edit Profile
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="mt-1 px-3 py-2 rounded-lg bg-white text-brand-dark font-semibold border border-brand-dark/10"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 )}
                 <nav className="flex flex-col gap-2 mt-2">
@@ -273,6 +283,8 @@ export default function SideDrawer({ open, onClose }: { open: boolean; onClose: 
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AddressManager open={isProfileOpen} onClose={() => setIsProfileOpen(false)} customer={customer} />
 
       <AnimatePresence>
         {isLoginOpen && (
