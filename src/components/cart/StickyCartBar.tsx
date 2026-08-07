@@ -23,7 +23,7 @@ export default function StickyCartBar() {
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-full max-w-3xl px-4 z-40"
       >
         <div className="bg-brand-primary text-white rounded-lg flex items-center justify-between p-3 shadow-lg">
-          <div className="font-bold">{itemCount} item{itemCount>1?"s":""} • ₹{total.toFixed(2)}</div>
+          <div className="font-bold">{itemCount} item{itemCount>1?"s":""} • ${total.toFixed(2)}</div>
           <button
             onClick={() => router.push('/cart')}
             className="bg-white text-brand-primary px-4 py-2 rounded-lg font-bold"

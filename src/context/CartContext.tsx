@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useMemo, useSyncExternalStore } from "react";
 import { CartItem, CartCustomization, MenuItem } from "@/types";
+import { isSameCartItem } from "@/utils/cart";
 
 interface CartContextType {
   cart: CartItem[];
@@ -114,36 +115,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     notes?: string
   ) => {
     const price = calculateItemPrice(menuItem, customization);
-    
-    // Check if item with same customization and notes already exists
-    const existingIndex = cart.findIndex((item) => {
-      if (item.menuItem.id !== menuItem.id) return false;
-      if (item.notes !== notes) return false;
-      
-      if (customization?.size || item.customization?.size) {
-        if (item.customization?.size?.id !== customization?.size?.id) return false;
-      }
 
-      if (menuItem.isPizza) {
-        if (!item.customization || !customization) return false;
-        
-        // Compare crust, sauce
-        if (item.customization.crust?.id !== customization.crust?.id) return false;
-        if (item.customization.sauce?.id !== customization.sauce?.id) return false;
-        
-        // Compare toppings (sort by id first)
-        const t1 = (item.customization.toppings || []).map(t => t.id).sort();
-        const t2 = (customization.toppings || []).map(t => t.id).sort();
-        if (t1.length !== t2.length || !t1.every((val, index) => val === t2[index])) return false;
-
-        // Compare addons
-        const a1 = (item.customization.addons || []).map(a => a.id).sort();
-        const a2 = (customization.addons || []).map(a => a.id).sort();
-        if (a1.length !== a2.length || !a1.every((val, index) => val === a2[index])) return false;
-      }
-      
-      return true;
-    });
+    const existingIndex = cart.findIndex((item) =>
+      isSameCartItem(item, menuItem, customization, notes)
+    );
 
     let nextCart: CartItem[];
     if (existingIndex > -1) {
